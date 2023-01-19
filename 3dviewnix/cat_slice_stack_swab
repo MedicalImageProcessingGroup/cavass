@@ -1,0 +1,29 @@
+#!/bin/sh
+
+case $# in
+  0 | 1 | 2 | 3 )
+	echo Usage: $0 header_bytes slice_bytes input_files output_file
+	;;
+
+  * )
+	lastarg=`argsafter $# $*`
+	if test $1 = _
+	then
+		for file in $*
+		do
+			if test $file != $1 -a $file != $2 -a $file != $lastarg
+			then
+				fcut $2 $2 $file -e | dd conv=swab >> $lastarg
+			fi
+		done
+	else
+		for file in $*
+		do
+			if test $file != $1 -a $file != $2 -a $file != $lastarg
+			then
+				fcut $1 $2 < $file | dd conv=swab >> $lastarg
+			fi
+		done
+	fi
+	;;
+esac

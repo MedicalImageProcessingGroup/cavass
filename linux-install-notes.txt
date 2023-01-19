@@ -1,0 +1,64 @@
+We are primarily using CAVASS under Ubuntu Linux.  Here are the steps we 
+follow to install it.  The procedure will most likely be somewhat different 
+on other Linux/Unix systems.
+
+You need to install Gnome development software and cmake.
+  Under Ubuntu:
+  sudo apt install libgtk2.0-dev
+
+  Under OpenSUSE:
+  Use the Software Management tool. You can find it in the Control Center 
+  (YaST).  Search for gtk2-devel.  Check the box and apply the change.  The 
+  rest of the Gnome development software (cc, c++, make), if it doesn't come 
+  with gtk2-devel.
+
+You also need to install wxWidgets:
+go to wxwidgets.org, download wxWidgets-3.0.5.tar.bz2,
+tar xjf wxWidgets-3.0.5.tar.bz2
+cd wxWidgets-3.0.5
+mkdir buildgtk
+cd buildgtk
+../configure --with-gtk
+make
+[wait]
+sudo make install
+[enter password]
+sudo /sbin/ldconfig
+
+You may optionally install ITK:
+go to http://www.itk.org/ITK/resources/software.html, download InsightToolkit-5.1.2.tar.gz,
+mkdir itk
+cd itk
+ccmake ../InsightToolkit-5.1.2
+c [configure]
+go down to BUILD_TESTING, if OFF enter to turn ON
+c [configure]
+e [exit help]
+g [generate and exit]
+make
+[wait]
+
+Then you install CAVASS:
+tar xzf cavass-src-1_0_29.tgz
+mkdir cavass-build
+cd cavass-build
+ccmake ../cavass
+c [configure]
+e [exit help, if no ITK]
+go down to CMAKE_BUILD_TYPE, enter, type "Release", enter
+c [configure]
+e [exit help, if no ITK]
+g [generate and exit]
+make
+[wait]
+in /etc/profile.local put the commands:
+
+VIEWNIX_ENV=~/cavass-build
+PATH=$PATH:~/cavass-build
+export PATH VIEWNIX_ENV
+
+but instead of ~ put the directory where cavass-build is.  Those commands will 
+take effect on your next login.
+
+You may have to change your appearance settings for GTK2 applications to make
+the button labels readable.

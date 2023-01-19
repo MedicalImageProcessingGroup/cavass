@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<title>Saving a data image file</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<link rel="stylesheet" href="tutorial.css" type="text/css">
+<script src="scripts.js" language="JavaScript1.2"></script><script src="tutorial.js" language="JavaScript1.2"></script><script src="size.js" language="JavaScript1.2"></script>
+
+<link href="tutorial.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body onLoad="MM_preloadImages('Graphics/gold_top_bar_digitalmedia.gif')">
+<table align="center" width="554" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><img src="Graphics/gold_top_bar_digitalmedia.gif" width="554" height="34" border="0" usemap="#Map"></td>
+  </tr>
+</table>
+<table id="mainTable2" align="center" width="554" cellspacing="0" cellpadding="0">
+<tr>
+    <td colspan="6" class="topicTitle">Converting rectangular grid image data into CAVASS</td>
+  </tr>
+<tr>
+<td colspan="1" width="30" valign="top"></td>
+<td colspan="5" valign="top"> <p align="left" class="topicText">The purpose of this command is to convert any input file containing a scene or a binary scene, which is stored as a rectangular matrix in a row-by-row, slice-by-slice, volume-by-volume form into an IM0 or BIM file in the generalized ACR-NEMA format of CAVASS. <br>
+Clicking on the EasyHeader tab sets up several tablets in the image window, each corresponding to a particular data description entry.<br>
+The names of the input file and output file should be typed in (along with the extensions) in the tablets labeled InputFile and OutputFile respectively.<br>
+Skip is used for indicating the number of slices in the input file that will be skipped before commencing transfer of data to output.<br>
+Specify the total number of slices that will be transferred to the output file in the Slices tablet.<br>
+Incr can be used to specify how far the next slice is to be transferred from the current slice.<br>
+Other aspects of the header, like, scene size, pixel size etc., can be altered too depending on the need.<br>
+    </p>
+
+
+    </td>
+
+  </tr>
+<tr>
+    <td colspan="3" bordercolor="#666666" bgcolor="#666666" class="tipsHeader">&nbsp;</td>
+    <td width="487" colspan="3" bordercolor="#666666" bgcolor="#666666">&nbsp;&nbsp;<span class="stepsHeader">Step-by-step</span></td>
+  </tr>
+  <tr>
+<td colspan="3" valign="top"><ul>
+      <br>
+    </ul></td>
+
+
+    <td colspan="3" valign="top"><p><br>
+      The Hdr switch has two options CAVASS and OTHER. Select CAVASS if the input file is in CAVASS format, else choose OTHER.<br>
+      Clicking on the ReadHdr button automatically populates the various tablets with the header information of the input file, and the information can then be altered.<br>
+      CpyInputHdr allows copying the entire input file header directly to the output file.<br>
+      Click on SaveNewHdr to save all the header information that is created in the image window, into the output file.<br>
+      Once SaveNewHdr has been clicked on SaveData should be clicked on. This action will transfer the data from the input file to the output file. This option should always be selected after clicking on SaveNewHdr in order to save the data properly.<br>
+      Clicking on SaveModHdr allows replacing the values in the appropriate sections in the input CAVASS file header by the values currently defined in the image window and writing this header to the output file. This option should always be selected prior to the SaveData option.</p>
+    <br></td>
+  </tr>
+</table>
+
+
+
+<table align="center" width="554" border="0" cellspacing="0" cellpadding="0">
+  <tr>
+    <td><a href="http://www.sonic.com" target="_blank"><img src="Graphics/bottom_bar_mipg.gif" width="90" height="34" border="0"></a></td>
+    <td><img src="Graphics/bottom_bar_right_side.gif" width="464" height="34"></td>
+  </tr>
+</table>
+<map name="Map"><area shape="rect" coords="426,5,534,28" href="http://www.sonic.com" target="_blank" alt="www.sonic.com">
+</map>
+<br><table align="center" width="554" border="0" cellspacing="0" cellpadding="0"><tr><td><p class="topicText" align="right">&copy; 2008 Medical Image Processing Group. All Rights Reserved.</p></td></tr></table></body>
+
+</html>
