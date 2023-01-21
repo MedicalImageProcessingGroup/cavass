@@ -6,4 +6,6 @@
 *.lib
 *.dll
 *.so
+.idea/
+cmake-build-debug/
 

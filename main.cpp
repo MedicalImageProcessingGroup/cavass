@@ -123,28 +123,33 @@ void addToAllWindowMenus ( wxString s ) {
     assert( ::gNextWindowID <= MainFrame::ID_LAST_DYNAMIC_WINDOW_MENU );
 }
 //----------------------------------------------------------------------
+/**
+  This function iterates over the window frame list (gFrameList) and
+  removes the specified string s from the Window menu in each frame.
+ */
 void removeFromAllWindowMenus ( wxString s ) {
-    for (int i=0; i<(int)::gFrameList.size(); i++) {
-        if (MontageFrame*  temp = dynamic_cast<MontageFrame*>(::gFrameList[i])) {
+  // This code is not only unnecessary on Mac OS Darwin arm64, it causes
+  // wxWidgets to abort on Darwin.
+  #ifndef __MACH__
+    //cout << __FILE__ << "." << __func__ << ": Removing " << s << "." << endl;
+    for (int j=0; j<(int)::gFrameList.size(); j++) {
+        if (MainFrame*  temp = dynamic_cast<MainFrame*>(::gFrameList[j])) {
+            // Funky for-loop used below just in case there are
+            // duplicates of s in the Window menu.
             for (int i=0; i<(int)temp->mWindowMenu->GetMenuItemCount(); /*unused*/) {
                 wxMenuItem*  mi = temp->mWindowMenu->FindItemByPosition( i );
-                if (mi->GetItemLabelText().Cmp(s) == 0)    temp->mWindowMenu->Remove( mi );
-                else                               ++i;
+                if (mi->GetItemLabelText().Cmp(s) == 0)
+                    temp->mWindowMenu->Remove( mi );
+                else
+                    ++i;
             }
-        } else if (OverlayFrame*  temp = dynamic_cast<OverlayFrame*>(::gFrameList[i])) {
-            for (int i=0; i<(int)temp->mWindowMenu->GetMenuItemCount(); /*unused*/) {
-                wxMenuItem*  mi = temp->mWindowMenu->FindItemByPosition( i );
-                if (mi->GetItemLabelText().Cmp(s) == 0)    temp->mWindowMenu->Remove( mi );
-                else                               ++i;
-            }
-        } else if (MainFrame*  temp = dynamic_cast<MainFrame*>(::gFrameList[i])) {
-            for (int i=0; i<(int)temp->mWindowMenu->GetMenuItemCount(); /*unused*/) {
-                wxMenuItem*  mi = temp->mWindowMenu->FindItemByPosition( i );
-                if (mi->GetItemLabelText().Cmp(s) == 0)    temp->mWindowMenu->Remove( mi );
-                else                               ++i;
-            }
+        } else {
+            //Should never get here because all windows should either be
+            // MainFrames or a subclass ofit.
+            cout << __FILE__ << "." << __func__ << ": Unrecognized window frame type." << endl;
         }
     }
+  #endif
 }
 //----------------------------------------------------------------------
 bool searchWindowTitles ( wxString s ) {
@@ -603,3 +608,4 @@ class CavassMain : public wxApp {
 // main program
 IMPLEMENT_APP( CavassMain )
 //----------------------------------------------------------------------
+

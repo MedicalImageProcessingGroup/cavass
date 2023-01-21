@@ -29,6 +29,10 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 FileHistory::FileHistory ( void ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/**
+ * Note: Suffix of /. is appended to data file names below to 
+ * distinguish them from directories.
+ */
 void FileHistory::AddFileToHistory ( const wxString& filename ) {
     int  n = GetNoHistoryFiles();
     assert( 0<=n && n<Preferences::FileCount );
@@ -36,8 +40,9 @@ void FileHistory::AddFileToHistory ( const wxString& filename ) {
     for (index=0; index<Preferences::FileCount-1 && index<n; index++)
     {
         wxString entry(Preferences::getFile( index ));
-        if (entry==filename || entry==filename+"/.")
-            break;
+        //if (entry==filename || entry==filename+"/.")    break;
+        if (entry.Cmp(filename) == 0)         break;
+        if (entry.Cmp(filename+"/.") == 0)    break;
     }
     while (index > 0)
     {
@@ -47,6 +52,7 @@ void FileHistory::AddFileToHistory ( const wxString& filename ) {
         index--;
     }
     Preferences::setFile( 0, filename+"/." );
+    //Preferences::setFile( 0, filename );
 
     wxString  path, name, ext;
     wxFileName::SplitPath( filename, &path, &name, &ext );

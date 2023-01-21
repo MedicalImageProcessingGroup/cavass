@@ -44,7 +44,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include <string.h>
 #include <time.h>
 
-#if defined (WIN32) || defined (_WIN32)
+#if defined (WIN32) || defined (_WIN32) || defined (__MACH__)
 #include "Xlib.h"
 #else
 #include <X11/Xlib.h>
