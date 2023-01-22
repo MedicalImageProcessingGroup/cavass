@@ -493,6 +493,9 @@ bool InputHistoryDialog::insert ( const wxString filename, const int where ) {
 #if defined (WIN32) || defined (_WIN32)
 	struct _stat64  s;
     _stat64( filename, &s );
+#elif defined( __MACH__ )
+    struct stat  s;
+    stat( filename.c_str(), &s );
 #else
     struct stat64  s;
     stat64( filename.c_str(), &s );

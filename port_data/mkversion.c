@@ -61,7 +61,7 @@ openFile(char* filename)
 int
 main(int argc, char* argv[])
 {
-    char* versionFile = "VERSION";
+    char* versionFile = "VERSION.dat";
     char* releaseDateFile = "RELEASE-DATE";
     char* alphaFile = "dist/tiff.alpha";
     char version[128];
