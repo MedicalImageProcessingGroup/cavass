@@ -60,6 +60,19 @@ add_library( 3dviewnix  3dviewnix/LIBRARY/data_interf.c
                         3dviewnix/LIBRARY/globals.c
                         3dviewnix/LIBRARY/overlay.c
                         3dviewnix/LIBRARY/proc_interf.c )
+
+if (MSVC)
+    add_custom_command( TARGET 3dviewnix PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR}/Release )
+    add_custom_command( TARGET 3dviewnix PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR}/Debug )
+else (MSVC)
+    add_custom_command( TARGET 3dviewnix PRE_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR} )
+endif (MSVC)
 #--------------------------------------------------------------------------------
 
 #
@@ -868,31 +881,32 @@ ENDIF (ITK_FOUND)
 #--------------------------------------------------------------------------------
 # copy the 3dviewnix directory (to access configuration files) to the location of
 # the executables
+# This appears to no longer work in cmake!
 #
 if (MSVC)
     EXECUTE_PROCESS(
-        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/3dviewnix ${CAVASS_BINARY_DIR}/Release
+        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR}/Release
     )
     EXECUTE_PROCESS(
-        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/3dviewnix ${CAVASS_BINARY_DIR}/Debug
+        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR}/Debug
     )
 else (MSVC)
     EXECUTE_PROCESS(
-        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/3dviewnix ${CAVASS_BINARY_DIR}
+        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR}
     )
 endif (MSVC)
 
 #copy tutorial information
 if (MSVC)
     EXECUTE_PROCESS(
-        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials ${CAVASS_BINARY_DIR}/Release/tutorials
+        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials/ ${CAVASS_BINARY_DIR}/Release/tutorials
     )
     EXECUTE_PROCESS(
-        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials ${CAVASS_BINARY_DIR}/Debug/tutorials
+        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials/ ${CAVASS_BINARY_DIR}/Debug/tutorials
     )
 else (MSVC)
     EXECUTE_PROCESS(
-        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials ${CAVASS_BINARY_DIR}/tutorials
+        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials/ ${CAVASS_BINARY_DIR}/tutorials
     )
 endif (MSVC)
 #--------------------------------------------------------------------------------
