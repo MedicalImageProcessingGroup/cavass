@@ -69,8 +69,8 @@ ThresholdFrame::ThresholdFrame ( bool maximize, int w, int h, bool fuzzy ): Main
 
     ::gFrameList.push_back( this );
     if (!Preferences::getSingleFrameMode()) {
-        gWhere += 20;
-        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = 20;
+        gWhere += cWhereIncr;
+        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
     }
     initializeMenu();
     ::setColor( this );

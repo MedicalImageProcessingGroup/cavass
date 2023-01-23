@@ -52,8 +52,9 @@ public:
      * \param name  name associated with this reader instance
      */
     DicomInfoFrame ( DicomReader& dr, const char* const name )
-        : wxFrame( NULL, -1, _T("DICOM info"), wxPoint(5,5),
-        wxSize(400,200) )
+        : wxFrame( NULL, -1, _T("DICOM info"),
+          wxPoint(cWhereIncr+cWhereIncr/2, cWhereIncr+cWhereIncr/2),
+          wxSize(400,200) )
     {
         wxTreeCtrl*  tree = new wxTreeCtrl( this, -1, wxDefaultPosition,
             wxDefaultSize,

@@ -114,8 +114,8 @@ ExportFrame::ExportFrame ( bool maximize, int w, int h, int frame_type )
     // at a time, we need to add this window to the list.
     ::gFrameList.push_back( this );
     if (!Preferences::getSingleFrameMode()) {
-        gWhere += 20;
-        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = 20;
+        gWhere += cWhereIncr;
+        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
     }
     
     initializeMenu();

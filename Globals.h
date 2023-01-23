@@ -67,7 +67,13 @@ extern Vector            demonsInputList;
 extern wxPrintData*      g_printData;        //global print data - to remember
                                              // settings during the session
 extern wxPageSetupData*  g_pageSetupData;    //global page setup data
-extern int               gWhere;
+#ifdef __MACH__
+  #define cWhereIncr 50
+#else
+  #define cWhereIncr 25
+#endif
+
+extern int               gWhere;             //position of new window
 extern FileHistory       gInputFileHistory;  //global input file history
 extern wxFont            gDefaultFont;       //default font
 

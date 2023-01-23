@@ -77,8 +77,8 @@ MainFrame::MainFrame ( )
 {
     ::gFrameList.push_back( this );
     if (!Preferences::getSingleFrameMode()) {
-        gWhere += 20;
-        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = 20;
+        gWhere += cWhereIncr;
+        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
     }
 
     SetIcon( wxICON(cavass_icon) );  //set the icon

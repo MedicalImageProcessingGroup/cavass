@@ -136,8 +136,8 @@ EasyHeaderFrame::EasyHeaderFrame ( bool maximize, int w, int h ): MainFrame( 0 )
 
     ::gFrameList.push_back( this );
     if (!Preferences::getSingleFrameMode()) {
-        gWhere += 20;
-        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = 20;
+        gWhere += cWhereIncr;
+        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
     }
     initializeMenu();
     ::setColor( this );

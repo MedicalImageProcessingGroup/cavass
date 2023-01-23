@@ -38,7 +38,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 Vector            demonsInputList;
 wxPrintData*      g_printData = NULL;      ///< global print data - to remember settings during the session
 wxPageSetupData*  g_pageSetupData = NULL;  ///< global page setup data
-int               gWhere = 20;             ///< neext new window position
+int               gWhere = cWhereIncr;     ///< next new window position
 FileHistory       gInputFileHistory;       ///< global input file history
 wxFont            gDefaultFont;            ///< default font
 wxLogWindow*      gLogWindow = NULL;       ///< log window (if any)
@@ -469,6 +469,7 @@ unsigned char* toRGBInterpolated ( CavassData& cd, double sx, double sy ) {
 //======================================================================
 static void calledAtExit ( void ) {
 	//this is very important because it causes the write to the configuration file
+    cout << "calledAtExit" << endl;
     delete wxConfigBase::Set( (wxConfigBase*)NULL );
 }
 //======================================================================

@@ -82,8 +82,8 @@ m_AlgebraType(ALGEBRA_APLUSB)
     mDivThreControls = NULL;    
 
     ::gFrameList.push_back( this );
-    gWhere += 20;
-    if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = 20;
+    gWhere += cWhereIncr;
+    if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
     
 //    m_lastChoice = m_lastChoiceSetting = -1;    
 //    m_zsub = m_ysub = NULL;
