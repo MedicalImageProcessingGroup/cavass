@@ -474,7 +474,8 @@ void MainFrame::OnOpen ( wxCommandEvent& e ) {
     wxLogMessage( "OnOpen" );
     wxString  filename = wxFileSelector( _T("Select image file"), _T(""),
         _T(""), _T(""),
-        "CAVASS files (*.BIM;*.BS0;*.BS2;*.IM0;*.SH0;*.MV0)|*.BIM;*.BS0;*.BS2;*.IM0;*.SH0;*.MV0",
+        //"CAVASS files (*.BIM;*.BS0;*.BS2;*.IM0;*.SH0;*.MV0)|*.BIM;*.BS0;*.BS2;*.IM0;*.SH0;*.MV0",
+        "CAVASS files (*.BIM;*.IM0)|*.BIM;*.IM0|DICOM files (*.DCM;*.DICOM;*.dcm;*.dicom)|*.DCM;*.DICOM;*.dcm;*.dicom|image files (*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff)|*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff", 
         wxFILE_MUST_EXIST );
 
     if (!filename || filename.Length() < 1) {

@@ -55,7 +55,8 @@ in /etc/profile.local put the commands:
 
 VIEWNIX_ENV=~/cavass-build
 PATH=$PATH:~/cavass-build
-export PATH VIEWNIX_ENV
+WXSUPPRESS_SIZER_FLAGS_CHECK=1
+export PATH VIEWNIX_ENV WXSUPPRESS_SIZER_FLAGS_CHECK
 
 but instead of ~ put the directory where cavass-build is.  Those commands will 
 take effect on your next login.
