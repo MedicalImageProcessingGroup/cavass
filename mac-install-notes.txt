@@ -1,0 +1,74 @@
+
+Note: gcc --version
+      shows that gcc on the mac is clang.
+
+Obtain wxWidgets source code. Then:
+  tar xjf ~/Downloads/wxWidgets-3.2.1.tar.bz2 
+  mkdir wx-build
+  cd wx-build
+  ../wxWidgets-3.2.1/configure
+  make
+
+(optional) Obtain ITK source code.
+  last seen at https://itk.org/download/
+  tar xvf ~/Downloads/InsightToolkit-5.3.0.tar
+  mkdir itk-build
+  run cmake gui
+
+Obtain cavass source code.
+  git clone george@grevera.ddns.net:/home/george/repos/cavass.git/
+  mkdir cavass-build
+  run cmake gui
+    source code:       /Users/ggrevera/monday/cavass
+    binaries:          /Users/ggrevera/monday/cavass-build
+    CMAKE_BUILD_TYPE:  Debug or Release
+    ITK_DIR:           (optionally specify location)
+    wxWidgets_CONFIG_EXECUTABLE:  /Users/ggrevera/monday/wx-build/wx-config
+    wxWidgets_wxrc_EXECUTABLE:  /Users/ggrevera/monday/wx-build/utils/wxrc/wxrc
+
+Edit (create, if necessary) ~/.zshrc. Add the following lines to the end:
+  export VIEWNIX_ENV=~/monday/cavass-build
+  export PATH=$PATH:~/monday/cavass-build
+  export WXSUPPRESS_SIZER_FLAGS_CHECK=1
+Open a new terminal window for these changes to take effect.
+
+Note: All git commands (except clone) must be in CVAVASS source dir.
+Useful git commands:
+  1. obtain a complete copy of CAVASS (from a remote repository)
+       git clone george@grevera.ddns.net:/home/george/repos/cavass.git/
+  2. list my changes
+       git status
+  3. add my changes to the staging area
+       git add *
+  4. commit my changes (in the staging area) to my local repo
+       git commit -m "my notes that will be added to these changes"
+         or
+       git commit -F ../notes.txt  (<-- notes.txt NOT in cavass source dir)
+  5. update my copy with updates in the remote repo:
+       git pull
+  6. push my changes to the remote repo:
+       git push -u origin master
+
+My personal/suggested workflow:
+  A. I start working in the morning and do the following:
+       git pull
+     to update my code with any changes in the remote repo.
+
+  B. I change the source code.
+
+  C. Do
+       make
+     in cavass-build, and test my changes.
+
+  D. At the end of the day, I do the following:
+     1. update my code with any updates in the remote repo:
+          git pull
+     2. All conflicts MUST be resolved before the remote repo is updated.
+     3. Do
+          make
+        to rebuild my code.
+     4. Test my code again.
+     5. Update the remote with my changes:
+          git push -u origin master
+  Note: One may repeat this throughout the day as often as one wishes.
+

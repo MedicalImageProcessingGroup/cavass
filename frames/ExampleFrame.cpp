@@ -95,9 +95,11 @@ ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
 #if wxUSE_DRAG_AND_DROP
     SetDropTarget( new MainFileDropTarget );
 #endif
+
     SetStatusText( "Move",     2 );
     SetStatusText( "Previous", 3 );
     SetStatusText( "Next",     4 );
+
     wxToolTip::Enable( Preferences::getShowToolTips() );
     mSplitter->SetSashPosition( -dControlsHeight );
     if (Preferences::getShowSaveScreen()) {
