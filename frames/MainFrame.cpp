@@ -194,6 +194,9 @@ void MainFrame::initializeMenu ( void ) {
     tools_menu->Append( ID_SHOW_SCREEN, "&Show Screen" );
     menu_bar->Append( tools_menu, "&Tools" );
 
+#ifndef BUILD_WITH_ITK
+    tools_menu->Enable( ID_ITK_FILTERS, false );
+#endif
     tools_menu->Enable( ID_TASKS,       false );
     tools_menu->Enable( ID_RECIPES,     false );
     
@@ -453,7 +456,7 @@ void MainFrame::OnAbout ( wxCommandEvent& unused ) {
   Xiaofen Zheng, Ph.D.,\n\
   Ying (Ronald) Zhuge, Ph.D.                    \n\
 \n\
-Copyright 1993-2022 University of Pennsylvania",
+Copyright 1993-2023 University of Pennsylvania",
         _T("About CAVASS"),
         wxICON_INFORMATION | wxOK );
 }
