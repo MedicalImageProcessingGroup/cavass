@@ -174,8 +174,10 @@ void MainFrame::initializeMenu ( void ) {
     mFileMenu->Append( ID_PAGE_SETUP,    "Page &Setup..." );
     mFileMenu->Append( ID_PRINT_PREVIEW, "Print Pre&view" );
     mFileMenu->Append( ID_PRINT,         "&Print" );
+#ifndef __MACH__  //not necessary on Mac
     mFileMenu->AppendSeparator();
     mFileMenu->Append( ID_EXIT,          "&Exit" );
+#endif
     menu_bar->Append( mFileMenu, "&File" );
 
     wxMenu*  edit_menu = new wxMenu();

@@ -28,11 +28,13 @@ Obtain cavass source code.
 
 Edit (create, if necessary) ~/.zshrc. Add the following lines to the end:
   export VIEWNIX_ENV=~/monday/cavass-build
+  #the export below is necessary to run cavass w/ an icon
+  export PATH=$PATH:~/monday/cavass-build/cavass.app/Contents/MacOS
   export PATH=$PATH:~/monday/cavass-build
   export WXSUPPRESS_SIZER_FLAGS_CHECK=1
 Open a new terminal window for these changes to take effect.
 
-Note: All git commands (except clone) must be in CVAVASS source dir.
+Note: All git commands (except clone) must be in CAVASS source dir.
 Useful git commands:
   1. obtain a complete copy of CAVASS (from a remote repository)
        git clone george@grevera.ddns.net:/home/george/repos/cavass.git/

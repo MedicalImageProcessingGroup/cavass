@@ -156,12 +156,14 @@ void histogram ( const T* const data, const int numberOfPixels,
 
     char  plotCommand[255];
     #if defined (WIN32) || defined (_WIN32)
-        sprintf( plotCommand, "\\gnuplot\\bin\\wgnuplot %s -", tmpName2 );
+        snprintf( plotCommand, sizeof plotCommand,
+                  "\\gnuplot\\bin\\wgnuplot %s -", tmpName2 );
         wxLogMessage( "data: %s, commands: %s, command: %s", tmpName,
             tmpName2, plotCommand );
         system( plotCommand );
     #else
-        sprintf( plotCommand, "gnuplot -persist %s", tmpName2 );
+        snprintf( plotCommand, sizeof plotCommand, "gnuplot -persist %s",
+                  tmpName2 );
         wxLogMessage( "data: %s, commands: %s, command: %s", tmpName,
             tmpName2, plotCommand );
         system( plotCommand );
@@ -223,12 +225,14 @@ void histogramWithTransform ( const T* const data, const int numberOfPixels,
 
     char  plotCommand[255];
     #if defined (WIN32) || defined (_WIN32)
-        sprintf( plotCommand, "\\gnuplot\\bin\\wgnuplot %s -", tmpName2 );
+        snprintf( plotCommand, sizeof plotCommand,
+                  "\\gnuplot\\bin\\wgnuplot %s -", tmpName2 );
         wxLogMessage( "data: %s, commands: %s, command: %s", tmpName,
             tmpName2, plotCommand );
         system( plotCommand );
     #else
-        sprintf( plotCommand, "gnuplot -persist %s", tmpName2 );
+        snprintf( plotCommand, sizeof plotCommand, "gnuplot -persist %s",
+                  tmpName2 );
         system( plotCommand );
         unlink(tmpName);    unlink(tmpName2);
     #endif

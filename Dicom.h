@@ -105,28 +105,28 @@ public:
         char  key[255];
 
         //check "########"
-        sprintf( key, "%04X%04X", group, element );
+        snprintf( key, sizeof key, "%04X%04X", group, element );
         if (m[key]!=NULL)    return m[key];
 
         assert(strlen(key)==8);  //the checks below assume this length
 
         //check "######XX"
-        sprintf( key, "%04X%04X", group, element );
+        snprintf( key, sizeof key, "%04X%04X", group, element );
         key[6] = key[7] = 'X';
         if (m[key]!=NULL)    return m[key];
 
         //check "######X#"
-        sprintf( key, "%04X%04X", group, element );
+        snprintf( key, sizeof key, "%04X%04X", group, element );
         key[6] = 'X';
         if (m[key]!=NULL)    return m[key];
 
         //check "####XXXX"
-        sprintf( key, "%04X%04X", group, element );
+        snprintf( key, sizeof key, "%04X%04X", group, element );
         key[4] = key[5] = key[6] = key[7] = 'X';
         if (m[key]!=NULL)    return m[key];
 
         //check "##XX####"
-        sprintf( key, "%04X%04X", group, element );
+        snprintf( key, sizeof key, "%04X%04X", group, element );
         key[2] = key[3] = 'X';
         return m[key];  //null will be returned if not found.
     }

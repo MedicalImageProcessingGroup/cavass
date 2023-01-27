@@ -2,7 +2,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 IF (COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
-	CMAKE_POLICY(SET CMP0043 NEW)
+    CMAKE_POLICY(SET CMP0043 NEW)
 ENDIF (COMMAND CMAKE_POLICY)
 
 project( CAVASS )
@@ -80,8 +80,6 @@ endif (MSVC)
 #
 add_library( libtiff  port_data/tif_aux.c port_data/tif_close.c port_data/tif_codec.c port_data/tif_color.c port_data/tif_compress.c port_data/tif_dir.c port_data/tif_dirinfo.c port_data/tif_dirread.c port_data/tif_dirwrite.c port_data/tif_dumpmode.c port_data/tif_error.c port_data/tif_fax3.c port_data/tif_fax3sm.c port_data/tif_flush.c port_data/tif_getimage.c port_data/tif_luv.c port_data/tif_lzw.c port_data/tif_next.c port_data/tif_open.c port_data/tif_packbits.c port_data/tif_predict.c port_data/tif_read.c port_data/tif_strip.c port_data/tif_swab.c port_data/tif_thunder.c port_data/tif_tile.c port_data/tif_unix.c port_data/tif_warning.c port_data/tif_write.c )
 #------------------------------------------------------------------------------
-
-
 #
 #build 3dviewnix command line programs
 #
@@ -99,15 +97,16 @@ add_executable( mmorph  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/mmo
 
 add_executable( median2d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median2d.c )
 
-add_executable(        median3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median3d.c )
+add_executable( median3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median3d.c )
 
-add_executable(        inhomo_correct_whole  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_whole.c )
+add_executable( inhomo_correct_whole  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_whole.c )
 
-add_executable(        inhomo_correct_bal_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_bal_std.c )
+add_executable( inhomo_correct_bal_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_bal_std.c )
 
-add_executable(        inhomo_correct_interac  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_interac.c )
+add_executable( inhomo_correct_interac  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_interac.c )
 
-add_executable(        inhomo_gscale_float  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_gscale_float.c )
+add_executable( inhomo_gscale_float  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_gscale_float.c )
+
 if (UNIX)
   target_link_libraries( toboggan  3dviewnix -lm )
   target_link_libraries( local_maxima  3dviewnix -lm )
@@ -161,20 +160,20 @@ target_link_libraries( invert  3dviewnix )
 add_executable( algebra  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/algebra.c )
 
 if (UNIX)
-	target_link_libraries( algebra  3dviewnix -lm )
+    target_link_libraries( algebra  3dviewnix -lm )
 else ()
-	target_link_libraries( algebra  3dviewnix )
+    target_link_libraries( algebra  3dviewnix )
 endif (UNIX)
 
-add_executable(        gc  maxflow/gc.cpp maxflow/${MAXFLOW_VERSION}/graph.cpp maxflow/${MAXFLOW_VERSION}/maxflow.cpp )
+add_executable( gc  maxflow/gc.cpp maxflow/${MAXFLOW_VERSION}/graph.cpp maxflow/${MAXFLOW_VERSION}/maxflow.cpp )
 target_link_libraries( gc  3dviewnix )
 
 add_executable( gscale  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/gscale.c )
 
-add_executable(        largest_component  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/largest_component.c )
+add_executable( largest_component  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/largest_component.c )
 target_link_libraries( largest_component  3dviewnix )
 
-add_executable(        masked_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/masked_stats.c )
+add_executable( masked_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/masked_stats.c )
 if (UNIX)
   target_link_libraries( gscale  3dviewnix -lm )
   target_link_libraries( masked_stats  3dviewnix -lm )
@@ -183,27 +182,27 @@ else ()
   target_link_libraries( masked_stats  3dviewnix )
 endif (UNIX)
 
-add_executable(        matched_reslice  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/matched_reslice.c )
+add_executable( matched_reslice  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/matched_reslice.c )
 target_link_libraries( matched_reslice  3dviewnix )
 
-add_executable(        mean_pose  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mean_pose.c )
+add_executable( mean_pose  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mean_pose.c )
 
-add_executable(        min_xor_threshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_threshold.c )
+add_executable( min_xor_threshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_threshold.c )
 target_link_libraries( min_xor_threshold  3dviewnix )
 
-add_executable(        min_xor_thresholds  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_thresholds.c )
+add_executable( min_xor_thresholds  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_thresholds.c )
 target_link_libraries( min_xor_thresholds  3dviewnix )
 
 add_executable( mrscaleprog  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mrscaleprog.c )
 target_link_libraries( mrscaleprog  3dviewnix )
 
-add_executable(        ball_enhance  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/ball_enhance.c )
+add_executable( ball_enhance  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/ball_enhance.c )
 
 add_executable( bin_volume  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_volume.c )
 
-add_executable(        b_scale_anisotrop_diffus_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_2D.c )
+add_executable( b_scale_anisotrop_diffus_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_2D.c )
 
-add_executable(        b_scale_anisotrop_diffus_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_3D.c )
+add_executable( b_scale_anisotrop_diffus_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_3D.c )
 if (UNIX)
   target_link_libraries( mean_pose  -lm )
   target_link_libraries( b_scale_anisotrop_diffus_2D  3dviewnix -lm )
@@ -217,25 +216,25 @@ else ()
   target_link_libraries( b_scale_anisotrop_diffus_3D  3dviewnix )
 endif (UNIX)
 
-add_executable(        bin_to_MSK  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_to_MSK.c )
+add_executable( bin_to_MSK  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_to_MSK.c )
 target_link_libraries( bin_to_MSK  3dviewnix )
 
-add_executable(        class2f  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/class2f.c )
+add_executable( class2f  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/class2f.c )
 target_link_libraries( class2f  3dviewnix )
 
-add_executable(        comp_interv  aar/comp_interv.c )
+add_executable( comp_interv  aar/comp_interv.c )
 
-add_executable(        correct_min_max  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/correct_min_max.c )
+add_executable( correct_min_max  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/correct_min_max.c )
 if (UNIX)
   target_link_libraries( correct_min_max  3dviewnix -lm )
 else ()
   target_link_libraries( correct_min_max  3dviewnix )
 endif (UNIX)
 
-add_executable(        create_icon  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/create_icon.c
+add_executable( create_icon  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/create_icon.c
                                     3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
 
-add_executable(        BS1_TO_BS0  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS1_TO_BS0.c
+add_executable( BS1_TO_BS0  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS1_TO_BS0.c
                                     3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
 if (UNIX)
   target_link_libraries( create_icon  3dviewnix -lm )
@@ -245,49 +244,48 @@ else ()
   target_link_libraries( BS1_TO_BS0  3dviewnix )
 endif (UNIX)
 
-add_executable(        BS0_TO_BS1  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS0_TO_BS1.c
+add_executable( BS0_TO_BS1  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS0_TO_BS1.c
                                     3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
 
-add_executable(        direction  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/direction.c )
+add_executable( direction  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/direction.c )
 target_link_libraries( direction  3dviewnix )
 
-add_executable(        distance3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/distance3D.c )
+add_executable( distance3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/distance3D.c )
 
-add_executable(        edge_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/edge_stats.c registration/matrix.c )
+add_executable( edge_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/edge_stats.c registration/matrix.c )
 target_link_libraries( edge_stats  3dviewnix )
 
-add_executable(        face_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/face_stats.c registration/matrix.c )
+add_executable( face_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/face_stats.c registration/matrix.c )
 
-add_executable(        fcut  port_data/fcut.c )
+add_executable( fcut  port_data/fcut.c )
 
-add_executable(        fg_components  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/fg_components.c )
+add_executable( fg_components  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/fg_components.c )
 target_link_libraries( fg_components  3dviewnix )
 
-add_executable(        BIM_to_rover  port_data/BIM_to_rover.c )
+add_executable( BIM_to_rover  port_data/BIM_to_rover.c )
 target_link_libraries( BIM_to_rover  3dviewnix )
 
-add_executable(        fillcontours  port_data/fillcontours.cpp port_data/read_acrnema.cpp )
+add_executable( fillcontours  port_data/fillcontours.cpp port_data/read_acrnema.cpp )
 target_link_libraries( fillcontours  3dviewnix )
 
-add_executable(        fuzziness  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/fuzziness.c )
+add_executable( fuzziness  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/fuzziness.c )
 
-add_executable(        fuzz_track_3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_3d.c
+add_executable( fuzz_track_3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_3d.c
                                       3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash.c
                                       3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash2.c
                                       3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/hheap.c
                                       3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/gqueue.c )
 
-
-add_executable(        fuzz_track_rel  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_rel.c
+add_executable( fuzz_track_rel  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_rel.c
                                       3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash.c
                                       3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash2.c
                                       3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/hheap.c )
 
-add_executable(        gaussian3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian3d.c )
+add_executable( gaussian3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian3d.c )
 
-add_executable(        gaussian_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian_3D.c )
+add_executable( gaussian_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian_3D.c )
 
-add_executable(        gaussian2d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian2d.c )
+add_executable( gaussian2d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian2d.c )
 if (UNIX)
   target_link_libraries( BS0_TO_BS1  3dviewnix -lm )
   target_link_libraries( distance3D  3dviewnix -lm )
@@ -310,16 +308,16 @@ else ()
   target_link_libraries( gaussian_3D  3dviewnix )
 endif (UNIX)
 
-add_executable(        get_bins  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/get_bins.c registration/matrix.c )
+add_executable( get_bins  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/get_bins.c registration/matrix.c )
 
-add_executable(        get_slicenumber  3dviewnix/PROCESS/AIRWAY/get_slicenumber.c )
+add_executable( get_slicenumber  3dviewnix/PROCESS/AIRWAY/get_slicenumber.c )
 target_link_libraries( get_slicenumber  3dviewnix )
 
-add_executable(        gradient  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gradient.c )
+add_executable( gradient  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gradient.c )
 
-add_executable(        gradient3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gradient3d.c )
+add_executable( gradient3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gradient3d.c )
 
-add_executable(        intensity_map  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/intensity_map.c )
+add_executable( intensity_map  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/intensity_map.c )
 
 if (UNIX)
   target_link_libraries( gradient  3dviewnix -lm )
@@ -333,33 +331,33 @@ else ()
   target_link_libraries( intensity_map  3dviewnix )
 endif (UNIX)
 
-add_executable(        LTDT3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/LTDT3d.cpp )
+add_executable( LTDT3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/LTDT3d.cpp )
 target_link_libraries( LTDT3D  3dviewnix )
 
-add_executable(        mask2bin  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MASK/mask2bin.c )
+add_executable( mask2bin  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MASK/mask2bin.c )
 target_link_libraries( mask2bin  3dviewnix )
 
-add_executable(        mask2grey  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MASK/mask2grey.c )
+add_executable( mask2grey  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MASK/mask2grey.c )
 target_link_libraries( mask2grey  3dviewnix )
 
-add_executable(        mean  aar/mean.c )
+add_executable( mean  aar/mean.c )
 
-add_executable(        merge_surface  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/MERGE_STRUCT/merge_surface.c )
+add_executable( merge_surface  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/MERGE_STRUCT/merge_surface.c )
 target_link_libraries( merge_surface  3dviewnix )
 
-add_executable(        ndclass  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/ndclass.c )
+add_executable( ndclass  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/ndclass.c )
 target_link_libraries( ndclass  3dviewnix )
 
-add_executable(        ndinterpolate  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/INTERPOLATE/ndinterpolate.c )
+add_executable( ndinterpolate  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/INTERPOLATE/ndinterpolate.c )
 
-add_executable(        ndthreshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/THRESHOLD/ndthreshold.c )
+add_executable( ndthreshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/THRESHOLD/ndthreshold.c )
 target_link_libraries( ndthreshold  3dviewnix )
 
-add_executable(        ndvoi  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/ndvoi.c )
+add_executable( ndvoi  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/ndvoi.c )
 
-add_executable(        gbscale2_scale  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_scale.c )
+add_executable( gbscale2_scale  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_scale.c )
 
-add_executable(        gbscale2_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_std.c )
+add_executable( gbscale2_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_std.c )
 if (UNIX)
   target_link_libraries( gbscale2_scale  3dviewnix -lm )
   target_link_libraries( ndinterpolate  3dviewnix -lm )
@@ -372,11 +370,11 @@ else ()
   target_link_libraries( gbscale2_std  3dviewnix )
 endif (UNIX)
 
-add_executable(        gbscale2_train  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_train.c )
+add_executable( gbscale2_train  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_train.c )
 
-add_executable(        merge  aar/merge.c )
+add_executable( merge  aar/merge.c )
 
-add_executable(        optimal_threshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/THRESHOLD/optimal_threshold.c )
+add_executable( optimal_threshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/THRESHOLD/optimal_threshold.c )
 if (UNIX)
   target_link_libraries( gbscale2_train  3dviewnix -lm )
   target_link_libraries( optimal_threshold  3dviewnix -lm )
@@ -387,22 +385,22 @@ else ()
   target_link_libraries( merge  3dviewnix )
 endif (UNIX)
 
-add_executable(        overlap_peak  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/overlap_peak.c )
+add_executable( overlap_peak  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/overlap_peak.c )
 
-add_executable(        reslice_proc  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/reslice_proc.c )
+add_executable( reslice_proc  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/reslice_proc.c )
 
-add_executable(        rint  aar/rint.c )
+add_executable( rint  aar/rint.c )
 
-add_executable(        scale_based_filtering_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/scale_based_filtering_2D.c )
+add_executable( scale_based_filtering_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/scale_based_filtering_2D.c )
 
-add_executable(        scale_based_filtering_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/scale_based_filtering_3D.c )
+add_executable( scale_based_filtering_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/scale_based_filtering_3D.c )
 
-add_executable(        screen_params  aar/screen_params.c )
+add_executable( screen_params  aar/screen_params.c )
 
-add_executable(        shell  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/shell.c
+add_executable( shell  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/shell.c
                               3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/gcode.c )
 
-add_executable(        sketch  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/sketch.c )
+add_executable( sketch  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/sketch.c )
 if (UNIX)
   target_link_libraries( shell  3dviewnix -lm )
   target_link_libraries( screen_params  -lm )
@@ -420,11 +418,11 @@ else ()
   target_link_libraries( sketch  3dviewnix )
 endif (UNIX)
 
-add_executable(        suv_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/suv_stats.c )
+add_executable( suv_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/suv_stats.c )
 
-add_executable(        texture_image  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/texture_image.c )
+add_executable( texture_image  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/texture_image.c )
 
-add_executable(        texture_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/texture_stats.c )
+add_executable( texture_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/texture_stats.c )
 if (UNIX)
   target_link_libraries( texture_image  3dviewnix -lm )
   target_link_libraries( suv_stats  3dviewnix -lm )
@@ -435,16 +433,16 @@ else ()
   target_link_libraries( texture_stats  3dviewnix )
 endif (UNIX)
 
-add_executable(        to_normal  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/to_normal.c
+add_executable( to_normal  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/to_normal.c
                                   3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
 
-add_executable(        track_3d  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_3d.c
+add_executable( track_3d  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_3d.c
                                  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
 
-add_executable(        track_all  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_all.c
+add_executable( track_all  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_all.c
                                   3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
 
-add_executable(        relpos     3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/relpos.c )
+add_executable( relpos     3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/relpos.c )
 
 if (UNIX)
   target_link_libraries( to_normal  3dviewnix -lm )
@@ -457,10 +455,19 @@ else ()
   target_link_libraries( track_all  3dviewnix )
 endif (UNIX)
 
-add_executable(        vote  aar/vote.c )
+add_executable( vote  aar/vote.c )
 
-add_executable(        xor_min  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/xor_min.c )
+add_executable( xor_min  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/xor_min.c )
 target_link_libraries( xor_min  3dviewnix )
+
+add_executable( IM0_to_pgm port_data/IM0_to_pgm.c )
+target_link_libraries( IM0_to_pgm 3dviewnix )
+
+add_executable( MV0_to_ppm port_data/MV0_to_ppm.c )
+target_link_libraries( MV0_to_ppm 3dviewnix )
+
+add_executable( imatron_to_IM0 port_data/imatron_to_IM0.c )
+target_link_libraries( imatron_to_IM0 3dviewnix )
 
 #--------------------------------------------------------------------------------
 #build andre's registration program
@@ -506,103 +513,209 @@ if (wxWidgets_FOUND)
 
     # For convenience we define the sources as a variable.
     SET( SRCS
-      cv3dv.h cavass.h CavassData.h ChunkData.h Dicom.h DicomInfoFrame.h fft.h
-      FileHistory.h Globals.h Preferences.h PreferencesDialog.h
-      ProcessManager.h
-      analyze/AnalyzeStaticCanvas.h     analyze/AnalyzeStaticFrame.h
-      analyze/KinematicsInterCanvas.h     analyze/KinematicsInterFrame.h
-      analyze/KinematicsIntraCanvas.h     analyze/KinematicsIntraFrame.h
-      analyze/ROIStatisticalCanvas.h     analyze/ROIStatisticalFrame.h
-      analyze/DensityCanvas.h     analyze/DensityFrame.h
-      filter/FilterCanvas.h       filter/FilterFrame.h
-      filter/ITKFilterCanvas.h    filter/ITKFilterFrame.h
-      frames/ToStructureCanvas.h     frames/ToStructureFrame.h
-      frames/CineControls.h frames/ClassifyControls.h frames/ColorControls.h
-      frames/CovarianceControls.h frames/IRFCControls.h
-      frames/VOIROICanvas.h frames/VOIROIFrame.h
-      frames/VOIIOICanvas.h frames/VOIIOIFrame.h
-      frames/VOIPickSlicesCanvas.h frames/VOIPickSlicesFrame.h
-      frames/VOIStandardlizeCanvas.h frames/VOIStandardlizeFrame.h
-      frames/ExampleCanvas.h frames/ExampleFrame.h
-      frames/ImportCanvas.h  frames/ImportFrame.h
-      frames/AlgebraCanvas.h frames/AlgebraFrame.h
-      frames/CycleCanvas.h frames/CycleData.h frames/CycleFrame.h frames/CyclePrint.h
-      frames/EasyHeaderCanvas.h frames/EasyHeaderFrame.h
-      frames/ExportCanvas.h frames/ExportFrame.h
-      frames/FrameControls.h
-      frames/FromDicomCanvas.h frames/FromDicomFrame.h
-      frames/FunctionControls.h frames/FuzzCompCanvas.h frames/FuzzCompFrame.h
-      frames/IntenMapCanvas.h frames/IntenMapFrame.h
-      frames/GrayMapControls.h frames/HistoSettingControls.h
-      frames/InformationDialog.h frames/InputHistoryDialog.h
-      frames/InterpolateCanvas.h frames/InterpolateFrame.h
-      frames/IRFCCanvas.h frames/IRFCFrame.h
-      frames/MagnifyControls.h frames/MainCanvas.h frames/MainFileDropTarget.h
-      frames/MainFrame.h
-      frames/MontageCanvas.h frames/MontageFrame.h frames/MontagePrint.h
-      frames/OpacityControls.h
-      frames/OverlayCanvas.h frames/OverlayFrame.h frames/OverlayPrint.h
-      frames/ParameterControls.h frames/RegisterFrame.h frames/RegistrationControls.h
-      frames/SaveScreenControls.h
-      frames/ShowScreenCanvas.h frames/ShowScreenFrame.h
-      frames/SetFuzzCompIndexControls.h
-      frames/SetIndexControls.h
-      frames/SurfOpacityControls.h frames/SurfPropertiesControls.h frames/SurfSpeedControls.h
-      frames/SurfViewCanvas.h frames/SurfViewFrame.h frames/SurfViewPrint.h
-      frames/TextControls.h
-      frames/ThresholdCanvas.h frames/ThresholdControls.h frames/ThresholdFrame.h frames/ThresholdPrint.h
-      Dicom.cpp  FileHistory.cpp  fft.cpp
-      filter/FilterAlgorithms.cpp
-      analyze/AnalyzeStaticCanvas.cpp     analyze/AnalyzeStaticFrame.cpp
-      analyze/auto_register.cpp     analyze/build_surf_tree.cpp
-      analyze/KinematicsInterCanvas.cpp     analyze/KinematicsInterFrame.cpp
-      analyze/KinematicsIntraCanvas.cpp     analyze/KinematicsIntraFrame.cpp
-      analyze/ROIStatisticalCanvas.cpp     analyze/ROIStatisticalFrame.cpp    analyze/ROIStatisticalAlgorithm.cpp
-      analyze/DensityCanvas.cpp     analyze/DensityFrame.cpp    analyze/DensityAlgorithm.cpp
-      CavassData.cpp
-      filter/FilterCanvas.cpp       filter/FilterFrame.cpp
-      filter/ITKFilterCanvas.cpp    filter/ITKFilterFrame.cpp
-      frames/ToStructureCanvas.cpp     frames/ToStructureFrame.cpp
-      frames/VOIROICanvas.cpp      frames/VOIROIFrame.cpp
-      frames/VOIIOICanvas.cpp      frames/VOIIOIFrame.cpp
-      frames/VOIPickSlicesCanvas.cpp      frames/VOIPickSlicesFrame.cpp
-      frames/VOIStandardlizeCanvas.cpp    frames/VOIStandardlizeFrame.cpp
-      frames/ExampleCanvas.cpp      frames/ExampleFrame.cpp
-      frames/ImportCanvas.cpp       frames/ImportFrame.cpp
-      frames/AlgebraCanvas.cpp      frames/AlgebraFrame.cpp
-      frames/CycleCanvas.cpp        frames/CycleFrame.cpp
-      frames/EasyHeaderCanvas.cpp   frames/EasyHeaderFrame.cpp
-      frames/ExportCanvas.cpp       frames/ExportFrame.cpp
-      frames/FromDicomCanvas.cpp    frames/FromDicomFrame.cpp
-      frames/FuzzCompCanvas.cpp     frames/FuzzCompFrame.cpp
-      frames/IntenMapCanvas.cpp     frames/IntenMapFrame.cpp
-      frames/InformationDialog.cpp
-      frames/InputHistoryDialog.cpp
-      frames/InterpolateCanvas.cpp  frames/InterpolateFrame.cpp
-      frames/IRFCCanvas.cpp         frames/IRFCFrame.cpp
-      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/gqueue.cpp
-      frames/MainCanvas.cpp         frames/MainFrame.cpp
-      frames/MainSplitter.cpp
-      frames/MontageCanvas.cpp      frames/MontageFrame.cpp
-      frames/OverlayCanvas.cpp      frames/OverlayFrame.cpp
-      frames/RegisterFrame.cpp
-      frames/Segment2dCanvas.cpp    frames/Segment2dFrame.cpp
-      frames/ShowScreenCanvas.cpp   frames/ShowScreenFrame.cpp
-      frames/SurfViewCanvas.cpp     frames/SurfViewFrame.cpp
-      frames/ThresholdCanvas.cpp    frames/ThresholdFrame.cpp
-      GaussianTransform.cpp  GrayScaleTransform.cpp
-      main.cpp  misc.cpp
-      port_data/read_acrnema.cpp
-      Preferences.cpp  PreferencesDialog.cpp
-      RampTransform.cpp
-      render/AtoM.cpp  render/cmput_colrs.cpp  render/gcode.cpp
-      render/load.cpp  render/make_image.cpp  render/manip_error.cpp
-      render/matrix.cpp  render/obj_number.cpp  render/obj_transf.cpp
-      render/patch.cpp  render/project.cpp  render/reflect.cpp
-      render/shade.cpp  render/cvRender.cpp render/view.cpp
-      render/view_interp.cpp render/do_cut.cpp render/poly_cut.cpp
-      render/separate.cpp
-      TrapezoidTransform.cpp
+        3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/gqueue.cpp
+        CavassData.cpp
+        CavassData.h
+        ChunkData.h
+        Dicom.cpp
+        Dicom.h
+        DicomInfoFrame.h
+        FileHistory.cpp
+        FileHistory.h
+        GaussianTransform.cpp
+        Globals.h
+        GrayScaleTransform.cpp
+        Preferences.cpp
+        Preferences.h
+        PreferencesDialog.cpp
+        PreferencesDialog.h
+        ProcessManager.h
+        RampTransform.cpp
+        TrapezoidTransform.cpp
+        analyze/AnalyzeStaticCanvas.cpp
+        analyze/AnalyzeStaticCanvas.h
+        analyze/AnalyzeStaticFrame.cpp
+        analyze/AnalyzeStaticFrame.h
+        analyze/DensityAlgorithm.cpp
+        analyze/DensityCanvas.cpp
+        analyze/DensityCanvas.h
+        analyze/DensityFrame.cpp
+        analyze/DensityFrame.h
+        analyze/KinematicsInterCanvas.cpp
+        analyze/KinematicsInterCanvas.h
+        analyze/KinematicsInterFrame.cpp
+        analyze/KinematicsInterFrame.h
+        analyze/KinematicsIntraCanvas.cpp
+        analyze/KinematicsIntraCanvas.h
+        analyze/KinematicsIntraFrame.cpp
+        analyze/KinematicsIntraFrame.h
+        analyze/ROIStatisticalAlgorithm.cpp
+        analyze/ROIStatisticalCanvas.cpp
+        analyze/ROIStatisticalCanvas.h
+        analyze/ROIStatisticalFrame.cpp
+        analyze/ROIStatisticalFrame.h
+        analyze/auto_register.cpp
+        analyze/build_surf_tree.cpp
+        cavass.h
+        cv3dv.h
+        fft.cpp
+        fft.h
+        filter/FilterAlgorithms.cpp
+        filter/FilterCanvas.cpp
+        filter/FilterCanvas.h
+        filter/FilterFrame.cpp
+        filter/FilterFrame.h
+        filter/ITKFilterCanvas.cpp
+        filter/ITKFilterCanvas.h
+        filter/ITKFilterFrame.cpp
+        filter/ITKFilterFrame.h
+        frames/AlgebraCanvas.cpp
+        frames/AlgebraCanvas.h
+        frames/AlgebraFrame.cpp
+        frames/AlgebraFrame.h
+        frames/CineControls.h
+        frames/ClassifyControls.h
+        frames/ColorControls.h
+        frames/CovarianceControls.h
+        frames/CycleCanvas.cpp
+        frames/CycleCanvas.h
+        frames/CycleData.h
+        frames/CycleFrame.cpp
+        frames/CycleFrame.h
+        frames/CyclePrint.h
+        frames/EasyHeaderCanvas.cpp
+        frames/EasyHeaderCanvas.h
+        frames/EasyHeaderFrame.cpp
+        frames/EasyHeaderFrame.h
+        frames/ExampleCanvas.cpp
+        frames/ExampleCanvas.h
+        frames/ExampleFrame.cpp
+        frames/ExampleFrame.h
+        frames/ExportCanvas.cpp
+        frames/ExportCanvas.h
+        frames/ExportFrame.cpp
+        frames/ExportFrame.h
+        frames/FrameControls.h
+        frames/FromDicomCanvas.cpp
+        frames/FromDicomCanvas.h
+        frames/FromDicomFrame.cpp
+        frames/FromDicomFrame.h
+        frames/FunctionControls.h
+        frames/FuzzCompCanvas.cpp
+        frames/FuzzCompCanvas.h
+        frames/FuzzCompFrame.cpp
+        frames/FuzzCompFrame.h
+        frames/GrayMapControls.h
+        frames/HistoSettingControls.h
+        frames/IRFCCanvas.cpp
+        frames/IRFCCanvas.h
+        frames/IRFCControls.h
+        frames/IRFCFrame.cpp
+        frames/IRFCFrame.h
+        frames/ImportCanvas.cpp
+        frames/ImportCanvas.h
+        frames/ImportFrame.cpp
+        frames/ImportFrame.h
+        frames/InformationDialog.cpp
+        frames/InformationDialog.h
+        frames/InputHistoryDialog.cpp
+        frames/InputHistoryDialog.h
+        frames/IntenMapCanvas.cpp
+        frames/IntenMapCanvas.h
+        frames/IntenMapFrame.cpp
+        frames/IntenMapFrame.h
+        frames/InterpolateCanvas.cpp
+        frames/InterpolateCanvas.h
+        frames/InterpolateFrame.cpp
+        frames/InterpolateFrame.h
+        frames/MagnifyControls.h
+        frames/MainCanvas.cpp
+        frames/MainCanvas.h
+        frames/MainFileDropTarget.h
+        frames/MainFrame.cpp
+        frames/MainFrame.h
+        frames/MainSplitter.cpp
+        frames/MontageCanvas.cpp
+        frames/MontageCanvas.h
+        frames/MontageFrame.cpp
+        frames/MontageFrame.h
+        frames/MontagePrint.h
+        frames/OpacityControls.h
+        frames/OverlayCanvas.cpp
+        frames/OverlayCanvas.h
+        frames/OverlayFrame.cpp
+        frames/OverlayFrame.h
+        frames/OverlayPrint.h
+        frames/ParameterControls.h
+        frames/RegisterFrame.cpp
+        frames/RegisterFrame.h
+        frames/RegistrationControls.h
+        frames/SaveScreenControls.h
+        frames/Segment2dCanvas.cpp
+        frames/Segment2dFrame.cpp
+        frames/SetFuzzCompIndexControls.h
+        frames/SetIndexControls.h
+        frames/ShowScreenCanvas.cpp
+        frames/ShowScreenCanvas.h
+        frames/ShowScreenFrame.cpp
+        frames/ShowScreenFrame.h
+        frames/SurfOpacityControls.h
+        frames/SurfPropertiesControls.h
+        frames/SurfSpeedControls.h
+        frames/SurfViewCanvas.cpp
+        frames/SurfViewCanvas.h
+        frames/SurfViewFrame.cpp
+        frames/SurfViewFrame.h
+        frames/SurfViewPrint.h
+        frames/TextControls.h
+        frames/ThresholdCanvas.cpp
+        frames/ThresholdCanvas.h
+        frames/ThresholdControls.h
+        frames/ThresholdFrame.cpp
+        frames/ThresholdFrame.h
+        frames/ThresholdPrint.h
+        frames/ToStructureCanvas.cpp
+        frames/ToStructureCanvas.h
+        frames/ToStructureFrame.cpp
+        frames/ToStructureFrame.h
+        frames/VOIIOICanvas.cpp
+        frames/VOIIOICanvas.h
+        frames/VOIIOIFrame.cpp
+        frames/VOIIOIFrame.h
+        frames/VOIPickSlicesCanvas.cpp
+        frames/VOIPickSlicesCanvas.h
+        frames/VOIPickSlicesFrame.cpp
+        frames/VOIPickSlicesFrame.h
+        frames/VOIROICanvas.cpp
+        frames/VOIROICanvas.h
+        frames/VOIROIFrame.cpp
+        frames/VOIROIFrame.h
+        frames/VOIStandardlizeCanvas.cpp
+        frames/VOIStandardlizeCanvas.h
+        frames/VOIStandardlizeFrame.cpp
+        frames/VOIStandardlizeFrame.h
+        main.cpp
+        misc.cpp
+        port_data/read_acrnema.cpp
+        render/AtoM.cpp
+        render/cmput_colrs.cpp
+        render/cvRender.cpp
+        render/do_cut.cpp
+        render/gcode.cpp
+        render/load.cpp
+        render/make_image.cpp
+        render/manip_error.cpp
+        render/matrix.cpp
+        render/obj_number.cpp
+        render/obj_transf.cpp
+        render/patch.cpp
+        render/poly_cut.cpp
+        render/project.cpp
+        render/reflect.cpp
+        render/separate.cpp
+        render/shade.cpp
+        render/view.cpp
+        render/view_interp.cpp
     )
  
     # If we build for windows systems, we also include the resource file
@@ -611,10 +724,20 @@ if (wxWidgets_FOUND)
         SET( SRCS ${SRCS} cavass.rc )
     ENDIF (MSVC)
   
-    add_executable(        cavass  WIN32 ${SRCS} )
+    # Add cavass icon on Mac.
+    if (APPLE)
+        set( MACOSX_BUNDLE_ICON_FILE cavass.icns )
+        set( app_ICON ${CMAKE_CURRENT_SOURCE_DIR}/cavass.icns )
+        #SET( SRCS ${SRCS} cavass.icns )
+        set_source_files_properties( ${app_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources" )
+        add_executable( cavass MACOSX_BUNDLE ${app_ICON} ${SRCS} )
+    else ()
+        add_executable( cavass WIN32 ${SRCS} )
+    endif (APPLE)
+
     target_link_libraries( cavass  ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
 
-    add_executable(        from_BS2 port_data/from_BS2.c )
+    add_executable( from_BS2 port_data/from_BS2.c )
 
     add_executable( from_dicom  port_data/from_dicom.cpp port_data/read_acrnema.cpp )
     target_link_libraries( from_dicom  ${wxWidgets_LIBRARIES} 3dviewnix )
@@ -622,17 +745,8 @@ if (wxWidgets_FOUND)
     add_executable( ser_loc  port_data/ser_loc.cpp port_data/read_acrnema.cpp )
     target_link_libraries( ser_loc  ${wxWidgets_LIBRARIES} 3dviewnix )
 
-    add_executable(        IM0_to_pgm port_data/IM0_to_pgm.c )
-    target_link_libraries( IM0_to_pgm 3dviewnix )
-
-    add_executable(        MV0_to_ppm port_data/MV0_to_ppm.c )
-    target_link_libraries( MV0_to_ppm 3dviewnix )
-
-    add_executable(        imatron_to_IM0 port_data/imatron_to_IM0.c )
-    target_link_libraries( imatron_to_IM0 3dviewnix )
-
-    add_executable(        MV0_to_tiff port_data/MV0_to_tiff.c )
-	if (UNIX)
+    add_executable( MV0_to_tiff port_data/MV0_to_tiff.c )
+    if (UNIX)
       target_link_libraries( from_BS2 3dviewnix -lm )
       target_link_libraries( MV0_to_tiff 3dviewnix libtiff -lm )
     else ()
@@ -640,28 +754,26 @@ if (wxWidgets_FOUND)
       target_link_libraries( MV0_to_tiff 3dviewnix libtiff )
     endif (UNIX)
 
-    add_executable(        mipg2dicom  port_data/mipg2dicom.cpp )
+    add_executable( mipg2dicom  port_data/mipg2dicom.cpp )
     target_link_libraries( mipg2dicom  ${wxWidgets_LIBRARIES} 3dviewnix )
 
-    add_executable(        estimateScale aar/estimateScale.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
+    add_executable( estimateScale aar/estimateScale.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
     target_link_libraries( estimateScale ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
 
-    add_executable(        exportMath port_data/exportMath.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
+    add_executable( exportMath port_data/exportMath.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
     target_link_libraries( exportMath ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
 
-    add_executable(        importMath port_data/importMath.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
+    add_executable( importMath port_data/importMath.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
     target_link_libraries( importMath ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
 
-    add_executable(        PLN_TO_BS0  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/PLN_TO_BS0.cpp )
+    add_executable( PLN_TO_BS0  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/PLN_TO_BS0.cpp )
 target_link_libraries( PLN_TO_BS0  ${wxWidgets_LIBRARIES} 3dviewnix )
 
-    add_executable(        PLN_TO_BS1  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/PLN_TO_BS1.cpp )
+    add_executable( PLN_TO_BS1  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/PLN_TO_BS1.cpp )
     target_link_libraries( PLN_TO_BS1  ${wxWidgets_LIBRARIES} 3dviewnix )
 
 else (wxWidgets_FOUND)
-
     message( "wxWidgets not found!" )
-
 endif (wxWidgets_FOUND)
 #--------------------------------------------------------------------------------
 # (optional) Generate ITK executable (command line) programs.

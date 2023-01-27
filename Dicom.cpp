@@ -1849,7 +1849,7 @@ DicomDictionary::DicomDictionary ( const bool verbose ) {
     //cout << "DicomDictionary::DicomDictionary: map" << endl;
     for (int i=0; entries[i][0]!=NULL; i++) {
         char  tmp[255];
-        sprintf( tmp, "%s%s", entries[i][0], entries[i][1] );
+        snprintf( tmp, sizeof tmp, "%s%s", entries[i][0], entries[i][1] );
         for (unsigned int j=0; j<strlen(tmp); j++) {
             tmp[j] = toupper(tmp[j]);
         }
