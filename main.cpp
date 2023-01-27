@@ -63,6 +63,11 @@ bool equals ( wxFileName f1, wxFileName f2 ) {
 }
 //----------------------------------------------------------------------
 void setColor ( wxWindow* w ) {
+#ifdef __MACH__
+    //Don't set the colors on MainFrames or subclasses on the mac.
+    // If we do, the status bar text will be unreadable.
+    if (dynamic_cast<MainFrame*>(w) != nullptr)    return;
+#endif
     if (Preferences::getCustomAppearance()) {
         int  r, g, b;
 

@@ -282,15 +282,23 @@ void MainFrame::initializeMenu ( void ) {
     scene_menu->Enable( ID_ANL_ROI,     true );
     structure_menu->Enable( ID_ANL_REGISTER,   false );
     structure_menu->Enable( ID_ANL_KINEMATICS, true );
-    
+
     mWindowMenu = new wxMenu();
+#ifndef __MACH__
     mHideControls = new wxMenuItem( mWindowMenu, ID_WINDOW_HIDE_CONTROLS,
                                     "Hide Controls\tAlt-C" );
     mWindowMenu->Append( mHideControls );
     mWindowMenu->AppendSeparator();
+#endif
     menu_bar->Append( mWindowMenu, "&Window" );
-    
+
     wxMenu*  help_menu = new wxMenu();
+#ifdef __MACH__
+    mHideControls = new wxMenuItem( mWindowMenu, ID_WINDOW_HIDE_CONTROLS,
+                                    "Hide Controls\tAlt-C" );
+    help_menu->Append( mHideControls );
+    help_menu->AppendSeparator();
+#endif
     help_menu->Append( ID_ABOUT,         "&About"       );
     help_menu->Append( ID_HELP,          "&Help"        );
     help_menu->Append( ID_INFORMATION,   "&Information" );
