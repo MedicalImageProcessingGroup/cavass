@@ -261,19 +261,22 @@ void GaussianTransform::setup ( void ) {
     const int  max = m_parent->mCanvas->mCavassData->m_max;
     mMean = ((double)m_mean_slider->GetValue())*(max-min) / sMaxSliderValue
             + min;
-    sprintf( buff, "%f", mMean );
+    int ret = snprintf( buff, sizeof buff, "%f", mMean );
+    assert( ret < sizeof buff );
     m_mean_text->SetValue( buff );
 
     static const double  stddevMin = 0.000001;
     const double         stddevMax = 2.0*(max-min);
     mStddev = ((double)m_stddev_slider->GetValue())*(stddevMax-stddevMin)
               / sMaxSliderValue + stddevMin;
-    sprintf( buff, "%f", mStddev );
+    ret = snprintf( buff, sizeof buff, "%f", mStddev );
+    assert( ret < sizeof buff );
     m_stddev_text->SetValue( buff );
 
     mScale = ((double)m_scale_slider->GetValue())*(sScaleMax-sScaleMin)
               / sMaxSliderValue + sScaleMin;
-    sprintf( buff, "%f", mScale );
+    ret = snprintf( buff, sizeof buff, "%f", mScale );
+    assert( ret < sizeof buff );
     m_scale_text->SetValue( buff );
 
     doTransform();
@@ -286,7 +289,8 @@ void GaussianTransform::OnMeanSlider ( wxScrollEvent& e ) {
     const int  max = m_parent->mCanvas->mCavassData->m_max;
     mMean = ((double)m_mean_slider->GetValue())*(max-min) / sMaxSliderValue
             + min;
-    sprintf( buff, "%f", mMean );
+    int ret = snprintf( buff, sizeof buff, "%f", mMean );
+    assert( ret < sizeof buff );
     m_mean_text->SetValue( buff );
 
     doTransform();
@@ -301,7 +305,8 @@ void GaussianTransform::OnStddevSlider ( wxScrollEvent& e ) {
     const double         stddevMax = 2.0*(max-min);
     mStddev = ((double)m_stddev_slider->GetValue())*(stddevMax-stddevMin)
               / sMaxSliderValue + stddevMin;
-    sprintf( buff, "%f", mStddev );
+    int ret = snprintf( buff, sizeof buff, "%f", mStddev );
+    assert( ret < sizeof buff );
     m_stddev_text->SetValue( buff );
 
     doTransform();
@@ -311,7 +316,8 @@ void GaussianTransform::OnScaleSlider ( wxScrollEvent& e ) {
     mScale = ((double)m_scale_slider->GetValue())*(sScaleMax-sScaleMin)
               / sMaxSliderValue + sScaleMin;
     char  buff[255];
-    sprintf( buff, "%f", mScale );
+    int ret = snprintf( buff, sizeof buff, "%f", mScale );
+    assert( ret < sizeof buff );
     m_scale_text->SetValue( buff );
 
     doTransform();

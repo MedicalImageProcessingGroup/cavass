@@ -246,11 +246,13 @@ void RampTransform::setupSliders ( void ) {
     char  buff[255];
 
     m_slope = ((double)m_slope_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_slope );
+    int ret = snprintf( buff, sizeof buff, "%f", m_slope );
+    assert( ret < sizeof buff );
     m_slope_text->SetValue( buff );
 
     m_yintercept = ((double)m_yintercept_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_yintercept );
+    ret = snprintf( buff, sizeof buff, "%f", m_yintercept );
+    assert( ret < sizeof buff );
     m_yintercept_text->SetValue( buff );
 
     doTransform();
@@ -259,7 +261,8 @@ void RampTransform::setupSliders ( void ) {
 void RampTransform::OnSlopeSlider ( wxScrollEvent& e ) {
     char  buff[255];
     m_slope = ((double)m_slope_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_slope );
+    int ret = snprintf( buff, sizeof buff, "%f", m_slope );
+    assert( ret < sizeof buff );
     m_slope_text->SetValue( buff );
 
     doTransform();
@@ -268,7 +271,8 @@ void RampTransform::OnSlopeSlider ( wxScrollEvent& e ) {
 void RampTransform::OnYInterceptSlider ( wxScrollEvent& e ) {
     char  buff[255];
     m_yintercept = ((double)m_yintercept_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_yintercept );
+    int ret = snprintf( buff, sizeof buff, "%f", m_yintercept );
+    assert( ret < sizeof buff );
     m_yintercept_text->SetValue( buff );
 
     doTransform();

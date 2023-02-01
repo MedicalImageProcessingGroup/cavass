@@ -285,19 +285,23 @@ void TrapezoidTransform::setupSliders ( void ) {
     char  buff[255];
 
     m_slope = ((double)m_slope_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_slope );
+    int ret = snprintf( buff, sizeof buff, "%f", m_slope );
+    assert( ret < sizeof buff );
     m_slope_text->SetValue( buff );
 
     m_yintercept = ((double)m_yintercept_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_yintercept );
+    ret = snprintf( buff, sizeof buff, "%f", m_yintercept );
+    assert( ret < sizeof buff );
     m_yintercept_text->SetValue( buff );
 
     m_slope2 = ((double)m_slope_slider2->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_slope2 );
+    ret = snprintf( buff, sizeof buff, "%f", m_slope2 );
+    assert( ret < sizeof buff );
     m_slope_text2->SetValue( buff );
 
     m_yintercept2 = ((double)m_yintercept_slider2->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_yintercept2 );
+    ret = snprintf( buff, sizeof buff, "%f", m_yintercept2 );
+    assert( ret < sizeof buff );
     m_yintercept_text2->SetValue( buff );
 
     doTransform();
@@ -307,7 +311,8 @@ void TrapezoidTransform::setupSliders ( void ) {
 void TrapezoidTransform::OnSlopeSlider ( wxScrollEvent& e ) {
     char  buff[255];
     m_slope = ((double)m_slope_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_slope );
+    int ret = snprintf( buff, sizeof buff, "%f", m_slope );
+    assert( ret < sizeof buff );
     m_slope_text->SetValue( buff );
 
     doTransform();
@@ -316,7 +321,8 @@ void TrapezoidTransform::OnSlopeSlider ( wxScrollEvent& e ) {
 void TrapezoidTransform::OnYInterceptSlider ( wxScrollEvent& e ) {
     char  buff[255];
     m_yintercept = ((double)m_yintercept_slider->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_yintercept );
+    int ret = snprintf( buff, sizeof buff, "%f", m_yintercept );
+    assert( ret < sizeof buff );
     m_yintercept_text->SetValue( buff );
 
     doTransform();
@@ -362,7 +368,8 @@ void TrapezoidTransform::OnYInterceptTextEnter ( wxCommandEvent& e ) {
 void TrapezoidTransform::OnSlopeSlider2 ( wxScrollEvent& e ) {
     char  buff[255];
     m_slope2 = ((double)m_slope_slider2->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_slope2 );
+    int ret = snprintf( buff, sizeof buff, "%f", m_slope2 );
+    assert( ret < sizeof buff );
     m_slope_text2->SetValue( buff );
 
     doTransform();
@@ -371,7 +378,8 @@ void TrapezoidTransform::OnSlopeSlider2 ( wxScrollEvent& e ) {
 void TrapezoidTransform::OnYInterceptSlider2 ( wxScrollEvent& e ) {
     char  buff[255];
     m_yintercept2 = ((double)m_yintercept_slider2->GetValue()) / sSliderDivisor;
-    sprintf( buff, "%f", m_yintercept2 );
+    int ret = snprintf( buff, sizeof buff, "%f", m_yintercept2 );
+    assert( ret < sizeof buff );
     m_yintercept_text2->SetValue( buff );
 
     doTransform();

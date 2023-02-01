@@ -363,9 +363,11 @@ void DemonsDialog::OnDoDemons2DRegistration ( void ) {
 #endif
         //show the result (just one slice)
         char  buff[255];
-        sprintf( buff, "registered result (fixed slice %d from %s and %d from %s; iterations %d)",
+        int ret = snprintf( buff, sizeof buff,
+                            "registered result (fixed slice %d from %s and %d from %s; iterations %d)",
                  c1->getSliceNo(), c1->mCavassData->m_fname, c2->getSliceNo(), c2->mCavassData->m_fname,
                  m_it_value );
+        assert( ret < sizeof buff );
         MontageFrame*  f = new MontageFrame();
                   //f->Show();
                   f->loadData( buff, c1->mCavassData->m_xSize, c1->mCavassData->m_ySize, 1,
@@ -389,13 +391,17 @@ void DemonsDialog::OnDoDemons2DRegistration ( void ) {
             mean += value;
         }
         mean /= c1->mCavassData->m_xSize*c1->mCavassData->m_ySize;
-        sprintf( buff, "slice (max mag diff=%d,mean mag diff=%.2f)",
-                 max, mean );
+        ret = snprintf( buff, sizeof buff,
+                        "slice (max mag diff=%d,mean mag diff=%.2f)",
+                        max, mean );
+        assert( ret < sizeof buff );
         puts( buff );    wxLogMessage( buff );
         f = new MontageFrame();
-        sprintf( buff, "difference (fixed slice %d from %s and %d from %s; iterations %d)",
-                 c1->getSliceNo(), c1->mCavassData->m_fname, c2->getSliceNo(), c2->mCavassData->m_fname,
-                 m_it_value );
+        ret = snprintf( buff, sizeof buff,
+            "difference (fixed slice %d from %s and %d from %s; iterations %d)",
+            c1->getSliceNo(), c1->mCavassData->m_fname, c2->getSliceNo(),
+            c2->mCavassData->m_fname, m_it_value );
+        assert( ret < sizeof buff );
         f->loadData( buff, c1->mCavassData->m_xSize, c1->mCavassData->m_ySize, 1,
             c1->mCavassData->m_xSpacing, c1->mCavassData->m_ySpacing, c1->mCavassData->m_zSpacing, diff,
             &c1->mCavassData->m_vh, c1->mCavassData->m_vh_initialized );
@@ -488,7 +494,9 @@ void DemonsDialog::OnDoDemons2DRegistration ( void ) {
 
           f = new MontageFrame();
           //f->Show();
-          sprintf( buff, "WITH registration; iterations %d", m_it_value );
+          ret = snprintf( buff, sizeof buff, "WITH registration; iterations %d",
+                          m_it_value );
+          assert( ret < sizeof buff );
           f->loadData( buff, c1->mCavassData->m_xSize, c1->mCavassData->m_ySize, 2,
               c1->mCavassData->m_xSpacing, c1->mCavassData->m_ySpacing, c1->mCavassData->m_zSpacing, twoFrames,
               &c1->mCavassData->m_vh, c1->mCavassData->m_vh_initialized );

@@ -53,7 +53,7 @@ enum CavassAlgebraType /* Type used in both frame and canvas */
 	ALGEBRA_BDIVIDEA,
 	ALGEBRA_AGREATB,
     ALGEBRA_BGREATA,
-    ALGEBRA_MEAN,        
+    ALGEBRA_MEAN        
 };
 
 

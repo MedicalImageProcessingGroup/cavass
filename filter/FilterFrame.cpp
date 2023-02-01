@@ -119,8 +119,8 @@ m_FilterType(FILTER_GRADIENT2D){
 	mSBAv3DControls = NULL;
 
     ::gFrameList.push_back( this );
-    gWhere += 20;
-    if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = 20;
+    gWhere += cWhereIncr;
+    if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
 
     initializeMenu();
     ::setColor( this );

@@ -67,7 +67,7 @@ IRFCFrame::IRFCFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
 
 
     ::gFrameList.push_back( this );
-    gWhere = 20;
+    gWhere = cWhereIncr;
 
     initializeMenu();
     ::setColor( this );

@@ -1,4 +1,4 @@
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 IF (COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
@@ -6,7 +6,28 @@ IF (COMMAND CMAKE_POLICY)
 ENDIF (COMMAND CMAKE_POLICY)
 
 project( CAVASS )
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
+# set compiler warning level
+if (MSVC)
+  add_compile_options( /W4 /WX )
+else (MSVC)
+  #add_compile_options( -Wall -Wextra -Wpedantic -Werror )
+  add_compile_options( -Wall -Wextra -Wpedantic
+      -Warray-bounds
+      -Wno-deprecated-declarations
+      -Wno-format
+      -Wno-missing-field-initializers
+      -Wno-overloaded-virtual
+      -Wno-sign-compare
+      -Wno-unused-but-set-variable
+      -Wno-unused-const-variable
+      -Wno-unused-parameter
+      -Wno-unused-private-field
+      -Wno-unused-variable
+      -Wsometimes-uninitialized
+  )
+endif (MSVC)
+#------------------------------------------------------------------------------
 # (optional) Parallel build.
 if (NOT BUILD_PARALLEL)
     #if not specified, set default value
@@ -40,7 +61,7 @@ if (BUILD_PARALLEL STREQUAL "On")
 else (BUILD_PARALLEL STREQUAL "On")
     SET (PARALLEL FALSE)
 endif (BUILD_PARALLEL STREQUAL "On")
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # (optional) Find ITK.
 FIND_PACKAGE( ITK )
 IF (ITK_FOUND)
@@ -50,7 +71,7 @@ ENDIF (ITK_FOUND)
 IF (MSVC)
     add_definitions( -D_CRT_SECURE_NO_DEPRECATE )
 ENDIF (MSVC)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 SET (MAXFLOW_VERSION adjacency_list)
 
 #
@@ -73,8 +94,7 @@ else (MSVC)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR} )
 endif (MSVC)
-#--------------------------------------------------------------------------------
-
+#------------------------------------------------------------------------------
 #
 #build the TIFF library
 #
@@ -469,8 +489,6 @@ target_link_libraries( MV0_to_ppm 3dviewnix )
 add_executable( imatron_to_IM0 port_data/imatron_to_IM0.c )
 target_link_libraries( imatron_to_IM0 3dviewnix )
 
-#--------------------------------------------------------------------------------
-#build andre's registration program
 add_executable( affine  registration/affine.c  registration/bigden.c
                         registration/matrix.c  registration/biglag.c
                         registration/newuoa.c  registration/newuob.c
@@ -490,7 +508,7 @@ else ()
   target_link_libraries( nonrigid  3dviewnix )
   target_link_libraries( deform  3dviewnix )
 endif (UNIX)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # build magnitude command line program
 add_executable( magnitude  registration/magnitude.c )
 if (UNIX)
@@ -498,7 +516,7 @@ if (UNIX)
 else ()
   target_link_libraries( magnitude  3dviewnix )
 endif (UNIX)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 #
 #build cavass
 #
@@ -517,6 +535,8 @@ if (wxWidgets_FOUND)
         CavassData.cpp
         CavassData.h
         ChunkData.h
+        #DemonsDialog.cpp
+        #DemonsDialog.h
         Dicom.cpp
         Dicom.h
         DicomInfoFrame.h
@@ -531,6 +551,8 @@ if (wxWidgets_FOUND)
         PreferencesDialog.h
         ProcessManager.h
         RampTransform.cpp
+        #SnakesDialog.cpp
+        #SnakesDialog.h
         TrapezoidTransform.cpp
         analyze/AnalyzeStaticCanvas.cpp
         analyze/AnalyzeStaticCanvas.h
@@ -755,7 +777,8 @@ if (wxWidgets_FOUND)
     endif (UNIX)
 
     add_executable( mipg2dicom  port_data/mipg2dicom.cpp )
-    target_link_libraries( mipg2dicom  ${wxWidgets_LIBRARIES} 3dviewnix )
+    #target_link_libraries( mipg2dicom  ${wxWidgets_LIBRARIES} 3dviewnix )
+    target_link_libraries( mipg2dicom  3dviewnix )
 
     add_executable( estimateScale aar/estimateScale.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
     target_link_libraries( estimateScale ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
@@ -775,7 +798,7 @@ target_link_libraries( PLN_TO_BS0  ${wxWidgets_LIBRARIES} 3dviewnix )
 else (wxWidgets_FOUND)
     message( "wxWidgets not found!" )
 endif (wxWidgets_FOUND)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # (optional) Generate ITK executable (command line) programs.
 IF (ITK_FOUND)
     INCLUDE( ${ITK_USE_FILE} )
@@ -958,7 +981,7 @@ IF (ITK_FOUND)
     target_link_libraries( itkVotingBinaryHoleFillingFilter ${ITK_LIBRARIES} 3dviewnix )
 
 ENDIF (ITK_FOUND)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # distance transform related programs
 #
 add_executable( createPhantom  distance/createPhantom.cpp distance/BoxMuller.h )
@@ -990,7 +1013,7 @@ IF (ITK_FOUND)
         itk/itkIM0VolumeReader.h        itk/itkIM0VolumeWriter.h )
     target_link_libraries( ballScale ${ITK_LIBRARIES} 3dviewnix )
 ENDIF (ITK_FOUND)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # copy the 3dviewnix directory (to access configuration files) to the location of
 # the executables
 # This appears to no longer work in cmake!
@@ -1021,7 +1044,7 @@ else (MSVC)
         COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials/ ${CAVASS_BINARY_DIR}/tutorials
     )
 endif (MSVC)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 if (PARALLEL)
     include_directories( . ${BUILD_PARALLEL_INC} )
     add_executable( p3dinterpolate
@@ -1066,5 +1089,5 @@ if (PARALLEL)
         target_link_libraries( p3dBScaleCompute 3dviewnix ${BUILD_PARALLEL_LIB}/libmpich.a )
     endif (MSVC)
 endif (PARALLEL)
-#--------------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 

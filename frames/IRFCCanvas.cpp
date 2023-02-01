@@ -1261,7 +1261,9 @@ int IRFCCanvas::ApplyTraining()
 	function_update();
 	delete outData;
 	outData = NULL;
-	sprintf(msg, "%d samples used.", training_samples>1? training_samples:0 );
+	int ret = snprintf(msg, sizeof msg, "%d samples used.",
+                          training_samples>1? training_samples:0 );
+        assert( ret < sizeof msg );
 	m_parent_frame->SetStatusText(msg, 1);
 
 	IRFC_update();

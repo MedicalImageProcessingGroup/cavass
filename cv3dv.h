@@ -57,7 +57,7 @@ extern "C" {
   int VGetHeaderLength ( FILE* fp, int* hdrlen );
   int VComputeLine   ( int x1, int y1, int x2, int y2, X_Point** points, int* npoints );
 #ifdef __cplusplus
-};
+}
 #endif
 
 #endif
