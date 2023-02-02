@@ -9,9 +9,9 @@ project( CAVASS )
 #------------------------------------------------------------------------------
 # set compiler warning level
 if (MSVC)
-  add_compile_options( /W4 /WX )
+  add_compile_options( /W4 )
 else (MSVC)
-  #add_compile_options( -Wall -Wextra -Wpedantic -Werror )
+  #add_compile_options( -Wall -Wextra -Wpedantic )
   add_compile_options( -Wall -Wextra -Wpedantic
       -Warray-bounds
       -Wno-deprecated-declarations
@@ -65,7 +65,7 @@ endif (BUILD_PARALLEL STREQUAL "On")
 # (optional) Find ITK.
 FIND_PACKAGE( ITK )
 IF (ITK_FOUND)
-      ADD_DEFINITIONS( -DBUILD_WITH_ITK )
+    ADD_DEFINITIONS( -DBUILD_WITH_ITK )
 ENDIF (ITK_FOUND)
 
 IF (MSVC)
@@ -104,52 +104,47 @@ add_library( libtiff  port_data/tif_aux.c port_data/tif_close.c port_data/tif_co
 #build 3dviewnix command line programs
 #
 include_directories( . 3dviewnix/INCLUDE maxflow/${MAXFLOW_VERSION} )
-
-add_executable( local_maxima  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/local_maxima.c )
-
-add_executable( sobel  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/sobel.c )
-
-add_executable( toboggan  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/toboggan.c )
-
-add_executable( morph  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/morph.c )
-
-add_executable( mmorph  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/mmorph.c )
-
-add_executable( median2d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median2d.c )
-
-add_executable( median3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median3d.c )
-
-add_executable( inhomo_correct_whole  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_whole.c )
-
-add_executable( inhomo_correct_bal_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_bal_std.c )
-
-add_executable( inhomo_correct_interac  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_interac.c )
-
-add_executable( inhomo_gscale_float  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_gscale_float.c )
-
 if (UNIX)
-  target_link_libraries( toboggan  3dviewnix -lm )
-  target_link_libraries( local_maxima  3dviewnix -lm )
-  target_link_libraries( median2d  3dviewnix -lm )
-  target_link_libraries( morph  3dviewnix -lm )
-  target_link_libraries( median3d  3dviewnix -lm )
-  target_link_libraries( sobel  3dviewnix -lm )
-  target_link_libraries( inhomo_correct_whole  3dviewnix -lm )
-  target_link_libraries( inhomo_correct_bal_std  3dviewnix -lm )
-  target_link_libraries( inhomo_gscale_float  3dviewnix -lm )
-  target_link_libraries( inhomo_correct_interac  3dviewnix -lm )
-else ()
-  target_link_libraries( toboggan  3dviewnix )
-  target_link_libraries( local_maxima  3dviewnix )
-  target_link_libraries( median2d  3dviewnix )
-  target_link_libraries( morph  3dviewnix )
-  target_link_libraries( median3d  3dviewnix )
-  target_link_libraries( sobel  3dviewnix )
-  target_link_libraries( inhomo_correct_whole  3dviewnix )
-  target_link_libraries( inhomo_correct_bal_std  3dviewnix )
-  target_link_libraries( inhomo_gscale_float  3dviewnix )
-  target_link_libraries( inhomo_correct_interac  3dviewnix )
+    set( 3DVLIB 3dviewnix -lm )
+else (UNIX)
+    set( 3DVLIB 3dviewnix )
 endif (UNIX)
+
+add_executable( BIM_to_rover  port_data/BIM_to_rover.c )
+target_link_libraries( BIM_to_rover  3dviewnix )
+
+add_executable( BS0_TO_BS1  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS0_TO_BS1.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
+target_link_libraries( BS0_TO_BS1 ${3DVLIB} )
+
+add_executable( BS1_TO_BS0  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS1_TO_BS0.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
+target_link_libraries( BS1_TO_BS0 ${3DVLIB} )
+
+add_executable( IM0_to_pgm port_data/IM0_to_pgm.c )
+target_link_libraries( IM0_to_pgm 3dviewnix )
+
+add_executable( LTDT3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/LTDT3d.cpp )
+target_link_libraries( LTDT3D  3dviewnix )
+
+add_executable( MV0_to_ppm port_data/MV0_to_ppm.c )
+target_link_libraries( MV0_to_ppm 3dviewnix )
+
+add_executable( MV0_to_tiff port_data/MV0_to_tiff.c )
+target_link_libraries( MV0_to_tiff ${3DVLIB} libtiff )
+
+add_executable( affine  registration/affine.c  registration/bigden.c registration/matrix.c  registration/biglag.c registration/newuoa.c  registration/newuob.c registration/trsapp.c  registration/update.c )
+target_link_libraries( affine ${3DVLIB} )
+
+add_executable( algebra  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/algebra.c )
+target_link_libraries( algebra ${3DVLIB} )
+
+add_executable( b_scale_anisotrop_diffus_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_2D.c )
+target_link_libraries( b_scale_anisotrop_diffus_2D ${3DVLIB} )
+
+add_executable( b_scale_anisotrop_diffus_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_3D.c )
+target_link_libraries( b_scale_anisotrop_diffus_3D ${3DVLIB} )
+
+add_executable( ball_enhance  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/ball_enhance.c )
+target_link_libraries( ball_enhance ${3DVLIB} )
 
 add_executable( bin_mask  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_mask.c )
 target_link_libraries( bin_mask  3dviewnix )
@@ -157,202 +152,135 @@ target_link_libraries( bin_mask  3dviewnix )
 add_executable( bin_ops  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_ops.c )
 target_link_libraries( bin_ops  3dviewnix )
 
-add_executable( bscale_dilate_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/bscale_dilate_2D.c )
-
-if (UNIX)
-  target_link_libraries( bscale_dilate_2D  3dviewnix -lm )
-else ()
-  target_link_libraries( bscale_dilate_2D  3dviewnix )
-endif (UNIX)
-
-add_executable( combine_cine_slices  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/combine_cine_slices.c )
-target_link_libraries( combine_cine_slices  3dviewnix )
-
-add_executable( copy_pose  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/copy_pose.c )
-target_link_libraries( copy_pose  3dviewnix )
-
-add_executable( divide  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/divide.c )
-target_link_libraries( divide  3dviewnix )
-
-add_executable( invert  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/invert.c )
-target_link_libraries( invert  3dviewnix )
-
-add_executable( algebra  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/algebra.c )
-
-if (UNIX)
-    target_link_libraries( algebra  3dviewnix -lm )
-else ()
-    target_link_libraries( algebra  3dviewnix )
-endif (UNIX)
-
-add_executable( gc  maxflow/gc.cpp maxflow/${MAXFLOW_VERSION}/graph.cpp maxflow/${MAXFLOW_VERSION}/maxflow.cpp )
-target_link_libraries( gc  3dviewnix )
-
-add_executable( gscale  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/gscale.c )
-
-add_executable( largest_component  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/largest_component.c )
-target_link_libraries( largest_component  3dviewnix )
-
-add_executable( masked_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/masked_stats.c )
-if (UNIX)
-  target_link_libraries( gscale  3dviewnix -lm )
-  target_link_libraries( masked_stats  3dviewnix -lm )
-else ()
-  target_link_libraries( gscale  3dviewnix )
-  target_link_libraries( masked_stats  3dviewnix )
-endif (UNIX)
-
-add_executable( matched_reslice  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/matched_reslice.c )
-target_link_libraries( matched_reslice  3dviewnix )
-
-add_executable( mean_pose  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mean_pose.c )
-
-add_executable( min_xor_threshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_threshold.c )
-target_link_libraries( min_xor_threshold  3dviewnix )
-
-add_executable( min_xor_thresholds  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_thresholds.c )
-target_link_libraries( min_xor_thresholds  3dviewnix )
-
-add_executable( mrscaleprog  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mrscaleprog.c )
-target_link_libraries( mrscaleprog  3dviewnix )
-
-add_executable( ball_enhance  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/ball_enhance.c )
-
-add_executable( bin_volume  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_volume.c )
-
-add_executable( b_scale_anisotrop_diffus_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_2D.c )
-
-add_executable( b_scale_anisotrop_diffus_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/b_scale_anisotrop_diffus_3D.c )
-if (UNIX)
-  target_link_libraries( mean_pose  -lm )
-  target_link_libraries( b_scale_anisotrop_diffus_2D  3dviewnix -lm )
-  target_link_libraries( ball_enhance  3dviewnix -lm )
-  target_link_libraries( bin_volume  3dviewnix -lm )
-  target_link_libraries( b_scale_anisotrop_diffus_3D  3dviewnix -lm )
-else ()
-  target_link_libraries( b_scale_anisotrop_diffus_2D  3dviewnix )
-  target_link_libraries( ball_enhance  3dviewnix )
-  target_link_libraries( bin_volume  3dviewnix )
-  target_link_libraries( b_scale_anisotrop_diffus_3D  3dviewnix )
-endif (UNIX)
-
 add_executable( bin_to_MSK  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_to_MSK.c )
 target_link_libraries( bin_to_MSK  3dviewnix )
+
+add_executable( bin_volume  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/bin_volume.c )
+target_link_libraries( bin_volume ${3DVLIB} )
+
+add_executable( bscale_dilate_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/bscale_dilate_2D.c )
+target_link_libraries( bscale_dilate_2D ${3DVLIB} )
 
 add_executable( class2f  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/class2f.c )
 target_link_libraries( class2f  3dviewnix )
 
+add_executable( combine_cine_slices  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/combine_cine_slices.c )
+target_link_libraries( combine_cine_slices  3dviewnix )
+
 add_executable( comp_interv  aar/comp_interv.c )
 
+add_executable( copy_pose  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/copy_pose.c )
+target_link_libraries( copy_pose  3dviewnix )
+
 add_executable( correct_min_max  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/correct_min_max.c )
-if (UNIX)
-  target_link_libraries( correct_min_max  3dviewnix -lm )
-else ()
-  target_link_libraries( correct_min_max  3dviewnix )
-endif (UNIX)
+target_link_libraries( correct_min_max ${3DVLIB} )
 
-add_executable( create_icon  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/create_icon.c
-                                    3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
+add_executable( create_icon  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/create_icon.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
+target_link_libraries( create_icon ${3DVLIB} )
 
-add_executable( BS1_TO_BS0  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS1_TO_BS0.c
-                                    3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
-if (UNIX)
-  target_link_libraries( create_icon  3dviewnix -lm )
-  target_link_libraries( BS1_TO_BS0  3dviewnix -lm )
-else ()
-  target_link_libraries( create_icon  3dviewnix )
-  target_link_libraries( BS1_TO_BS0  3dviewnix )
-endif (UNIX)
-
-add_executable( BS0_TO_BS1  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/BS0_TO_BS1.c
-                                    3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
+add_executable( deform  registration/deform.c )
+target_link_libraries( deform ${3DVLIB} )
 
 add_executable( direction  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/direction.c )
 target_link_libraries( direction  3dviewnix )
 
 add_executable( distance3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/distance3D.c )
+target_link_libraries( distance3D ${3DVLIB} )
+
+add_executable( divide  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/divide.c )
+target_link_libraries( divide  3dviewnix )
 
 add_executable( edge_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/edge_stats.c registration/matrix.c )
 target_link_libraries( edge_stats  3dviewnix )
 
 add_executable( face_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/face_stats.c registration/matrix.c )
+target_link_libraries( face_stats ${3DVLIB} )
 
 add_executable( fcut  port_data/fcut.c )
 
 add_executable( fg_components  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/fg_components.c )
 target_link_libraries( fg_components  3dviewnix )
 
-add_executable( BIM_to_rover  port_data/BIM_to_rover.c )
-target_link_libraries( BIM_to_rover  3dviewnix )
-
 add_executable( fillcontours  port_data/fillcontours.cpp port_data/read_acrnema.cpp )
 target_link_libraries( fillcontours  3dviewnix )
 
+add_executable( from_BS2 port_data/from_BS2.c )
+target_link_libraries( from_BS2 ${3DVLIB} )
+
+add_executable( fuzz_track_3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_3d.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash2.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/hheap.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/gqueue.c )
+target_link_libraries( fuzz_track_3d ${3DVLIB} )
+
+add_executable( fuzz_track_rel  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_rel.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash2.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/hheap.c )
+target_link_libraries( fuzz_track_rel ${3DVLIB} )
+
 add_executable( fuzziness  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/fuzziness.c )
-
-add_executable( fuzz_track_3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_3d.c
-                                      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash.c
-                                      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash2.c
-                                      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/hheap.c
-                                      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/gqueue.c )
-
-add_executable( fuzz_track_rel  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/fuzz_track_rel.c
-                                      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash.c
-                                      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/chash2.c
-                                      3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FUZZ_TRACK/hheap.c )
-
-add_executable( gaussian3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian3d.c )
-
-add_executable( gaussian_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian_3D.c )
+target_link_libraries( fuzziness ${3DVLIB} )
 
 add_executable( gaussian2d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian2d.c )
-if (UNIX)
-  target_link_libraries( BS0_TO_BS1  3dviewnix -lm )
-  target_link_libraries( distance3D  3dviewnix -lm )
-  target_link_libraries( fuzziness  3dviewnix -lm )
-  target_link_libraries( face_stats  3dviewnix -lm )
-  target_link_libraries( fuzz_track_3d  3dviewnix -lm )
-  target_link_libraries( fuzz_track_rel  3dviewnix -lm )
-  target_link_libraries( gaussian2d  3dviewnix -lm )
-  target_link_libraries( gaussian3d  3dviewnix -lm )
-  target_link_libraries( gaussian_3D  3dviewnix -lm )
-else ()
-  target_link_libraries( BS0_TO_BS1  3dviewnix )
-  target_link_libraries( distance3D  3dviewnix )
-  target_link_libraries( fuzziness  3dviewnix )
-  target_link_libraries( face_stats  3dviewnix )
-  target_link_libraries( fuzz_track_3d  3dviewnix )
-  target_link_libraries( fuzz_track_rel  3dviewnix )
-  target_link_libraries( gaussian2d  3dviewnix )
-  target_link_libraries( gaussian3d  3dviewnix )
-  target_link_libraries( gaussian_3D  3dviewnix )
-endif (UNIX)
+target_link_libraries( gaussian2d ${3DVLIB} )
+
+add_executable( gaussian3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian3d.c )
+target_link_libraries( gaussian3d ${3DVLIB} )
+
+add_executable( gaussian_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gaussian_3D.c )
+target_link_libraries( gaussian_3D ${3DVLIB} )
+
+add_executable( gbscale2_scale  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_scale.c )
+target_link_libraries( gbscale2_scale ${3DVLIB} )
+
+add_executable( gbscale2_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_std.c )
+target_link_libraries( gbscale2_std ${3DVLIB} )
+
+add_executable( gbscale2_train  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_train.c )
+target_link_libraries( gbscale2_train ${3DVLIB} )
+
+add_executable( gc  maxflow/gc.cpp maxflow/${MAXFLOW_VERSION}/graph.cpp maxflow/${MAXFLOW_VERSION}/maxflow.cpp )
+target_link_libraries( gc  3dviewnix )
 
 add_executable( get_bins  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/get_bins.c registration/matrix.c )
+target_link_libraries( get_bins ${3DVLIB} )
 
 add_executable( get_slicenumber  3dviewnix/PROCESS/AIRWAY/get_slicenumber.c )
 target_link_libraries( get_slicenumber  3dviewnix )
 
 add_executable( gradient  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gradient.c )
+target_link_libraries( gradient ${3DVLIB} )
 
 add_executable( gradient3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/gradient3d.c )
+target_link_libraries( gradient3d ${3DVLIB} )
+
+add_executable( gscale  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/gscale.c )
+target_link_libraries( gscale ${3DVLIB} )
+
+add_executable( imatron_to_IM0 port_data/imatron_to_IM0.c )
+target_link_libraries( imatron_to_IM0 3dviewnix )
+
+add_executable( inhomo_correct_bal_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_bal_std.c )
+target_link_libraries( inhomo_correct_bal_std ${3DVLIB} )
+
+add_executable( inhomo_correct_interac  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_interac.c )
+target_link_libraries( inhomo_correct_interac ${3DVLIB} )
+
+add_executable( inhomo_correct_whole  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_correct_whole.c )
+target_link_libraries( inhomo_correct_whole ${3DVLIB} )
+
+add_executable( inhomo_gscale_float  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/inhomo_gscale_float.c )
+target_link_libraries( inhomo_gscale_float ${3DVLIB} )
 
 add_executable( intensity_map  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/intensity_map.c )
+target_link_libraries( intensity_map ${3DVLIB} )
 
-if (UNIX)
-  target_link_libraries( gradient  3dviewnix -lm )
-  target_link_libraries( get_bins  3dviewnix -lm )
-  target_link_libraries( gradient3d  3dviewnix -lm )
-  target_link_libraries( intensity_map  3dviewnix -lm )
-else ()
-  target_link_libraries( gradient  3dviewnix )
-  target_link_libraries( get_bins  3dviewnix )
-  target_link_libraries( gradient3d  3dviewnix )
-  target_link_libraries( intensity_map  3dviewnix )
-endif (UNIX)
+add_executable( invert  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/invert.c )
+target_link_libraries( invert  3dviewnix )
 
-add_executable( LTDT3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/LTDT3d.cpp )
-target_link_libraries( LTDT3D  3dviewnix )
+add_executable( largest_component  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/largest_component.c )
+target_link_libraries( largest_component  3dviewnix )
+
+add_executable( local_maxima  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/local_maxima.c )
+target_link_libraries( local_maxima ${3DVLIB} )
+
+add_executable( magnitude  registration/magnitude.c )
+target_link_libraries( magnitude ${3DVLIB} )
 
 add_executable( mask2bin  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MASK/mask2bin.c )
 target_link_libraries( mask2bin  3dviewnix )
@@ -360,162 +288,116 @@ target_link_libraries( mask2bin  3dviewnix )
 add_executable( mask2grey  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MASK/mask2grey.c )
 target_link_libraries( mask2grey  3dviewnix )
 
+add_executable( masked_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/masked_stats.c )
+target_link_libraries( masked_stats ${3DVLIB} )
+
+add_executable( matched_reslice  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/matched_reslice.c )
+target_link_libraries( matched_reslice  3dviewnix )
+
 add_executable( mean  aar/mean.c )
+
+add_executable( mean_pose  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mean_pose.c )
+
+add_executable( median2d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median2d.c )
+target_link_libraries( median2d ${3DVLIB} )
+
+add_executable( median3d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median3d.c )
+target_link_libraries( median3d ${3DVLIB} )
+
+add_executable( merge  aar/merge.c )
+target_link_libraries( merge ${3DVLIB} )
 
 add_executable( merge_surface  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/MERGE_STRUCT/merge_surface.c )
 target_link_libraries( merge_surface  3dviewnix )
+
+add_executable( min_xor_threshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_threshold.c )
+target_link_libraries( min_xor_threshold  3dviewnix )
+
+add_executable( min_xor_thresholds  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/min_xor_thresholds.c )
+target_link_libraries( min_xor_thresholds  3dviewnix )
+
+add_executable( mipg2dicom  port_data/mipg2dicom.cpp )
+target_link_libraries( mipg2dicom  3dviewnix )
+
+add_executable( mmorph  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/mmorph.c )
+
+add_executable( morph  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/morph.c )
+target_link_libraries( morph ${3DVLIB} )
+
+add_executable( mrscaleprog  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mrscaleprog.c )
+target_link_libraries( mrscaleprog  3dviewnix )
 
 add_executable( ndclass  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/ndclass.c )
 target_link_libraries( ndclass  3dviewnix )
 
 add_executable( ndinterpolate  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/INTERPOLATE/ndinterpolate.c )
+target_link_libraries( ndinterpolate ${3DVLIB} )
 
 add_executable( ndthreshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/THRESHOLD/ndthreshold.c )
 target_link_libraries( ndthreshold  3dviewnix )
 
 add_executable( ndvoi  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/ndvoi.c )
+target_link_libraries( ndvoi ${3DVLIB} )
 
-add_executable( gbscale2_scale  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_scale.c )
-
-add_executable( gbscale2_std  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_std.c )
-if (UNIX)
-  target_link_libraries( gbscale2_scale  3dviewnix -lm )
-  target_link_libraries( ndinterpolate  3dviewnix -lm )
-  target_link_libraries( ndvoi  3dviewnix -lm )
-  target_link_libraries( gbscale2_std  3dviewnix -lm )
-else ()
-  target_link_libraries( gbscale2_scale  3dviewnix )
-  target_link_libraries( ndinterpolate  3dviewnix )
-  target_link_libraries( ndvoi  3dviewnix )
-  target_link_libraries( gbscale2_std  3dviewnix )
-endif (UNIX)
-
-add_executable( gbscale2_train  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/VOI/gbscale2_train.c )
-
-add_executable( merge  aar/merge.c )
+add_executable( nonrigid  registration/nonrigid.c )
+target_link_libraries( nonrigid ${3DVLIB} )
 
 add_executable( optimal_threshold  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/THRESHOLD/optimal_threshold.c )
-if (UNIX)
-  target_link_libraries( gbscale2_train  3dviewnix -lm )
-  target_link_libraries( optimal_threshold  3dviewnix -lm )
-  target_link_libraries( merge  3dviewnix -lm )
-else ()
-  target_link_libraries( gbscale2_train  3dviewnix )
-  target_link_libraries( optimal_threshold  3dviewnix )
-  target_link_libraries( merge  3dviewnix )
-endif (UNIX)
+target_link_libraries( optimal_threshold ${3DVLIB} )
 
 add_executable( overlap_peak  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/overlap_peak.c )
+target_link_libraries( overlap_peak ${3DVLIB} )
+
+add_executable( relpos     3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/relpos.c )
 
 add_executable( reslice_proc  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/reslice_proc.c )
+target_link_libraries( reslice_proc ${3DVLIB} )
 
 add_executable( rint  aar/rint.c )
 
 add_executable( scale_based_filtering_2D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/scale_based_filtering_2D.c )
+target_link_libraries( scale_based_filtering_2D ${3DVLIB} )
 
 add_executable( scale_based_filtering_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/scale_based_filtering_3D.c )
+target_link_libraries( scale_based_filtering_3D ${3DVLIB} )
 
 add_executable( screen_params  aar/screen_params.c )
 
-add_executable( shell  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/shell.c
-                              3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/gcode.c )
+add_executable( shell  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/shell.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/gcode.c )
+target_link_libraries( shell ${3DVLIB} )
 
 add_executable( sketch  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/sketch.c )
-if (UNIX)
-  target_link_libraries( shell  3dviewnix -lm )
-  target_link_libraries( screen_params  -lm )
-  target_link_libraries( overlap_peak  3dviewnix -lm )
-  target_link_libraries( reslice_proc  3dviewnix -lm )
-  target_link_libraries( scale_based_filtering_2D  3dviewnix -lm )
-  target_link_libraries( scale_based_filtering_3D  3dviewnix -lm )
-  target_link_libraries( sketch  3dviewnix -lm )
-else ()
-  target_link_libraries( shell  3dviewnix )
-  target_link_libraries( overlap_peak  3dviewnix )
-  target_link_libraries( reslice_proc  3dviewnix )
-  target_link_libraries( scale_based_filtering_2D  3dviewnix )
-  target_link_libraries( scale_based_filtering_3D  3dviewnix )
-  target_link_libraries( sketch  3dviewnix )
-endif (UNIX)
+target_link_libraries( sketch ${3DVLIB} )
+
+add_executable( sobel  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/sobel.c )
+target_link_libraries( sobel ${3DVLIB} )
 
 add_executable( suv_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/suv_stats.c )
+target_link_libraries( suv_stats ${3DVLIB} )
 
 add_executable( texture_image  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/texture_image.c )
+target_link_libraries( texture_image ${3DVLIB} )
 
 add_executable( texture_stats  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/texture_stats.c )
-if (UNIX)
-  target_link_libraries( texture_image  3dviewnix -lm )
-  target_link_libraries( suv_stats  3dviewnix -lm )
-  target_link_libraries( texture_stats  3dviewnix -lm )
-else ()
-  target_link_libraries( texture_image  3dviewnix )
-  target_link_libraries( suv_stats  3dviewnix )
-  target_link_libraries( texture_stats  3dviewnix )
-endif (UNIX)
+target_link_libraries( texture_stats ${3DVLIB} )
 
-add_executable( to_normal  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/to_normal.c
-                                  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
+add_executable( to_normal  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/to_normal.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
+target_link_libraries( to_normal ${3DVLIB} )
 
-add_executable( track_3d  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_3d.c
-                                 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
+add_executable( toboggan  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/toboggan.c )
+target_link_libraries( toboggan ${3DVLIB} )
 
-add_executable( track_all  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_all.c
-                                  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
+add_executable( track_3d  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_3d.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
+target_link_libraries( track_3d ${3DVLIB} )
 
-add_executable( relpos     3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/relpos.c )
-
-if (UNIX)
-  target_link_libraries( to_normal  3dviewnix -lm )
-  target_link_libraries( track_3d  3dviewnix -lm )
-  target_link_libraries( track_all  3dviewnix -lm )
-  target_link_libraries( relpos  -lm )
-else ()
-  target_link_libraries( to_normal  3dviewnix )
-  target_link_libraries( track_3d  3dviewnix )
-  target_link_libraries( track_all  3dviewnix )
-endif (UNIX)
+add_executable( track_all  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/track_all.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_NORMAL/gcode.c )
+target_link_libraries( track_all ${3DVLIB} )
 
 add_executable( vote  aar/vote.c )
 
 add_executable( xor_min  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/xor_min.c )
 target_link_libraries( xor_min  3dviewnix )
-
-add_executable( IM0_to_pgm port_data/IM0_to_pgm.c )
-target_link_libraries( IM0_to_pgm 3dviewnix )
-
-add_executable( MV0_to_ppm port_data/MV0_to_ppm.c )
-target_link_libraries( MV0_to_ppm 3dviewnix )
-
-add_executable( imatron_to_IM0 port_data/imatron_to_IM0.c )
-target_link_libraries( imatron_to_IM0 3dviewnix )
-
-add_executable( affine  registration/affine.c  registration/bigden.c
-                        registration/matrix.c  registration/biglag.c
-                        registration/newuoa.c  registration/newuob.c
-                        registration/trsapp.c  registration/update.c )
 #------------------------------------------------------------------------------
-#------------------------------------------------------------------------------
-#build Xiaofen's nonrigid registration program
-add_executable( nonrigid  registration/nonrigid.c )
-#build deform command line program
-add_executable( deform  registration/deform.c )
-if (UNIX)
-  target_link_libraries( affine  3dviewnix -lm )
-  target_link_libraries( nonrigid  3dviewnix -lm )
-  target_link_libraries( deform  3dviewnix -lm )
-else ()
-  target_link_libraries( affine  3dviewnix )
-  target_link_libraries( nonrigid  3dviewnix )
-  target_link_libraries( deform  3dviewnix )
-endif (UNIX)
-#------------------------------------------------------------------------------
-# build magnitude command line program
-add_executable( magnitude  registration/magnitude.c )
-if (UNIX)
-  target_link_libraries( magnitude  3dviewnix -lm )
-else ()
-  target_link_libraries( magnitude  3dviewnix )
-endif (UNIX)
 #------------------------------------------------------------------------------
 #
 #build cavass
@@ -759,26 +641,11 @@ if (wxWidgets_FOUND)
 
     target_link_libraries( cavass  ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
 
-    add_executable( from_BS2 port_data/from_BS2.c )
-
     add_executable( from_dicom  port_data/from_dicom.cpp port_data/read_acrnema.cpp )
     target_link_libraries( from_dicom  ${wxWidgets_LIBRARIES} 3dviewnix )
 
     add_executable( ser_loc  port_data/ser_loc.cpp port_data/read_acrnema.cpp )
     target_link_libraries( ser_loc  ${wxWidgets_LIBRARIES} 3dviewnix )
-
-    add_executable( MV0_to_tiff port_data/MV0_to_tiff.c )
-    if (UNIX)
-      target_link_libraries( from_BS2 3dviewnix -lm )
-      target_link_libraries( MV0_to_tiff 3dviewnix libtiff -lm )
-    else ()
-      target_link_libraries( from_BS2 3dviewnix )
-      target_link_libraries( MV0_to_tiff 3dviewnix libtiff )
-    endif (UNIX)
-
-    add_executable( mipg2dicom  port_data/mipg2dicom.cpp )
-    #target_link_libraries( mipg2dicom  ${wxWidgets_LIBRARIES} 3dviewnix )
-    target_link_libraries( mipg2dicom  3dviewnix )
 
     add_executable( estimateScale aar/estimateScale.cpp Dicom.cpp CavassData.cpp port_data/read_acrnema.cpp )
     target_link_libraries( estimateScale ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
@@ -1017,6 +884,7 @@ ENDIF (ITK_FOUND)
 # copy the 3dviewnix directory (to access configuration files) to the location of
 # the executables
 # This appears to no longer work in cmake!
+# It has been replaced with code above (search for copy_dir).
 #
 if (MSVC)
     EXECUTE_PROCESS(

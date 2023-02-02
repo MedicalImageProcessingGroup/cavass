@@ -32,6 +32,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
+#include  <wx/stdpaths.h>
 #include  "cavass.h"
 #include  "MontageCanvas.h"
 
@@ -491,7 +492,10 @@ class CavassMain : public wxApp {
 
         SetVendorName( _T("MIPG")   );
         SetAppName(    _T("CAVASS") );
-        wxFileConfig*  wxfc = new wxFileConfig( "CAVASS" );
+        wxString iniFile = wxStandardPaths::Get().GetUserConfigDir()
+                         + wxFileName::GetPathSeparator() + "cavass.ini";
+        cout << "ini file: " << iniFile << endl;
+        wxFileConfig* wxfc = new wxFileConfig( "", "", iniFile );
 		assert( wxfc != NULL );
 		wxFileConfig::Set( wxfc );
 		wxfc->SetRecordDefaults();

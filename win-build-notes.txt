@@ -1,0 +1,47 @@
+-----------------------------
+Build wxWidgets (win version)
+-----------------------------
+I COULD NOT GET CAVASS TO LINK TO WXWIDGETS  WHEN I BUILT WXWIDGETS WITH 
+CMAKE!
+Download wxWidgets from wxwidgets.org, and unzip.
+The most recent version of CAVASS was built with version 3.2.1.
+Open the file wx_vc17.sln in wxWidgets-3.2.1\build\msw with Visual C++.
+Do Build --> Batch Build... --> Select All --> Build.
+Open the file wxrc_vc15.sln in wxWidgets-3.2.1/utils/wxrc.
+Do Build --> Batch Build...
+Select wxrc Debug x64 Debug|x64.
+Select wxrc Release x64 Release|x64.
+Click Build.
+
+--------------------
+Build ITK (optional)
+--------------------
+Optionally build ITK if desired.
+
+------------
+Build CAVASS
+------------
+Download CAVASS or clone the CAVASS repo
+(e.g., git clone george@grevera.ddns.net:/home/george/repos/cavass.git/).
+Run cmake. Indicate CAVASS source folder.
+We suggest that a separate folder (e.g., cavass-build)
+be used for "Where to build the binaries."
+Choose CMAKE_CONFIGURATION_TYPES (e.g., Debug).
+
+Specify wxWidgets_LIB_DIR
+(e.g., C:/Users/ggrevera/Desktop/mipg3/wxWidgets-3.2.1/lib/vc_x64_lib).
+
+Specify wxWidgets_ROOT_DIR
+(e.g., C:/Users/ggrevera/Desktop/mipg3/wxWidgets-3.2.1).
+
+Specify wxWidgets_wxrc_EXECUTABLE
+(C:/Users/ggrevera/Desktop/mipg3/wxWidgets-3.2.1/utils/wxrc/vc_x64_mswud/wxrc.exe).
+
+Press Configure and then press Generate.
+Open CAVASS.sln in cavass-build.
+Do Build --> Batch Build... --> ALL_BUILD Debug x64 Debug|x64 --> Build.
+ALL_BUILD Release x64 Release|x64 can be chose as well.
+
+To run CAVASS from Solution Explorer,
+rt-click on cavass --> Set as Startup Project.
+Then run it.
