@@ -1,7 +1,7 @@
 -----------------------------
 Build wxWidgets (win version)
 -----------------------------
-I COULD NOT GET CAVASS TO LINK TO WXWIDGETS  WHEN I BUILT WXWIDGETS WITH 
+I COULD NOT GET CAVASS TO LINK TO WXWIDGETS WHEN I BUILT WXWIDGETS WITH 
 CMAKE!
 Download wxWidgets from wxwidgets.org, and unzip.
 The most recent version of CAVASS was built with version 3.2.1.
