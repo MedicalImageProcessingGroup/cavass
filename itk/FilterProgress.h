@@ -33,7 +33,7 @@ public :
     typedef  itk::Command             Superclass;
     typedef  itk::SmartPointer<Self>  Pointer;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    itkNewMacro ( Self );
+    itkNewMacro ( Self )
 protected :
     FilterProgress ( void ) { }
 public :

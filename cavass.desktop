@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=cavass
+Exec=/home/jorge/mipg/cavass-build-wx321/cavass
+Comment=cavass from mipg
+Terminal=false
+Icon=/home/jorge/mipg/cavass-build-wx321/cavass.png
+Type=Application

@@ -57,7 +57,7 @@ public:
   itkTypeMacro(IM0VolumeWriter, Object);
 
   /** Method for creation through the object factory. */
-  itkNewMacro(Self);
+  itkNewMacro(Self)
 
   /** Image Type. */
   typedef TImage ImageType;

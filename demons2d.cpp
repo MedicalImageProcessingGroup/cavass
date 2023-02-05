@@ -39,7 +39,7 @@ class CommandIterationUpdate : public itk::Command {
         typedef  itk::Command             Superclass;
         typedef  itk::SmartPointer<Self>  Pointer;
         // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        itkNewMacro ( Self );
+        itkNewMacro ( Self )
     protected :
         CommandIterationUpdate ( void ) { }
     public :
