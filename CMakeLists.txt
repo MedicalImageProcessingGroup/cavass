@@ -10,8 +10,7 @@ project( CAVASS )
 # set compiler warning level
 if (MSVC)
   add_compile_options( /W4 )
-else (MSVC)
-  #add_compile_options( -Wall -Wextra -Wpedantic )
+elseif (MACH)
   add_compile_options( -Wall -Wextra -Wpedantic
       -Warray-bounds
       -Wno-deprecated-declarations
@@ -26,7 +25,25 @@ else (MSVC)
       -Wno-unused-variable
       -Wsometimes-uninitialized
   )
-endif (MSVC)
+else()
+  add_compile_options( -Wall -Wextra -Wpedantic
+      -Warray-bounds
+      -Wno-deprecated-declarations
+      -Wno-format
+      -Wno-missing-field-initializers
+      -Wno-overloaded-virtual
+      -Wno-sign-compare
+      -Wno-unused-but-set-variable
+      -Wno-unused-const-variable
+      -Wno-unused-parameter
+      -Wno-unused-variable
+      -Wno-misleading-indentation
+      -Wno-parentheses
+      -Wno-implicit-fallthrough
+      -Wno-stringop-truncation
+      -Wno-cast-function-type
+  )
+endif()
 #------------------------------------------------------------------------------
 # (optional) Parallel build.
 if (NOT BUILD_PARALLEL)
@@ -129,7 +146,11 @@ add_executable( MV0_to_ppm port_data/MV0_to_ppm.c )
 target_link_libraries( MV0_to_ppm 3dviewnix )
 
 add_executable( MV0_to_tiff port_data/MV0_to_tiff.c )
-target_link_libraries( MV0_to_tiff ${3DVLIB} libtiff )
+if (UNIX)
+    target_link_libraries( MV0_to_tiff ${3DVLIB} libtiff -lm )
+else (UNIX)
+    target_link_libraries( MV0_to_tiff ${3DVLIB} libtiff )
+endif (UNIX)
 
 add_executable( affine  registration/affine.c  registration/bigden.c registration/matrix.c  registration/biglag.c registration/newuoa.c  registration/newuob.c registration/trsapp.c  registration/update.c )
 target_link_libraries( affine ${3DVLIB} )
@@ -297,6 +318,11 @@ target_link_libraries( matched_reslice  3dviewnix )
 add_executable( mean  aar/mean.c )
 
 add_executable( mean_pose  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/mean_pose.c )
+if (UNIX)
+     target_link_libraries( mean_pose -lm )
+else (UNIX)
+     target_link_libraries( mean_pose )
+endif (UNIX)
 
 add_executable( median2d  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/FILTER/median2d.c )
 target_link_libraries( median2d ${3DVLIB} )
@@ -348,7 +374,12 @@ target_link_libraries( optimal_threshold ${3DVLIB} )
 add_executable( overlap_peak  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/overlap_peak.c )
 target_link_libraries( overlap_peak ${3DVLIB} )
 
-add_executable( relpos     3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/relpos.c )
+add_executable( relpos 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/relpos.c )
+if (UNIX)
+    target_link_libraries( relpos -lm )
+else (UNIX)
+    target_link_libraries( relpos )
+endif (UNIX)
 
 add_executable( reslice_proc  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/MISC_OPS/reslice_proc.c )
 target_link_libraries( reslice_proc ${3DVLIB} )
@@ -362,6 +393,11 @@ add_executable( scale_based_filtering_3D  3dviewnix/PROCESS/PREPROCESS/SCENE_OPE
 target_link_libraries( scale_based_filtering_3D ${3DVLIB} )
 
 add_executable( screen_params  aar/screen_params.c )
+if (UNIX)
+    target_link_libraries( screen_params -lm )
+else (UNIX)
+    target_link_libraries( screen_params )
+endif (UNIX)
 
 add_executable( shell  3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/shell.c 3dviewnix/PROCESS/PREPROCESS/SCENE_OPERATIONS/CLASSIFY/gcode.c )
 target_link_libraries( shell ${3DVLIB} )

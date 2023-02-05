@@ -51,6 +51,7 @@ int  gNextWindowID = MainFrame::ID_FIRST_DYNAMIC_WINDOW_MENU;
 #include  "cavass-splash.xpm"
 #include  "button-zoomin15.xpm"
 #include  "button-zoomout15.xpm"
+#include  "cavass_icon.xpm"    //icon (for log window)
 //----------------------------------------------------------------------
 /** \brief 
  *  \param f1 is the name of an input file.
@@ -487,13 +488,14 @@ class CavassMain : public wxApp {
      */
     virtual bool OnInit ( void ) {
         puts( "in CavassMain::OnInit()" );
+        setenv( "WXSUPPRESS_SIZER_FLAGS_CHECK", "1", 1 );  //suppress warnings
         //cout << "free memory  = " << hex << ::wxGetFreeMemory() << dec << endl;
         cout << "aspect ratio = " << getAspectRatio() << endl;
 
         SetVendorName( _T("MIPG")   );
         SetAppName(    _T("CAVASS") );
         wxString iniFile = wxStandardPaths::Get().GetUserConfigDir()
-                         + wxFileName::GetPathSeparator() + "cavass.ini";
+                         + wxFileName::GetPathSeparator() + ".cavass.ini";
         cout << "ini file: " << iniFile << endl;
         wxFileConfig* wxfc = new wxFileConfig( "", "", iniFile );
 		assert( wxfc != NULL );
@@ -507,6 +509,9 @@ class CavassMain : public wxApp {
 
         wxInitAllImageHandlers();
         gLogWindow = new wxLogWindow( NULL, "log", Preferences::getShowLog(), false );
+        //set icon for log window as well
+        gLogWindow->GetFrame()->SetIcon( wxICON(cavass_icon) );
+
         wxLogMessage( "VIEWNIX_ENV=%s", getenv("VIEWNIX_ENV") );
         wxLogMessage( "PATH=%s",        getenv("PATH") );
         wxLogMessage( "ARGV[0]=%s",     argv[0] );

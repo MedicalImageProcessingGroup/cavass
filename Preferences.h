@@ -39,9 +39,9 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  *  This (singleton) class allows the caller to check and modify the
  *  status/state of user preferences.  This class allows preferences
  *  to persist via loading and storing preferences in a wxConfig object.
- *  Changes are automatically stored (to the file ~/.CAVASS on Linux,
+ *  Changes are automatically stored (to the file ~/.cavass.ini on Linux,
  *  ~/Library/Preferences/CAVASS\ Preferences on Mac OS, or
- *  C:Users\ggrevera\AppData\Roaming\cavass.ini on Windows for example).
+ *  C:Users\ggrevera\AppData\Roaming\.cavass.ini on Windows for example).
  *  On Windows, one should avoid the Windows registry and use a file 
  *  instead.
  */

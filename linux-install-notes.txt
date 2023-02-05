@@ -55,11 +55,15 @@ in /etc/profile.local put the commands:
 
 VIEWNIX_ENV=~/cavass-build
 PATH=$PATH:~/cavass-build
-WXSUPPRESS_SIZER_FLAGS_CHECK=1
-export PATH VIEWNIX_ENV WXSUPPRESS_SIZER_FLAGS_CHECK
+export PATH VIEWNIX_ENV
 
 but instead of ~ put the directory where cavass-build is.  Those commands will 
 take effect on your next login.
 
 You may have to change your appearance settings for GTK2 applications to make
 the button labels readable.
+
+How to create a desktop icon:
+  Copy the file, cavass.desktop, to the desktop folder.
+  Edit cavass.desktop and specify the correct paths to cavass and the png file.
+
