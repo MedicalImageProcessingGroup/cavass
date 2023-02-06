@@ -488,7 +488,11 @@ class CavassMain : public wxApp {
      */
     virtual bool OnInit ( void ) {
         puts( "in CavassMain::OnInit()" );
+#if defined (WIN32) || defined (_WIN32)
+        putenv( "WXSUPPRESS_SIZER_FLAGS_CHECK=1" );
+#else
         setenv( "WXSUPPRESS_SIZER_FLAGS_CHECK", "1", 1 );  //suppress warnings
+#endif
         //cout << "free memory  = " << hex << ::wxGetFreeMemory() << dec << endl;
         cout << "aspect ratio = " << getAspectRatio() << endl;
 
