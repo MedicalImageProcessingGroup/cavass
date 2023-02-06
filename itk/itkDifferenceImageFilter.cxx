@@ -34,7 +34,10 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include "itkIM0VolumeWriter.h"
 #include "ElapsedTime.h"
 
-#include "itkDifferenceImageFilter.h"
+//#include "itkDifferenceImageFilter.h" //Gone!
+// Other possibilities include AbsoluteValueDifferenceImageFilter,
+// or SquaredDifferenceImageFilter.
+#include "itkTestingComparisonImageFilter.h"
 #include "itkImageRegionIterator.h"
 
 #include "FilterProgress.h"
@@ -112,8 +115,8 @@ int main ( int argc, char* argv[] ) {
     IM0Reader2->SetInputImage( in2 );
     IM0Reader2->Execute();
 
-    typedef  itk::DifferenceImageFilter< InputImageType, OutputImageType >
-             FilterType;
+    typedef  itk::Testing::ComparisonImageFilter< InputImageType,
+                                                  OutputImageType > FilterType;
 
     FilterType::Pointer  filter = FilterType::New();
 
