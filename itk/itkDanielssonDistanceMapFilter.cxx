@@ -30,6 +30,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include "ElapsedTime.h"
 
 #include "itkDanielssonDistanceMapImageFilter.h"
+#include "itkRescaleIntensityImageFilter.h"
 #include "FilterProgress.h"
 
 int main ( int argc, char * argv[] ) {
@@ -85,8 +86,19 @@ int main ( int argc, char * argv[] ) {
 
   if (argc>3) {
       writer->SetFileName( argv[3] );
-      writer->SetInputImage( filter->GetVoronoiMap() );
-      writer->Execute();
+
+      //need work (update).
+      // see https://itk.org/Doxygen/html/Examples_2Filtering_2DanielssonDistanceMapImageFilter_8cxx-example.html for an example
+
+      //using VoronoiRescalerType = itk::RescaleIntensityImageFilter<
+      //    OutputImageType, OutputImageType >;
+      typedef itk::RescaleIntensityImageFilter< OutputImageType,
+          OutputImageType > VoronoiRescalerType;
+      auto voronoiScaler = VoronoiRescalerType::New();
+      voronoiScaler->SetInput( filter->GetVoronoiMap() );
+
+      //writer->SetInputImage( filter->GetVoronoiMap() );
+      //writer->Execute();
   }
 
   std::cout << "Total computation time: " << et.getElapsedTime() << std::endl;

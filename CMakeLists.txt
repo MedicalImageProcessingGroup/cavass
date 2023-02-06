@@ -10,38 +10,42 @@ project( CAVASS )
 # set compiler warning level
 if (MSVC)
   add_compile_options( /W4 )
-elseif (MACH)
+elseif (APPLE)
   add_compile_options( -Wall -Wextra -Wpedantic
-      -Warray-bounds
+      -Wno-array-bounds
       -Wno-deprecated-declarations
+      -Wno-extra-semi
       -Wno-format
+      -Wno-macro-redefined
       -Wno-missing-field-initializers
+      -Wno-sizeof-array-decay
       -Wno-overloaded-virtual
+      -Wno-parentheses
       -Wno-sign-compare
+      -Wno-sometimes-uninitialized
       -Wno-unused-but-set-variable
       -Wno-unused-const-variable
       -Wno-unused-parameter
       -Wno-unused-private-field
       -Wno-unused-variable
-      -Wsometimes-uninitialized
   )
 else()
   add_compile_options( -Wall -Wextra -Wpedantic
       -Warray-bounds
+      -Wno-cast-function-type
       -Wno-deprecated-declarations
       -Wno-format
+      -Wno-implicit-fallthrough
+      -Wno-misleading-indentation
       -Wno-missing-field-initializers
       -Wno-overloaded-virtual
+      -Wno-parentheses
       -Wno-sign-compare
+      -Wno-stringop-truncation
       -Wno-unused-but-set-variable
       -Wno-unused-const-variable
       -Wno-unused-parameter
       -Wno-unused-variable
-      -Wno-misleading-indentation
-      -Wno-parentheses
-      -Wno-implicit-fallthrough
-      -Wno-stringop-truncation
-      -Wno-cast-function-type
   )
 endif()
 #------------------------------------------------------------------------------
@@ -772,21 +776,22 @@ IF (ITK_FOUND)
         itk/FilterProgress.h )
     target_link_libraries( itkCurvatureFlowImageFilter ${ITK_LIBRARIES} 3dviewnix libtiff )
 
-#    add_executable( itkDanielssonDistanceMapFilter
-#        itk/itkDanielssonDistanceMapFilter.cxx
-#        itk/itkIM0VolumeReader.h itk/itkIM0VolumeWriter.h
-#        itk/FilterProgress.h )
-#    target_link_libraries( itkDanielssonDistanceMapFilter ${ITK_LIBRARIES} 3dviewnix )
+    # needs work (update)
+    #add_executable( itkDanielssonDistanceMapFilter
+    #    itk/itkDanielssonDistanceMapFilter.cxx
+    #    itk/itkIM0VolumeReader.h itk/itkIM0VolumeWriter.h
+    #    itk/FilterProgress.h )
+    #target_link_libraries( itkDanielssonDistanceMapFilter ${ITK_LIBRARIES} 3dviewnix )
 
     add_executable( itkDerivativeFilter itk/itkDerivativeFilter.cxx
         itk/itkIM0VolumeReader.h itk/itkIM0VolumeWriter.h
         itk/FilterProgress.h )
     target_link_libraries( itkDerivativeFilter ${ITK_LIBRARIES} 3dviewnix )
 
-#    add_executable( itkDifferenceImageFilter itk/itkDifferenceImageFilter.cxx
-#        itk/itkIM0VolumeReader.h itk/itkIM0VolumeWriter.h
-#        itk/FilterProgress.h )
-#    target_link_libraries( itkDifferenceImageFilter ${ITK_LIBRARIES} 3dviewnix )
+    add_executable( itkDifferenceImageFilter itk/itkDifferenceImageFilter.cxx
+        itk/itkIM0VolumeReader.h itk/itkIM0VolumeWriter.h
+        itk/FilterProgress.h )
+    target_link_libraries( itkDifferenceImageFilter ${ITK_LIBRARIES} 3dviewnix )
 
     add_executable( itkDiscreteGaussianFilter itk/itkDiscreteGaussianFilter.cxx
         itk/itkIM0VolumeReader.h itk/itkIM0VolumeWriter.h
