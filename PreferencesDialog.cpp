@@ -221,7 +221,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mCTLungSt = new wxStaticText( panel, wxID_ANY, "lung (center - width):" );
     bs->Add( mCTLungSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getCTLungCenter() );
-    mCTLungCenter = new wxTextCtrl( panel, ID_CT_LUNG_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
+    mCTLungCenter = new wxTextCtrl( panel, ID_CT_LUNG_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
     bs->Add( mCTLungCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getCTLungWidth() );
     mCTLungWidth = new wxTextCtrl( panel, ID_CT_LUNG_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -235,7 +235,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mCTSoftTissueSt = new wxStaticText( panel, wxID_ANY, "soft tissue (center - width):" );
     bs->Add( mCTSoftTissueSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getCTSoftTissueCenter() );
-    mCTSoftTissueCenter = new wxTextCtrl( panel, ID_CT_SOFT_TISSUE_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
+    mCTSoftTissueCenter = new wxTextCtrl( panel, ID_CT_SOFT_TISSUE_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
     bs->Add( mCTSoftTissueCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getCTSoftTissueWidth() );
     mCTSoftTissueWidth = new wxTextCtrl( panel, ID_CT_SOFT_TISSUE_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -250,7 +250,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mCTBoneSt = new wxStaticText( panel, wxID_ANY, "bone (center - width):" );
     bs->Add( mCTBoneSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getCTBoneCenter() );
-    mCTBoneCenter = new wxTextCtrl( panel, ID_CT_BONE_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
+    mCTBoneCenter = new wxTextCtrl( panel, ID_CT_BONE_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
     bs->Add( mCTBoneCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getCTBoneWidth() );
     mCTBoneWidth = new wxTextCtrl( panel, ID_CT_BONE_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -265,7 +265,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mPETSt = new wxStaticText( panel, wxID_ANY, "PET (center - width):" );
     bs->Add( mPETSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getPETCenter() );
-    mPETCenter = new wxTextCtrl( panel, ID_PET_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
+    mPETCenter = new wxTextCtrl( panel, ID_PET_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
     bs->Add( mPETCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getPETWidth() );
     mPETWidth = new wxTextCtrl( panel, ID_PET_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );

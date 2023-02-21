@@ -583,19 +583,19 @@ void MontageFrame::createMontageFrame ( wxFrame* parentFrame, bool useHistory )
             "CAVASS files (*.BIM;*.IM0;*.MV0)|*.BIM;*.IM0;*.MV0|DICOM files (*.DCM;*.DICOM;*.dcm;*.dicom)|*.DCM;*.DICOM;*.dcm;*.dicom|image files (*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff)|*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff",
             wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_MULTIPLE );
         if (fd.ShowModal() != wxID_OK)    return;
-		wxArrayString recent_filenames;
+        wxArrayString recent_filenames;
         fd.GetFilenames( recent_filenames );
-		for (unsigned int i=0; i<recent_filenames.Count(); i++)
-			if (::gInputFileHistory.IsSelected( i ))
-				filenames.Add(recent_filenames[i]);
+        for (unsigned int i=0; i<recent_filenames.Count(); i++)
+            //if (::gInputFileHistory.IsSelected( i ))
+                filenames.Add(recent_filenames[i]);
         if (filenames.Count()==0)    return;
         //add the input files to the input history
         wxString  d = fd.GetDirectory();
         d += wxFileName::GetPathSeparator();
         for (int i=filenames.Count()-1; i>=0; i--) {
             filenames[i] = d + filenames[i];  //prepend the directory
-			::gInputFileHistory.AddFileToHistory( filenames[i] );
-			wxLogMessage( "AddFileToHistory( " + filenames[i] + " )" );
+            ::gInputFileHistory.AddFileToHistory( filenames[i] );
+            wxLogMessage( "AddFileToHistory( " + filenames[i] + " )" );
         }
         wxConfigBase*  pConfig = wxConfigBase::Get();
         ::gInputFileHistory.Save( *pConfig );

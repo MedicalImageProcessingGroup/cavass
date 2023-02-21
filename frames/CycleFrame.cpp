@@ -583,7 +583,7 @@ void CycleFrame::createCycleFrame ( wxFrame* parentFrame, bool useHistory )
         wxArrayString recent_filenames;
         fd.GetFilenames( recent_filenames );
         for (unsigned int i=0; i<recent_filenames.Count(); i++)
-            if (::gInputFileHistory.IsSelected( i ))
+            //if (::gInputFileHistory.IsSelected( i ))
                 filenames.Add(recent_filenames[i]);
         if (filenames.Count()==0)    return;
         //add the input files to the input history
