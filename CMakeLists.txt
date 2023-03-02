@@ -30,21 +30,22 @@ elseif (APPLE)
       -Wno-unused-variable
   )
 else()
-  add_compile_options( -Wall -Wextra -Wpedantic
-      -Warray-bounds
+  add_compile_options( -Wall -Wextra
+      -Wno-array-bounds
+      -Wno-array-parameter
       -Wno-cast-function-type
       -Wno-deprecated-declarations
       -Wno-format
       -Wno-implicit-fallthrough
       -Wno-misleading-indentation
       -Wno-missing-field-initializers
-      -Wno-overloaded-virtual
       -Wno-parentheses
       -Wno-sign-compare
       -Wno-stringop-truncation
       -Wno-unused-but-set-variable
-      -Wno-unused-const-variable
+      #-Wno-unused-const-variable
       -Wno-unused-parameter
+      -Wno-stringop-overflow
       -Wno-unused-variable
   )
 endif()
