@@ -40,7 +40,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  *  status/state of user preferences.  This class allows preferences
  *  to persist via loading and storing preferences in a wxConfig object.
  *  Changes are automatically stored (to the file ~/.cavass.ini on Linux,
- *  ~/Library/Preferences/cavass.ini on Mac OS, or
+ *  ~/Library/Preferences/.cavass.ini on Mac OS, or
  *  C:\Users\ggrevera\AppData\Roaming\cavass.ini on Windows for example).
  *  On Windows, one should avoid the Windows registry and use a file 
  *  instead.

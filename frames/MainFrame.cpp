@@ -247,9 +247,9 @@ void MainFrame::initializeMenu ( void ) {
     wxMenuItem* menuItem = new wxMenuItem( vis_slice_menu, ID_VIS_CYCLE, "&Cycle" );
     vis_slice_menu->Append( menuItem );
 
-    menuItem = new wxMenuItem( vis_slice_menu, ID_VIS_RESLICE, "&Reslice" );
-    vis_slice_menu->Append( menuItem );
-    menuItem->Enable( false );
+    //menuItem = new wxMenuItem( vis_slice_menu, ID_VIS_RESLICE, "&Reslice" );
+    //vis_slice_menu->Append( menuItem );
+    //menuItem->Enable( false );
 
     vis_slice_menu->Append( ID_VIS_OVERLAY, "&Overlay" );
     visualize_menu->Append( ID_VIS_SLICE, "&Slice", vis_slice_menu );
