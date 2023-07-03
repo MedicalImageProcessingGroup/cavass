@@ -27,6 +27,7 @@ elseif (APPLE)
       -Wno-unused-const-variable
       -Wno-unused-parameter
       -Wno-unused-private-field
+      -Wno-unused-result
       -Wno-unused-variable
   )
 else()
@@ -46,6 +47,7 @@ else()
       #-Wno-unused-const-variable
       -Wno-unused-parameter
       -Wno-stringop-overflow
+      -Wno-unused-result
       -Wno-unused-variable
   )
 endif()
