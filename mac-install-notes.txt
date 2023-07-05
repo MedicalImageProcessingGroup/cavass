@@ -18,7 +18,7 @@ Obtain wxWidgets source code. Then:
   run cmake gui
 
 Obtain cavass source code.
-  git clone george@grevera.ddns.net:/home/george/repos/cavass.git/
+  git clone george@grevera.ddns.net:/home/george/repos/cavass.git
   mkdir cavass-build
   run cmake gui
     source code:       /Users/ggrevera/monday/cavass
@@ -29,10 +29,10 @@ Obtain cavass source code.
     wxWidgets_wxrc_EXECUTABLE:  /Users/ggrevera/monday/wx-build/utils/wxrc/wxrc
 
 Edit (create, if necessary) ~/.zshrc. Add the following lines to the end:
-  export VIEWNIX_ENV=~/monday/cavass-build
+  export VIEWNIX_ENV=~/cavass-build
   #the export below is necessary to run cavass w/ an icon
-  export PATH=$PATH:~/monday/cavass-build/cavass.app/Contents/MacOS
-  export PATH=$PATH:~/monday/cavass-build
+  export PATH=$PATH:~/cavass-build/cavass.app/Contents/MacOS
+  export PATH=$PATH:~/cavass-build
   export WXSUPPRESS_SIZER_FLAGS_CHECK=1
 Open a new terminal window for these changes to take effect.
 -------------------------------------

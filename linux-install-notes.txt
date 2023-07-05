@@ -40,7 +40,7 @@ You may optionally install ITK:
   [wait]
 
 Then you install CAVASS:
-  tar xzf cavass-src-1_0_29.tgz
+  git clone https://github.com/MedicalImageProcessingGroup/cavass.git
   mkdir cavass-build
   cd cavass-build
   ccmake ../cavass
