@@ -84,6 +84,7 @@ class MainFrame : public wxFrame {
           ID_PP_SCOPS_VOI, ID_PP_SCOPS_INTERPOLATE, ID_PP_SCOPS_FILTER,
           ID_PP_SCOPS_SEGMENT,  ID_PP_SCOPS_SEGMENT_THRESHOLD,
               ID_PP_SCOPS_SEGMENT_2DINTERACTIVE,
+              ID_PP_SCOPS_SEGMENT_OWEN,
           ID_PP_SCOPS_CLASSIFY, ID_PP_SCOPS_CLASSIFY_1FEATURE,
           ID_PP_SCOPS_CLASSIFY_FUZZ_CONN, ID_PP_SCOPS_CLASSIFY_INTEN_MAP,
 		  ID_PP_SCOPS_IRFC,
@@ -184,6 +185,7 @@ class MainFrame : public wxFrame {
     virtual void OnRegister        ( wxCommandEvent& unused );
     virtual void OnSaveScreen      ( wxCommandEvent& unused );
     virtual void OnSegment2d       ( wxCommandEvent& unused );
+    virtual void OnOwen2d          ( wxCommandEvent& unused );
     virtual void OnShowScreen      ( wxCommandEvent& unused );
     virtual void OnTasks           ( wxCommandEvent& unused );
     virtual void OnTutorials       ( wxCommandEvent& unused );
@@ -264,6 +266,8 @@ class MainFrame : public wxFrame {
   EVT_MENU( ID_PP_SCOPS_SEGMENT_THRESHOLD, MainFrame::OnPPScopsThreshold )  \
   EVT_MENU( ID_PP_SCOPS_SEGMENT_2DINTERACTIVE,                      \
                                      MainFrame::OnSegment2d    )    \
+  EVT_MENU( ID_PP_SCOPS_SEGMENT_OWEN,                      \
+                                     MainFrame::OnOwen2d    )    \
   EVT_MENU( ID_PP_SCOPS_IRFC,        MainFrame::OnPPScopsIRFC  )    \
   EVT_MENU( ID_PP_STOPS_TO_STRUCTURE,MainFrame::OnPPStopsToStructure ) \
   EVT_MENU( ID_PREFERENCES,          MainFrame::OnPreferences  )    \

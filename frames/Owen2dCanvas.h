@@ -22,8 +22,8 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 //======================================================================
 /**
- * \file   Segment2dCanvas.h
- * \brief  Segment2dCanvas definition.
+ * \file   Owen2dCanvas.h
+ * \brief  Owen2dCanvas definition.
  * \author George J. Grevera, Ph.D.
  *
  * Copyright: (C) 2003, George Grevera
@@ -31,8 +31,8 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
-#ifndef __Segment2dCanvas_h
-#define __Segment2dCanvas_h
+#ifndef __Owen2dCanvas_h
+#define __Owen2dCanvas_h
 
 #include  <deque>
 #include  <math.h>
@@ -77,7 +77,7 @@ typedef unsigned short ushort;
 typedef unsigned long ulong;
 #endif
 
-#if 0  //already defined in Owen2dCanvas.h
+
 typedef struct {
         unsigned char *original_data;   /* pointer to original image from where this derived */
         unsigned char *data;            /* pointer to the actual data representing the image */
@@ -176,7 +176,6 @@ typedef struct {
     int Variable_spacing; /* entire scene  - 0=constant slice spacing, 1=variable s.s. */
  
                                         } SLICES;
-#endif
 
 
 
@@ -194,7 +193,7 @@ typedef struct {
  *  appearance of the drawn images.  The get* methods (inspectors) return
  *  the values of the current settings.
  */
-class Segment2dCanvas : public MainCanvas {
+class Owen2dCanvas : public MainCanvas {
     int  mXSize, mYSize, mZSize;         ///< max count of pixels of displayed images in x,y,z
 public:
 	enum {
@@ -305,11 +304,11 @@ protected:
 	int               (*peek_point)[2];
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   public:
-    Segment2dCanvas ( void );
-    Segment2dCanvas ( wxWindow* parent, MainFrame* parent_frame, wxWindowID id,
+    Owen2dCanvas ( void );
+    Owen2dCanvas ( wxWindow* parent, MainFrame* parent_frame, wxWindowID id,
                     const wxPoint &pos, const wxSize &size );
 
-    ~Segment2dCanvas ( void );
+    ~Owen2dCanvas ( void );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   protected:
     void init ( void );
@@ -509,7 +508,7 @@ protected:
 		else return false;}
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    DECLARE_DYNAMIC_CLASS(Segment2dCanvas)
+    DECLARE_DYNAMIC_CLASS(Owen2dCanvas)
     DECLARE_EVENT_TABLE()
 };
 

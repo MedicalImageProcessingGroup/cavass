@@ -93,6 +93,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "MainPrint.h"
 #include  "OverlayFrame.h"
 #include  "OverlayPrint.h"
+#include  "Owen2dFrame.h"
 #include  "Preferences.h"
 #include  "ProcessManager.h"
 #include  "SaveScreenControls.h"

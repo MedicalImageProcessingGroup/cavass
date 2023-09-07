@@ -81,7 +81,9 @@ My personal/suggested workflow:
 cavass and clion ide
 --------------------
 1. Build cavass as per above.
-2. Open cavass-build as a makefile (not cmake) project.
+2. Run clion. Open. Then navigate to Makefile in cavass-build and select it.
+   Open as Project. Trust Project.
+   (Do NOT open as cmake project.)
 3. Clean and rebuild all of cavass.
 4. To debug cavass using the clion, you must tell clion where it is.
    Select cavass from the menu between the hammer and run and debug icons.
@@ -93,4 +95,6 @@ cavass and clion ide
 Note: cavass --> > --> Run 'cavass' with Valgring Memcheck is available
    (but needs to be installed).
 
+Note: On linux, using gdb w/ clion to debug is painfully slow. Switch to
+lldb instead (File -> Settings... -> Toolchains. Then select lldb in ebugger:).
 

@@ -593,13 +593,19 @@ if (wxWidgets_FOUND)
         frames/OverlayFrame.cpp
         frames/OverlayFrame.h
         frames/OverlayPrint.h
+        frames/Owen2dCanvas.cpp
+        frames/Owen2dCanvas.h
+        frames/Owen2dFrame.cpp
+        frames/Owen2dFrame.h
         frames/ParameterControls.h
         frames/RegisterFrame.cpp
         frames/RegisterFrame.h
         frames/RegistrationControls.h
         frames/SaveScreenControls.h
         frames/Segment2dCanvas.cpp
+        frames/Segment2dCanvas.h
         frames/Segment2dFrame.cpp
+        frames/Segment2dFrame.h
         frames/SetFuzzCompIndexControls.h
         frames/SetIndexControls.h
         frames/ShowScreenCanvas.cpp

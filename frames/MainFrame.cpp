@@ -217,6 +217,7 @@ void MainFrame::initializeMenu ( void ) {
     mSegmentMenu = new wxMenu();
     mSegmentMenu->Append( ID_PP_SCOPS_SEGMENT_THRESHOLD, "&Threshold" );
     mSegmentMenu->Append( ID_PP_SCOPS_SEGMENT_2DINTERACTIVE,"&Interactive2D" );
+    mSegmentMenu->Append( ID_PP_SCOPS_SEGMENT_OWEN,"&Owen2D" );
     mSegmentMenu->Append( ID_PP_SCOPS_IRFC, "I&RFC" );
     pp_scops_menu->Append( ID_PP_SCOPS_SEGMENT,     "&Segment", mSegmentMenu );
 
@@ -807,6 +808,9 @@ void MainFrame::OnPPScopsThreshold ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnSegment2d ( wxCommandEvent& unused ) {
     Segment2dFrame::createSegment2dFrame( this );
+}
+void MainFrame::OnOwen2d ( wxCommandEvent& unused ) {
+    Owen2dFrame::createOwen2dFrame( this );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnPPScopsIRFC ( wxCommandEvent& unused ) {

@@ -22,8 +22,8 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 //======================================================================
 /**
- * \file:  Segment2dCanvas.cpp
- * \brief  Segment2dCanvas class implementation
+ * \file:  Owen2dCanvas.cpp
+ * \brief  Owen2dCanvas class implementation
  * \author George J. Grevera, Ph.D.
  *
  * Copyright: (C) 2003, George Grevera
@@ -98,17 +98,17 @@ static bool leftToRightModifier ( wxMouseEvent& e ) {
     return e.AltDown() || wxGetKeyState( WXK_ALT ) || e.RightIsDown();
 }
 //----------------------------------------------------------------------
-const int  Segment2dCanvas::sSpacing=1;  ///< space, in pixels, between each slice (on the screen in the frame in the canvas)
+const int  Owen2dCanvas::sSpacing=1;  ///< space, in pixels, between each slice (on the screen in the frame in the canvas)
 static const unsigned char onbit[9] = { 1, 2, 4, 8, 16, 32, 64, 128, 255};
 static const unsigned char offbit[9] = { 254, 253, 251, 247, 239, 223, 191, 127, 0};
 //----------------------------------------------------------------------
-/** \brief Segment2dCanvas ctor. */
-Segment2dCanvas::Segment2dCanvas ( void ) {
+/** \brief Owen2dCanvas ctor. */
+Owen2dCanvas::Owen2dCanvas ( void ) {
     init();
 }
 //----------------------------------------------------------------------
-/** \brief Segment2dCanvas ctor. */
-Segment2dCanvas::Segment2dCanvas ( wxWindow* parent, MainFrame* parent_frame,
+/** \brief Owen2dCanvas ctor. */
+Owen2dCanvas::Owen2dCanvas ( wxWindow* parent, MainFrame* parent_frame,
     wxWindowID id, const wxPoint &pos, const wxSize &size )
   : MainCanvas ( parent, parent_frame, id, pos, size )
 {
@@ -116,7 +116,7 @@ Segment2dCanvas::Segment2dCanvas ( wxWindow* parent, MainFrame* parent_frame,
 }
 //----------------------------------------------------------------------
 /** \brief initialize members. */
-void Segment2dCanvas::init ( void ) {
+void Owen2dCanvas::init ( void ) {
 	num_detection_modes = 8;
 	detection_modes[0] = TRAINING;
 	detection_modes[1] = ILW;
@@ -217,10 +217,10 @@ void Segment2dCanvas::init ( void ) {
 #endif
 }
 //----------------------------------------------------------------------
-/** \brief Segment2dCanvas dtor. */
-Segment2dCanvas::~Segment2dCanvas ( void ) {
-    cout << "Segment2dCanvas::~Segment2dCanvas" << endl;
-    wxLogMessage( "Segment2dCanvas::~Segment2dCanvas" );
+/** \brief Owen2dCanvas dtor. */
+Owen2dCanvas::~Owen2dCanvas ( void ) {
+    cout << "Owen2dCanvas::~Owen2dCanvas" << endl;
+    wxLogMessage( "Owen2dCanvas::~Owen2dCanvas" );
 	if (mCavassData)
 	{
 		FILE *fp;
@@ -256,7 +256,7 @@ printf("create greymap.TMP\n");
 }
 //----------------------------------------------------------------------
 /** \brief release memory allocated to this object. */
-void Segment2dCanvas::release ( void ) {
+void Owen2dCanvas::release ( void ) {
 	if(hzl_edge_mask != NULL){
 		for (int j=0; j < (mCavassData->m_ySize+1); j++)
 			free(hzl_edge_mask[j]);
@@ -357,7 +357,7 @@ void Segment2dCanvas::release ( void ) {
 }
 //----------------------------------------------------------------------
 /** \brief load data from memory. */
-void Segment2dCanvas::loadData ( char* name,
+void Owen2dCanvas::loadData ( char* name,
     const int xSize, const int ySize, const int zSize,
     const double xSpacing, const double ySpacing, const double zSpacing,
     const int* const data, const ViewnixHeader* const vh,
@@ -390,7 +390,7 @@ void Segment2dCanvas::loadData ( char* name,
 /** \brief load data from a file.
  *  \param fn input data file name.
  */
-void Segment2dCanvas::loadFile ( const char* const fn ) {
+void Owen2dCanvas::loadFile ( const char* const fn ) {
     SetCursor( wxCursor(wxCURSOR_WAIT) );    wxYield();
     release();
     if (fn==NULL || strlen(fn)==0) {
@@ -515,7 +515,7 @@ void Segment2dCanvas::loadFile ( const char* const fn ) {
 /** \brief initialize the specified lookup table.
  *  \param which specifies the particular data set (if more than 1 read).
  */
-void Segment2dCanvas::initLUT ( const int which ) {
+void Owen2dCanvas::initLUT ( const int which ) {
     assert( which==0 || which==1 );
     if (!isLoaded(which))    return;
     if (which==0)    mCavassData->initLUT();
@@ -525,7 +525,7 @@ void Segment2dCanvas::initLUT ( const int which ) {
 /** \brief free any allocated images (of type wxImage) and/or bitmaps
  *  (of type wxBitmap)
  */
-void Segment2dCanvas::freeImagesAndBitmaps ( void ) {
+void Owen2dCanvas::freeImagesAndBitmaps ( void ) {
     if (mImages!=NULL) {
         for (int i=0; i<mRows*mCols; i++) {
             if (mImages[i]!=NULL) {
@@ -550,7 +550,7 @@ void Segment2dCanvas::freeImagesAndBitmaps ( void ) {
 }
 //----------------------------------------------------------------------
 /** \brief reload the drawable image data. */
-void Segment2dCanvas::reload ( void ) {
+void Owen2dCanvas::reload ( void ) {
     if (!isLoaded(0))    return;
     freeImagesAndBitmaps();
     
@@ -777,9 +777,9 @@ void Segment2dCanvas::reload ( void ) {
 }
 //----------------------------------------------------------------------
 /** \brief note: spacebar mimics middle mouse button. */
-void Segment2dCanvas::OnChar ( wxKeyEvent& e ) {
-    //cout << "Segment2dCanvas::OnChar" << endl;
-    wxLogMessage( "Segment2dCanvas::OnChar" );
+void Owen2dCanvas::OnChar ( wxKeyEvent& e ) {
+    //cout << "Owen2dCanvas::OnChar" << endl;
+    wxLogMessage( "Owen2dCanvas::OnChar" );
     if (e.m_keyCode==' ') {
         if (isLoaded(1)) {
             mCavassData->mNext->mDisplay = !mCavassData->mNext->mDisplay;
@@ -788,7 +788,7 @@ void Segment2dCanvas::OnChar ( wxKeyEvent& e ) {
     } else if (e.m_keyCode=='h' || e.m_keyCode == 'H' || e.m_keyCode == '/'
                || e.m_keyCode == 'h') {
         wxCommandEvent e;
-        Segment2dFrame::OnHelp( e );
+        Owen2dFrame::OnHelp( e );
     } else {
         //pass the event up to the parent frame
         //m_parent_frame->ProcessEvent( e );
@@ -796,7 +796,7 @@ void Segment2dCanvas::OnChar ( wxKeyEvent& e ) {
 }
 //----------------------------------------------------------------------
 /** \brief callback for mouse move events */
-void Segment2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
     wxClientDC  dc(this);
     PrepareDC(dc);
     const wxPoint  pos = e.GetPosition();
@@ -1083,7 +1083,7 @@ void Segment2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
 	}
 }
 
-int Segment2dCanvas::get_closest_contour_point(int x, int y)
+int Owen2dCanvas::get_closest_contour_point(int x, int y)
 {
 	int i,index, dx, dy;
 	float min_dist, temp;
@@ -1107,7 +1107,7 @@ int Segment2dCanvas::get_closest_contour_point(int x, int y)
 
 	return(index);
 }
-void Segment2dCanvas::delete_open_contour_to_the_end(IMAGE *image, int overlay,
+void Owen2dCanvas::delete_open_contour_to_the_end(IMAGE *image, int overlay,
 	int n, OPEN_CONTOUR *cont)
 {
 	if(image == NULL) return;
@@ -1123,7 +1123,7 @@ void Segment2dCanvas::delete_open_contour_to_the_end(IMAGE *image, int overlay,
 	cont->last = n;
 }
 
-void Segment2dCanvas::erase_mask(int cx, int cy)
+void Owen2dCanvas::erase_mask(int cx, int cy)
 {
 	if (paint_brush_size<0 ||
 		cx<orig.locx || cx>=orig.locx+orig.w ||
@@ -1165,7 +1165,7 @@ void Segment2dCanvas::erase_mask(int cx, int cy)
 				object_mask[*(tblr+j) + i] &= offbit[object_number];
 	reload();
 }
-void Segment2dCanvas::paint_mask(int cx, int cy)
+void Owen2dCanvas::paint_mask(int cx, int cy)
 {
 	if (cx<orig.locx || cx>=orig.locx+orig.w ||
 		cy<orig.locy || cy>=orig.locy+orig.h)
@@ -1343,7 +1343,7 @@ void Segment2dCanvas::paint_mask(int cx, int cy)
 	reload();
 }
 
-void Segment2dCanvas::Erase_PxRegion(int cx, int cy)
+void Owen2dCanvas::Erase_PxRegion(int cx, int cy)
 {
 	if (train_brush_size<0 ||
 		cx<orig.locx || cx>=orig.locx+orig.w ||
@@ -1369,7 +1369,7 @@ void Segment2dCanvas::Erase_PxRegion(int cx, int cy)
 			region[*(tblr+j) + i] = 0;
 	reload();
 }
-void Segment2dCanvas::paint_region(int cx, int cy)
+void Owen2dCanvas::paint_region(int cx, int cy)
 {
 //@@ to do: implement fill
 	if (cx<orig.locx || cx>=orig.locx+orig.w ||
@@ -1397,7 +1397,7 @@ void Segment2dCanvas::paint_region(int cx, int cy)
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle right mouse button down events. */
-void Segment2dCanvas::OnRightDown ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnRightDown ( wxMouseEvent& e ) {
     SetFocus();  //to regain/recapture keypress events
 
     log( "OnRightDown" );
@@ -1534,12 +1534,12 @@ void Segment2dCanvas::OnRightDown ( wxMouseEvent& e ) {
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle right mouse button up events. */
-void Segment2dCanvas::OnRightUp ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnRightUp ( wxMouseEvent& e ) {
     log( "OnRightUp" );
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle middle mouse button down events. */
-void Segment2dCanvas::OnMiddleDown ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnMiddleDown ( wxMouseEvent& e ) {
 	SetFocus();  //to regain/recapture keypress events
 
 	log( "OnMiddleDown" );
@@ -1747,12 +1747,12 @@ void Segment2dCanvas::OnMiddleDown ( wxMouseEvent& e ) {
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle middle mouse button up events. */
-void Segment2dCanvas::OnMiddleUp ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnMiddleUp ( wxMouseEvent& e ) {
     log( "OnMiddleUp" );
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle left mouse button down events. */
-void Segment2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
     SetFocus();  //to regain/recapture keypress events
 
     log( "OnLeftDown" );
@@ -1991,7 +1991,7 @@ void Segment2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle left mouse button double click events. */
-void Segment2dCanvas::OnLeftDClick ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnLeftDClick ( wxMouseEvent& e ) {
     SetFocus();  //to regain/recapture keypress events
 
     log( "OnLeftDClick" );
@@ -2043,7 +2043,7 @@ void Segment2dCanvas::OnLeftDClick ( wxMouseEvent& e ) {
 }
 //----------------------------------------------------------------------
 /** \brief callback to handle left mouse button up events. */
-void Segment2dCanvas::OnLeftUp ( wxMouseEvent& e ) {
+void Owen2dCanvas::OnLeftUp ( wxMouseEvent& e ) {
 	log( "OnLeftUp" );
 	if (leftToMiddleModifier( e )) {
 		log( "  simulate the middle button" );
@@ -2064,7 +2064,7 @@ void Segment2dCanvas::OnLeftUp ( wxMouseEvent& e ) {
 	SetCursor( *wxSTANDARD_CURSOR );
 }
 
-void Segment2dCanvas::set_ilw_control_points()
+void Owen2dCanvas::set_ilw_control_points()
 {
 
 	if (dp_anchor_points)
@@ -2147,7 +2147,7 @@ void Segment2dCanvas::set_ilw_control_points()
 }
 //----------------------------------------------------------------------
 /** \brief callback for paint events. */
-void Segment2dCanvas::OnPaint ( wxPaintEvent& e ) {
+void Owen2dCanvas::OnPaint ( wxPaintEvent& e ) {
     wxMemoryDC  m;
     int         w, h;
     GetSize( &w, &h );
@@ -2176,7 +2176,7 @@ void Segment2dCanvas::OnPaint ( wxPaintEvent& e ) {
 }
 //----------------------------------------------------------------------
 /** \brief called in response to paint, print, or copy to the clipboard. */
-void Segment2dCanvas::paint ( wxDC* dc ) {
+void Owen2dCanvas::paint ( wxDC* dc ) {
     dc->SetTextBackground( *wxBLACK );
     dc->SetTextForeground( wxColour(Yellow) );
 	dc->SetPen( wxPen(wxColour(0, 255, 0)) );
@@ -2601,7 +2601,7 @@ void Segment2dCanvas::paint ( wxDC* dc ) {
  *  \param    which specifies the particular data set (if more than 1 read).
  *  \returns  true if the data set has been loaded; false otherwise.
  */
-bool Segment2dCanvas::isLoaded ( const int which ) const {
+bool Owen2dCanvas::isLoaded ( const int which ) const {
     if (which==0) {
         if (mCavassData==NULL)    return false;
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2624,7 +2624,7 @@ bool Segment2dCanvas::isLoaded ( const int which ) const {
  *  \param    which specifies the particular data set (if more than 1 read).
  *  \returns  the current center contrast setting value.
  */
-int Segment2dCanvas::getCenter ( const int which ) const {
+int Owen2dCanvas::getCenter ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2643,7 +2643,7 @@ int Segment2dCanvas::getCenter ( const int which ) const {
  *  \param    which specifies the particular data set (if more than 1 read).
  *  \returns  the maximum value.
  */
-int Segment2dCanvas::getMax ( const int which ) const {
+int Owen2dCanvas::getMax ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2662,7 +2662,7 @@ int Segment2dCanvas::getMax ( const int which ) const {
  *  \param    which specifies the particular data set (if more than 1 read).
  *  \returns  the minimum value.
  */
-int Segment2dCanvas::getMin ( const int which ) const {
+int Owen2dCanvas::getMin ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2681,7 +2681,7 @@ int Segment2dCanvas::getMin ( const int which ) const {
  *  \param    which specifies the particular data set (if more than 1 read).
  *  \returns  the number of slices in the entire data set.
  */
-int Segment2dCanvas::getNoSlices ( const int which ) const {
+int Owen2dCanvas::getNoSlices ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2699,14 +2699,14 @@ int Segment2dCanvas::getNoSlices ( const int which ) const {
 /** \brief    get the status of the overlay.
  *  \returns  true if overlay is on; false otherwise.
  */
-bool Segment2dCanvas::getLabels ( void ) const {
+bool Owen2dCanvas::getLabels ( void ) const {
     return mLabels;
 }
 //----------------------------------------------------------------------
 /** \brief    get the overall scale of the displayed image(s).
  *  \returns  the overall scale value.
  */
-double Segment2dCanvas::getScale ( void ) const {
+double Owen2dCanvas::getScale ( void ) const {
     return detection_mode==REVIEW? reviewScale: mScale;
 }
 //----------------------------------------------------------------------
@@ -2714,7 +2714,7 @@ double Segment2dCanvas::getScale ( void ) const {
  *  \param    which specifies the particular data set (if more than 1 read).
  *  \returns  the number of the first displayed slice.
  */
-int Segment2dCanvas::getSliceNo ( const int which ) const {
+int Owen2dCanvas::getSliceNo ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
 		if (detection_mode == REVIEW)
@@ -2735,7 +2735,7 @@ int Segment2dCanvas::getSliceNo ( const int which ) const {
  *  \param    which specifies the particular data set (if more than one).
  *  \returns  the current width contrast setting value.
  */
-int Segment2dCanvas::getWidth ( const int which ) const {
+int Owen2dCanvas::getWidth ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2754,7 +2754,7 @@ int Segment2dCanvas::getWidth ( const int which ) const {
  *  \param    which specifies the particular data set (if more than one).
  *  \returns  true if invert is on; false otherwise.
  */
-bool Segment2dCanvas::getInvert ( const int which ) const {
+bool Owen2dCanvas::getInvert ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2773,7 +2773,7 @@ bool Segment2dCanvas::getInvert ( const int which ) const {
  *  \param    which specifies the particular data set (if more than one).
  *  \returns  the current blue emphasis value.
  */
-double Segment2dCanvas::getB ( const int which ) const {
+double Owen2dCanvas::getB ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2792,7 +2792,7 @@ double Segment2dCanvas::getB ( const int which ) const {
  *  \param    which specifies the particular data set (if more than one).
  *  \returns  the current green emphasis value.
  */
-double Segment2dCanvas::getG ( const int which ) const {
+double Owen2dCanvas::getG ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2811,7 +2811,7 @@ double Segment2dCanvas::getG ( const int which ) const {
  *  \param    which specifies the particular data set (if more than one).
  *  \returns  the current red emphasis value.
  */
-double Segment2dCanvas::getR ( const int which ) const {
+double Owen2dCanvas::getR ( const int which ) const {
     if (which==0) {
         assert( mCavassData!=NULL );
         const SliceData&  cd = *(SliceData *)mCavassData;
@@ -2831,7 +2831,7 @@ double Segment2dCanvas::getR ( const int which ) const {
  *  \param  which specifies the particular data set (if more than one).
  *  \param  b the current blue emphasis value.
  */
-void Segment2dCanvas::setB ( const int which, const double b ) {
+void Owen2dCanvas::setB ( const int which, const double b ) {
     if (which==0) {
         assert( mCavassData!=NULL );
         SliceData&  cd = *(SliceData *)mCavassData;
@@ -2849,7 +2849,7 @@ void Segment2dCanvas::setB ( const int which, const double b ) {
  *  \param  which specifies the particular data set (if more than one).
  *  \param  center is the contrast setting value.
  */
-void Segment2dCanvas::setCenter ( const int which, const int center ) {
+void Owen2dCanvas::setCenter ( const int which, const int center ) {
     if (which==0) {
         assert( mCavassData!=NULL );
         SliceData&  cd = *(SliceData *)mCavassData;
@@ -2867,7 +2867,7 @@ void Segment2dCanvas::setCenter ( const int which, const int center ) {
  *  \param  which specifies the particular data set (if more than one).
  *  \param  g the current green emphasis value.
  */
-void Segment2dCanvas::setG ( const int which, const double g ) {
+void Owen2dCanvas::setG ( const int which, const double g ) {
     if (which==0) {
         assert( mCavassData!=NULL );
         SliceData&  cd = *(SliceData *)mCavassData;
@@ -2885,7 +2885,7 @@ void Segment2dCanvas::setG ( const int which, const double g ) {
  *  \param    which specifies the particular data set (if more than one).
  *  \param    invert is true to turn invert on; false otherwise.
  */
-void Segment2dCanvas::setInvert ( const int which, const bool invert ) {
+void Owen2dCanvas::setInvert ( const int which, const bool invert ) {
     if (which==0) {
         assert( mCavassData!=NULL );
         SliceData&  cd = *(SliceData *)mCavassData;
@@ -2896,7 +2896,7 @@ void Segment2dCanvas::setInvert ( const int which, const bool invert ) {
 /** \brief    set the current setting of the overlay state.
  *  \param    overlay is true to turn overlay on; false otherwise.
  */
-void Segment2dCanvas::setLabels ( const bool overlay ) { 
+void Owen2dCanvas::setLabels ( const bool overlay ) { 
     mLabels = overlay;
 	mCavassData->setOverlay( overlay );
 	Refresh();
@@ -2906,7 +2906,7 @@ void Segment2dCanvas::setLabels ( const bool overlay ) {
  *  \param  which specifies the particular data set (if more than one).
  *  \param  r the current red emphasis value.
  */
-void Segment2dCanvas::setR ( const int which, const double r ) {
+void Owen2dCanvas::setR ( const int which, const double r ) {
     if (which==0) {
         assert( mCavassData!=NULL );
         SliceData&  cd = *(SliceData *)mCavassData;
@@ -2923,7 +2923,7 @@ void Segment2dCanvas::setR ( const int which, const double r ) {
 /** \brief  set the overall scale (magnification) of the displayed image(s).
  *  \param  scale the overall scale value.
  */
-void Segment2dCanvas::setScale   ( const double scale )  {
+void Owen2dCanvas::setScale   ( const double scale )  {
     //must do this now before we (possibly) change m_rows and/or m_cols
     freeImagesAndBitmaps();
 
@@ -2981,7 +2981,7 @@ void Segment2dCanvas::setScale   ( const double scale )  {
  *  \param  which specifies the particular data set (if more than 1 read).
  *  \param  sliceNo specifies the number of the first displayed slice.
  */
-void Segment2dCanvas::setSliceNo ( const int which, const int sliceNo ) {
+void Owen2dCanvas::setSliceNo ( const int which, const int sliceNo ) {
     if (which==0) {
         assert( mCavassData!=NULL );
 		if (detection_mode == REVIEW)
@@ -3014,7 +3014,7 @@ void Segment2dCanvas::setSliceNo ( const int which, const int sliceNo ) {
  *  \param  which specifies the particular data set (if more than one).
  *  \param  width is the contrast setting value.
  */
-void Segment2dCanvas::setWidth ( const int which, const int width ) {
+void Owen2dCanvas::setWidth ( const int which, const int width ) {
     if (which==0) {
         assert( mCavassData!=NULL );
         SliceData&  cd = *(SliceData *)mCavassData;
@@ -3028,7 +3028,7 @@ void Segment2dCanvas::setWidth ( const int which, const int width ) {
     }
 }
 
-void Segment2dCanvas::add_vertex_to_o_contour(int x, int y)
+void Owen2dCanvas::add_vertex_to_o_contour(int x, int y)
 {
 	if( o_contour.last == MAX_POINTS-1)
 	{
@@ -3053,7 +3053,7 @@ void Segment2dCanvas::add_vertex_to_o_contour(int x, int y)
 	object_vertex[y][x] |= onbit[object_number];
 }
 
-int Segment2dCanvas::draw_and_save_vertices(int x1, int y1, int x2, int y2
+int Owen2dCanvas::draw_and_save_vertices(int x1, int y1, int x2, int y2
 	/* pixels in screen co-ordinates */ )
 {
     X_Point *pp;
@@ -3120,7 +3120,7 @@ int Segment2dCanvas::draw_and_save_vertices(int x1, int y1, int x2, int y2
 //----------------------------------------------------------------------
 /* Modified: 8/21/08 status, transform, weight initialized by Dewey Odhner.
  */
-void Segment2dCanvas::Reset_training_proc(int accept)
+void Owen2dCanvas::Reset_training_proc(int accept)
 {
     int i;
 
@@ -3216,7 +3216,7 @@ void Segment2dCanvas::Reset_training_proc(int accept)
     Initialize_Edge_Masks();
 }
 //----------------------------------------------------------------------
-int Segment2dCanvas::Initialize_Edge_Masks()
+int Owen2dCanvas::Initialize_Edge_Masks()
 {
 	int j; 
 
@@ -3265,7 +3265,7 @@ int Segment2dCanvas::Initialize_Edge_Masks()
 }
 //----------------------------------------------------------------------
 /* Clears the temporary array of contours */
-void Segment2dCanvas::clear_temporary_contours_array()
+void Owen2dCanvas::clear_temporary_contours_array()
 {
 	if(temp_contours.last > 0)
 	{
@@ -3278,7 +3278,7 @@ void Segment2dCanvas::clear_temporary_contours_array()
 
 /* Modified: 12/13/96 error code returned by Dewey Odhner */
 /* Modified: 12/18/96 statistical calculations corrected by Dewey Odhner */
-int Segment2dCanvas::compute_slices(ViewnixHeader *vh, SLICES *sl)
+int Owen2dCanvas::compute_slices(ViewnixHeader *vh, SLICES *sl)
 {
 
 	int i,j,k;
@@ -3432,7 +3432,7 @@ int Segment2dCanvas::compute_slices(ViewnixHeader *vh, SLICES *sl)
  *       by Dewey Odhner */
 /*    Modified: 4/11/97 graymap file check corrected
  *       by Dewey Odhner */
-int Segment2dCanvas::ask_user_what_to_do()
+int Owen2dCanvas::ask_user_what_to_do()
 {
 	FILE *fp;
 
@@ -3490,7 +3490,7 @@ int Segment2dCanvas::ask_user_what_to_do()
  * HISTORY:
  *    Created: 9/28/04 by Dewey Odhner.
  *****************************************************************************/
-void Segment2dCanvas::get_anchor_points(int *npoints, int (**point)[2], char filename[])
+void Owen2dCanvas::get_anchor_points(int *npoints, int (**point)[2], char filename[])
 {
 	FILE *fp;
 	int tp[2], (*tpoint)[2];
@@ -3534,7 +3534,7 @@ void Segment2dCanvas::get_anchor_points(int *npoints, int (**point)[2], char fil
  * HISTORY:
  *    Created: 10/4/04 by Dewey Odhner.
  *****************************************************************************/
-void Segment2dCanvas::draw_anchor_points(wxDC & dc, int img_x, int img_y)
+void Owen2dCanvas::draw_anchor_points(wxDC & dc, int img_x, int img_y)
 {
 	int j, x, y;
 
@@ -3549,7 +3549,7 @@ void Segment2dCanvas::draw_anchor_points(wxDC & dc, int img_x, int img_y)
 	}
 }
 
-int Segment2dCanvas::allocControlPoints()
+int Owen2dCanvas::allocControlPoints()
 {
 	int (*tl)[2];
 	const int needed = dp_anchor_points+1;
@@ -3600,7 +3600,7 @@ int Segment2dCanvas::allocControlPoints()
  *    Modified: 5/6/05 check for realloc corrected by Dewey Odhner.
  *    Modified: 8/19/08 anchor_point_array_size corrected by Dewey Odhner.
  *****************************************************************************/
-void Segment2dCanvas::add_anchor_point(int x, int y, OPEN_CONTOUR *cont)
+void Owen2dCanvas::add_anchor_point(int x, int y, OPEN_CONTOUR *cont)
 {
 	int j;
 
@@ -3636,7 +3636,7 @@ void Segment2dCanvas::add_anchor_point(int x, int y, OPEN_CONTOUR *cont)
  *    Created: 6/30/05 by Dewey Odhner.
  *    Modified: 12/2/05 bounds check corrected by Dewey Odhner.
  *****************************************************************************/
-int Segment2dCanvas::iterate_live_snake(IMAGE *timg, int ilw_iterations,
+int Owen2dCanvas::iterate_live_snake(IMAGE *timg, int ilw_iterations,
 	double alpha, double beta, double gamma)
 {
 	int j, k, tmp_anchor_points, tt;
@@ -3796,7 +3796,7 @@ int Segment2dCanvas::iterate_live_snake(IMAGE *timg, int ilw_iterations,
  *    Modified: 9/27/05 min_pts passed by Dewey Odhner.
  *    Modified: 4/29/08 error code returned by Dewey Odhner.
  *****************************************************************************/
-int Segment2dCanvas::iterate_live_wire(IMAGE *timg, int ilw_iterations, int min_pts)
+int Owen2dCanvas::iterate_live_wire(IMAGE *timg, int ilw_iterations, int min_pts)
 {
 	static int array_size, (*tmp_anchor_point)[2], (*midpoint)[2];
 	int j, k, nextj, (*tl)[2], tmp_anchor_points, last, tt;
@@ -3952,7 +3952,7 @@ int Segment2dCanvas::iterate_live_wire(IMAGE *timg, int ilw_iterations, int min_
  * HISTORY:
  *    Created: 10/4/04 by Dewey Odhner.
  *****************************************************************************/
-int Segment2dCanvas::is_vertex_of_contour(int x, int y, OPEN_CONTOUR *cont)
+int Owen2dCanvas::is_vertex_of_contour(int x, int y, OPEN_CONTOUR *cont)
 {
 	int j;
 
@@ -3977,7 +3977,7 @@ int Segment2dCanvas::is_vertex_of_contour(int x, int y, OPEN_CONTOUR *cont)
  * HISTORY:
  *    Created: 5/19/05 by Dewey Odhner.
  *****************************************************************************/
-int Segment2dCanvas::find_contour_midpoint(int *x, int *y, int x1, int y1,
+int Owen2dCanvas::find_contour_midpoint(int *x, int *y, int x1, int y1,
 	int x2, int y2, OPEN_CONTOUR *cont)
 {
 	int j, j1, j2;
@@ -4013,7 +4013,7 @@ int Segment2dCanvas::find_contour_midpoint(int *x, int *y, int x1, int y1,
  * HISTORY:
  *    Created: 9/20/05 by Dewey Odhner.
  *****************************************************************************/
-int Segment2dCanvas::contour_length(int x1, int y1, int x2, int y2, OPEN_CONTOUR *cont)
+int Owen2dCanvas::contour_length(int x1, int y1, int x2, int y2, OPEN_CONTOUR *cont)
 {
 	int j1, j2;
 
@@ -4042,7 +4042,7 @@ int Segment2dCanvas::contour_length(int x1, int y1, int x2, int y2, OPEN_CONTOUR
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-void Segment2dCanvas::initdliststructure(dliststructuretype *L)
+void Owen2dCanvas::initdliststructure(dliststructuretype *L)
 {
 	L->begin = NULL;
 	L->numberelements = 0;
@@ -4063,7 +4063,7 @@ void Segment2dCanvas::initdliststructure(dliststructuretype *L)
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-void Segment2dCanvas::vertexcoordinate(int *x, int *y, int vertex)
+void Owen2dCanvas::vertexcoordinate(int *x, int *y, int vertex)
 {
   *(y) = (int) (vertex / circular.w);
   *(x) = (int) (vertex % circular.w);
@@ -4083,7 +4083,7 @@ void Segment2dCanvas::vertexcoordinate(int *x, int *y, int vertex)
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-int Segment2dCanvas::vertexposition(X_Point *vertex)
+int Owen2dCanvas::vertexposition(X_Point *vertex)
 {
   int vpos;  
   vpos = vertex->x + tblcc[vertex->y];
@@ -4104,7 +4104,7 @@ int Segment2dCanvas::vertexposition(X_Point *vertex)
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-int Segment2dCanvas::InitCircular(X_Point pt0, IMAGE *timg)
+int Owen2dCanvas::InitCircular(X_Point pt0, IMAGE *timg)
 {
   int i,N,row,col;
   X_Point u; 
@@ -4169,7 +4169,7 @@ int Segment2dCanvas::InitCircular(X_Point pt0, IMAGE *timg)
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-void Segment2dCanvas::UpdateCircular(X_Point pt0, IMAGE *timg)
+void Owen2dCanvas::UpdateCircular(X_Point pt0, IMAGE *timg)
 {
   int i,z,N,row,col;
   X_Point u;
@@ -4217,7 +4217,7 @@ void Segment2dCanvas::UpdateCircular(X_Point pt0, IMAGE *timg)
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-void Segment2dCanvas::FreeCircular()
+void Owen2dCanvas::FreeCircular()
 {
     if (circular.processed) free(circular.processed);
 	circular.processed = NULL;
@@ -4243,7 +4243,7 @@ void Segment2dCanvas::FreeCircular()
  *    Modified: 4/22/08 check for image edges by Dewey Odhner.
  *****************************************************************************/
 
-int Segment2dCanvas::FindShortestPath(X_Point pt0, X_Point pt1, int flag)
+int Owen2dCanvas::FindShortestPath(X_Point pt0, X_Point pt1, int flag)
 {
   unsigned long mincc; 
 
@@ -4522,7 +4522,7 @@ static int cvComputeLine ( int x1, int y1, int x2, int y2, X_Point** points,
     return(0);
 }
 
-int Segment2dCanvas::FindStraightPath(IMAGE *timg, X_Point pt0, X_Point pt1, int flag)
+int Owen2dCanvas::FindStraightPath(IMAGE *timg, X_Point pt0, X_Point pt1, int flag)
 {
   unsigned long mincc;
 
@@ -4671,7 +4671,7 @@ int Segment2dCanvas::FindStraightPath(IMAGE *timg, X_Point pt0, X_Point pt1, int
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-int Segment2dCanvas::circular_remove_first(X_Point *vertex)
+int Owen2dCanvas::circular_remove_first(X_Point *vertex)
 {
   dliststructuretype *L;
   dlisttype *first;
@@ -4709,7 +4709,7 @@ int Segment2dCanvas::circular_remove_first(X_Point *vertex)
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-int Segment2dCanvas::circular_update()
+int Owen2dCanvas::circular_update()
 {
   int fim;
   int i;
@@ -4747,7 +4747,7 @@ int Segment2dCanvas::circular_update()
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-int Segment2dCanvas::circular_decrement(X_Point *vertex, unsigned long novocusto)
+int Owen2dCanvas::circular_decrement(X_Point *vertex, unsigned long novocusto)
 {
   int remover,i;
   unsigned long custoremover;
@@ -4795,7 +4795,7 @@ int Segment2dCanvas::circular_decrement(X_Point *vertex, unsigned long novocusto
  * Modified: mm/dd/yyyy by programmer name.
  *****************************************************************************/
 
-int Segment2dCanvas::circular_insert(X_Point *vertex, unsigned long cost)
+int Owen2dCanvas::circular_insert(X_Point *vertex, unsigned long cost)
 {
   int pos,vpos;
   dliststructuretype *L;
@@ -4846,7 +4846,7 @@ int Segment2dCanvas::circular_insert(X_Point *vertex, unsigned long cost)
  *****************************************************************************/
 
 /*****************************************************************************/
-int Segment2dCanvas::InitialPoint_Selected(IMAGE *timg, int eventx, int eventy)
+int Owen2dCanvas::InitialPoint_Selected(IMAGE *timg, int eventx, int eventy)
 {
 
 	/*------------------------------------------------------*/
@@ -4933,7 +4933,7 @@ int Segment2dCanvas::InitialPoint_Selected(IMAGE *timg, int eventx, int eventy)
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::Point_Selected(IMAGE *timg, int eventx, int eventy)
+int Owen2dCanvas::Point_Selected(IMAGE *timg, int eventx, int eventy)
 {
 
 	if (NumPoints!=0) /* Live wire exists */
@@ -4970,7 +4970,7 @@ int Segment2dCanvas::Point_Selected(IMAGE *timg, int eventx, int eventy)
  *    Modified: 12/3/08 image coordinates used if timg is NULL by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::Is_Point_Selected_Valid(IMAGE *timg, int eventx, int eventy)
+int Owen2dCanvas::Is_Point_Selected_Valid(IMAGE *timg, int eventx, int eventy)
 {
 	int px, py;
  
@@ -5043,7 +5043,7 @@ int Segment2dCanvas::Is_Point_Selected_Valid(IMAGE *timg, int eventx, int eventy
  *    Modified: 12/3/08 image coordinates used if timg is NULL by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::Live_Wire(IMAGE *timg, int scrx, int scry, int flag)
+int Owen2dCanvas::Live_Wire(IMAGE *timg, int scrx, int scry, int flag)
 /* scrx, scry; Pixel-centre mouse points to, in screen coordinates */
 /* flag; indicates if contour_seg to stay OPEN or to be CLOSEd */
 {
@@ -5153,7 +5153,7 @@ y */
 }
  
 
-int Segment2dCanvas::Store_Contour_Seg(IMAGE *timg, int imgx, int imgy, int flag)
+int Owen2dCanvas::Store_Contour_Seg(IMAGE *timg, int imgx, int imgy, int flag)
 /* imgx, imgy; Next pt selected by user, in img coordinates */
 /* flag; indicates if contour_seg to stay OPEN or to be CLOSEd */
 {
@@ -5207,7 +5207,7 @@ int Segment2dCanvas::Store_Contour_Seg(IMAGE *timg, int imgx, int imgy, int flag
 }
 
 
-int Segment2dCanvas::Close_Phase(IMAGE *timg)
+int Owen2dCanvas::Close_Phase(IMAGE *timg)
 {
 	int flag=0; /* value of phase */
 
@@ -5251,7 +5251,7 @@ int Segment2dCanvas::Close_Phase(IMAGE *timg)
  *    cumulative costs in LWOF.
  *
  *****************************************************************************/
-int Segment2dCanvas::Close_Contour(IMAGE *timg)
+int Owen2dCanvas::Close_Contour(IMAGE *timg)
 {
     int flag=0;
 
@@ -5280,7 +5280,7 @@ int Segment2dCanvas::Close_Contour(IMAGE *timg)
  *    Modified: 28/02/2001 by Alexandre Falcao
  *    
  *****************************************************************************/
-int Segment2dCanvas::Add_Contours()
+int Owen2dCanvas::Add_Contours()
 {
 
 	if( temp_contours.last != -1 ) /* at least one contour exists */
@@ -5310,7 +5310,7 @@ int Segment2dCanvas::Add_Contours()
  *    Modified: mm/dd/yy by programmer name
  *    
  *****************************************************************************/
-int Segment2dCanvas::Cut_Contours()
+int Owen2dCanvas::Cut_Contours()
 {
 
 	if( temp_contours.last != -1 ) /* at least one contour exists */
@@ -5341,7 +5341,7 @@ int Segment2dCanvas::Cut_Contours()
  *    Modified: 8/13/04 Appends contour to file "DP_CONTOUR_RECORD" by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::Convert_Contours_to_Vedges()
+int Owen2dCanvas::Convert_Contours_to_Vedges()
 {
     int i, row, col;
 	static int first_call=1;
@@ -5407,7 +5407,7 @@ int Segment2dCanvas::Convert_Contours_to_Vedges()
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::SaveContour2ObjectMask()
+int Owen2dCanvas::SaveContour2ObjectMask()
 {
     int inside=0;
     int i, j;
@@ -5448,7 +5448,7 @@ int Segment2dCanvas::SaveContour2ObjectMask()
  *    Modified: 5/21/02 to alter only one object by Dewey Odhner
  *
  *****************************************************************************/
-int Segment2dCanvas::DeleteContour2ObjectMask()
+int Owen2dCanvas::DeleteContour2ObjectMask()
 {
     int inside=0;
     int i, j;
@@ -5486,7 +5486,7 @@ int Segment2dCanvas::DeleteContour2ObjectMask()
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::clear_Vedges_array()
+int Owen2dCanvas::clear_Vedges_array()
 {
 	int i, j;
 	unsigned char offobj;
@@ -5503,7 +5503,7 @@ int Segment2dCanvas::clear_Vedges_array()
 	return 0;
 }
 
-void Segment2dCanvas::Reset_object_proc()
+void Owen2dCanvas::Reset_object_proc()
 {
 	/* Save object (if it was specified on different slice) */
 	if (mask_index_different())
@@ -5553,7 +5553,7 @@ void Segment2dCanvas::Reset_object_proc()
 	reload();
 }
 
-void Segment2dCanvas::set_object_vertex_mask_bit(int bit, int value)
+void Owen2dCanvas::set_object_vertex_mask_bit(int bit, int value)
 {
 	int i, j;
 
@@ -5572,7 +5572,7 @@ void Segment2dCanvas::set_object_vertex_mask_bit(int bit, int value)
 	}
 }
 
-bool Segment2dCanvas::mask_index_different()
+bool Owen2dCanvas::mask_index_different()
 {
 	return
 		object_mask_slice_index!=sl.slice_index[VolNo][mCavassData->m_sliceNo];
@@ -5612,7 +5612,7 @@ bool Segment2dCanvas::mask_index_different()
  *
  *****************************************************************************/
 /** allocate space for edge_cost, cum_cost & dir_vtx arrays ****/
-int Segment2dCanvas::Alloc_CostArrays()
+int Owen2dCanvas::Alloc_CostArrays()
 {
 	int i;
 
@@ -5759,7 +5759,7 @@ int Segment2dCanvas::Alloc_CostArrays()
  *
  *****************************************************************************/
 /** de-allocate space for edge_cost, cum_cost & dir_vtx arrays ****/
-void Segment2dCanvas::Dealloc_CostArrays()
+void Owen2dCanvas::Dealloc_CostArrays()
 {
 	int j;
 
@@ -5842,7 +5842,7 @@ void Segment2dCanvas::Dealloc_CostArrays()
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::Alloc_Edge_Features()
+int Owen2dCanvas::Alloc_Edge_Features()
 {
     int i;
  
@@ -5898,7 +5898,7 @@ int Segment2dCanvas::Alloc_Edge_Features()
  *    Modified:
  *
  *****************************************************************************/
-void Segment2dCanvas::Dealloc_Edge_Features()
+void Owen2dCanvas::Dealloc_Edge_Features()
 {
     int i;
  
@@ -5931,7 +5931,7 @@ void Segment2dCanvas::Dealloc_Edge_Features()
  *    Modified:
  *
  *****************************************************************************/
-void Segment2dCanvas::Alloc_Temp_Arrays()
+void Owen2dCanvas::Alloc_Temp_Arrays()
 {
     int i;
  
@@ -6003,7 +6003,7 @@ void Segment2dCanvas::Alloc_Temp_Arrays()
  *    Modified:
  *
  *****************************************************************************/
-void Segment2dCanvas::Dealloc_Temp_Arrays()
+void Owen2dCanvas::Dealloc_Temp_Arrays()
 {
     int i;
  
@@ -6056,7 +6056,7 @@ void Segment2dCanvas::Dealloc_Temp_Arrays()
  *
  *****************************************************************************/
 /** Edge features are calculated for the entire slice *******/
-int Segment2dCanvas::Calc_Edge_Features(int num /* feature num */,
+int Owen2dCanvas::Calc_Edge_Features(int num /* feature num */,
 	int flag /* 1 => grad, 2=> tempf */, struct FeatureList *list)
 {
 
@@ -6121,7 +6121,7 @@ int Segment2dCanvas::Calc_Edge_Features(int num /* feature num */,
  *
  *****************************************************************************/
 /** Edge features are calculated for the entire slice *******/
-int Segment2dCanvas::Calc_Edge_Costs_from_Features(int num /* feature */,
+int Owen2dCanvas::Calc_Edge_Costs_from_Features(int num /* feature */,
 	int flag /* flag, 1=>cost,  2=>tempc */, struct FeatureList *list)
 {
     
@@ -6178,7 +6178,7 @@ int Segment2dCanvas::Calc_Edge_Costs_from_Features(int num /* feature */,
  *****************************************************************************/
 /* flag: 0 => ALL features considered for calculations
          1 => all EXCEPT curr_feature considered for calculations   */
-void Segment2dCanvas::Calc_Combined_Edge_Costs(struct FeatureList *list, int flag)
+void Owen2dCanvas::Calc_Combined_Edge_Costs(struct FeatureList *list, int flag)
 {
   int row, col, i;
   float total_weight=0; /* total of feature weighting factors */
@@ -6260,7 +6260,7 @@ void Segment2dCanvas::Calc_Combined_Edge_Costs(struct FeatureList *list, int fla
  *
  *****************************************************************************/
 /** Edge features are calculated for the entire slice *******/
-void Segment2dCanvas::Calc_Edge_Costs()
+void Owen2dCanvas::Calc_Edge_Costs()
 {
 	/* list used here is always accepted_list only */
 
@@ -6296,7 +6296,7 @@ void Segment2dCanvas::Calc_Edge_Costs()
  *****************************************************************************/
 /** Edge features are calculated for the entire slice *******/
 /** same as Calc_Edge_Costs, but Features already allocated **/
-void Segment2dCanvas::ReCalc_Edge_Costs()
+void Owen2dCanvas::ReCalc_Edge_Costs()
 {
     /* list used here is always accepted_list only */
  
@@ -6346,7 +6346,7 @@ void Segment2dCanvas::ReCalc_Edge_Costs()
 /*    Modified: 3/18/08 Removed zoomed slice initialization in case of no ROI
  *       by Dewey Odhner.
  */
-int Segment2dCanvas::Initialize_Costs(IMAGE *timg, int flag)
+int Owen2dCanvas::Initialize_Costs(IMAGE *timg, int flag)
 {
     int row, col, width, height, initcol, initrow;
 
@@ -6487,7 +6487,7 @@ IDE*/
  *    Modified: 4/10/08 0 for no gradient by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::create_sign_buffer()
+int Owen2dCanvas::create_sign_buffer()
 {
     int row, col;
     int nrow1, nrow2;  /* variables used to decrease computing time */
@@ -6609,7 +6609,7 @@ int Segment2dCanvas::create_sign_buffer()
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::AbsGrad1(int flag /* indicates whether to use feature or temp arrays */)
+int Owen2dCanvas::AbsGrad1(int flag /* indicates whether to use feature or temp arrays */)
 {
     int row, col;
 	unsigned short **hzl, **vert; /* set to feature or temp depend. on flag */
@@ -6740,7 +6740,7 @@ int Segment2dCanvas::AbsGrad1(int flag /* indicates whether to use feature or te
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::AbsGrad2(int flag /* indicates whether to use feature or temp arrays */)
+int Owen2dCanvas::AbsGrad2(int flag /* indicates whether to use feature or temp arrays */)
 {
     int row, col;
 	unsigned short **hzl, **vert; /* set to feature or temp depend. on flag */
@@ -6882,7 +6882,7 @@ int Segment2dCanvas::AbsGrad2(int flag /* indicates whether to use feature or te
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::AbsGrad3(int flag /* indicates whether to use feature or temp arrays */)
+int Owen2dCanvas::AbsGrad3(int flag /* indicates whether to use feature or temp arrays */)
 {
     int row, col;
 	unsigned short **hzl, **vert; /* set to feature or temp depend. on flag */
@@ -7032,7 +7032,7 @@ int Segment2dCanvas::AbsGrad3(int flag /* indicates whether to use feature or te
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::AbsGrad4(int flag /* indicates whether to use feature or temp arrays */)
+int Owen2dCanvas::AbsGrad4(int flag /* indicates whether to use feature or temp arrays */)
 {
     int row, col;
 	unsigned short **hzl, **vert; /* set to feature or temp depend. on flag */
@@ -7187,7 +7187,7 @@ h; ptr8_1++,ptr8_2++, col++)
  *       by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::Density1(int flag /* indicates whether to use feature or temp arrays */)
+int Owen2dCanvas::Density1(int flag /* indicates whether to use feature or temp arrays */)
 {
     int row, col;
     unsigned short **hzl, **vert; /* set to feature or temp depend. on flag */
@@ -7361,7 +7361,7 @@ int Segment2dCanvas::Density1(int flag /* indicates whether to use feature or te
  *       by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::Density2(int flag /* indicates whether to use feature or temp arrays */)
+int Owen2dCanvas::Density2(int flag /* indicates whether to use feature or temp arrays */)
 {
     int row, col;
     unsigned short **hzl, **vert; /* set to feature or temp depend. on flag */
@@ -7521,7 +7521,7 @@ int Segment2dCanvas::Density2(int flag /* indicates whether to use feature or te
  *
  *****************************************************************************/
 /* resets object_vertex array to 0 */
-void Segment2dCanvas::Reset_ObjectVertex()
+void Owen2dCanvas::Reset_ObjectVertex()
 {
 	int row, col;
 
@@ -7554,7 +7554,7 @@ void Segment2dCanvas::Reset_ObjectVertex()
  *
  *****************************************************************************/
 /* resets object_vertex array corresp to temp arrays to 0 */
-void Segment2dCanvas::reset_object_vertex_of_temparrays()
+void Owen2dCanvas::reset_object_vertex_of_temparrays()
 {
 	int i;
 
@@ -7620,7 +7620,7 @@ void Segment2dCanvas::reset_object_vertex_of_temparrays()
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::InvLinearTransform(int featr, int flag)
+int Owen2dCanvas::InvLinearTransform(int featr, int flag)
 {
   int row, col;
   float slope, Fmax, Fmin;
@@ -7727,7 +7727,7 @@ int Segment2dCanvas::InvLinearTransform(int featr, int flag)
  *    Modified: 05/27/08 table expanded, freed by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::InvGaussianTransform(int featr, int flag)
+int Owen2dCanvas::InvGaussianTransform(int featr, int flag)
 {
   int row, col, tbl_offset,i;
   double square, fvar;
@@ -7841,7 +7841,7 @@ int Segment2dCanvas::InvGaussianTransform(int featr, int flag)
  *    Modified:
  *
  *****************************************************************************/
-int Segment2dCanvas::LinearTransform(int featr, int flag)
+int Owen2dCanvas::LinearTransform(int featr, int flag)
 {
     int row, col;
     float slope, Fmax, Fmin;
@@ -7942,7 +7942,7 @@ int Segment2dCanvas::LinearTransform(int featr, int flag)
  *    Modified: 05/27/08 table expanded, freed by Dewey Odhner.
  *
  *****************************************************************************/
-int Segment2dCanvas::GaussianTransform(int featr, int flag)
+int Owen2dCanvas::GaussianTransform(int featr, int flag)
 {
   int row, col, i, tbl_offset;
   double square, fvar;
@@ -8014,7 +8014,7 @@ int Segment2dCanvas::GaussianTransform(int featr, int flag)
 /* Modified: 5/23/08 HWHM set to specified stddev by Dewey Odhner.
  *    Modified: 05/27/08 table expanded, freed by Dewey Odhner.
  */
-int Segment2dCanvas::HyperTransform(int featr, int flag)
+int Owen2dCanvas::HyperTransform(int featr, int flag)
 {
   int row, col, i, tbl_offset;
   double Abx, K;
@@ -8088,7 +8088,7 @@ int Segment2dCanvas::HyperTransform(int featr, int flag)
 /* Modified: 5/23/08 HWHM set to specified stddev by Dewey Odhner.
  *    Modified: 05/27/08 table expanded, freed by Dewey Odhner.
  */
-int Segment2dCanvas::InvHyperTransform(int featr, int flag)
+int Owen2dCanvas::InvHyperTransform(int featr, int flag)
 {
   int row, col, i, tbl_offset;
   double Abx, K;
@@ -8177,7 +8177,7 @@ int Segment2dCanvas::InvHyperTransform(int featr, int flag)
  *    Modified:
  *
  *****************************************************************************/
-void Segment2dCanvas::Calc_SumCost()
+void Owen2dCanvas::Calc_SumCost()
 {
 
 /*
@@ -8190,14 +8190,14 @@ void Segment2dCanvas::Calc_SumCost()
 
 }
 
-void Segment2dCanvas::LoadFeatureList()
+void Owen2dCanvas::LoadFeatureList()
 {
   static char feature_def_file[80]=".FEATURES.DEF";
   LoadFeatureList(feature_def_file);
 }
 
 /* Modified: 4/11/97 file closed by Dewey Odhner. */
-void Segment2dCanvas::LoadFeatureList(const char *feature_def_file)
+void Owen2dCanvas::LoadFeatureList(const char *feature_def_file)
 {
   int i, j;
   FILE *fp;
@@ -8235,7 +8235,7 @@ void Segment2dCanvas::LoadFeatureList(const char *feature_def_file)
  
  
 /* Modified: 4/11/97 file closed by Dewey Odhner. */
-void Segment2dCanvas::WriteFeatureList()
+void Owen2dCanvas::WriteFeatureList()
 {
   int i, j;
   FILE *fp;
@@ -8279,7 +8279,7 @@ void Segment2dCanvas::WriteFeatureList()
  *****************************************************************************/
 
 
-void Segment2dCanvas::SnakeDeformation(double **Gradient, int NumberOfControlPoints, CPoint *ControlPoint, double alpha, double beta, double gamma, int nrows, int ncolumns, int niterations)
+void Owen2dCanvas::SnakeDeformation(double **Gradient, int NumberOfControlPoints, CPoint *ControlPoint, double alpha, double beta, double gamma, int nrows, int ncolumns, int niterations)
 {
   int iteration,N,SearchPixelsPerRow,SearchArea;
   int pTerminationFlag = FALSE;
@@ -8363,7 +8363,7 @@ void Segment2dCanvas::SnakeDeformation(double **Gradient, int NumberOfControlPoi
 /***************************************************************
  * Compute snake energy for a control point given by "present"
  **************************************************************/
-double Segment2dCanvas::ComputeEnergy(CPoint present,CPoint previous,CPoint next, double GradientMagnitude, double Dmax, double alpha, double beta, double gamma)
+double Owen2dCanvas::ComputeEnergy(CPoint present,CPoint previous,CPoint next, double GradientMagnitude, double Dmax, double alpha, double beta, double gamma)
 {
   double Energy,ContinuityEnergy,CurvatureEnergy,GradientEnergy;
 
@@ -8387,7 +8387,7 @@ double Segment2dCanvas::ComputeEnergy(CPoint present,CPoint previous,CPoint next
  *           Energy=|(s-(s-d))/d|^2
  *           d is the interval, which is 1 in this case 
  ***********************************************************/
-double Segment2dCanvas::ComputeContinuityEnergy(CPoint present, CPoint previous)
+double Owen2dCanvas::ComputeContinuityEnergy(CPoint present, CPoint previous)
 {
   return pow(present.x-previous.x,2.)+pow(present.y-previous.y,2.);
 }
@@ -8400,7 +8400,7 @@ double Segment2dCanvas::ComputeContinuityEnergy(CPoint present, CPoint previous)
  *      Energy = |(s-d)-2(s)+(s+d)/d^2|^2
  *      d is the interval, which is 1 in this case
  ***********************************************************/
-double Segment2dCanvas::ComputeCurvatureEnergy(CPoint present, CPoint previous, CPoint next)
+double Owen2dCanvas::ComputeCurvatureEnergy(CPoint present, CPoint previous, CPoint next)
 {
   double xfactor,yfactor;
   
@@ -8414,7 +8414,7 @@ double Segment2dCanvas::ComputeCurvatureEnergy(CPoint present, CPoint previous, 
  * GetNewPoint : Find the coordinate position corresponding to 
  *               a defined neighborhood
  ***************************************************************/
-CPoint Segment2dCanvas::get_new_point(CPoint present, int j, int limit)
+CPoint Owen2dCanvas::get_new_point(CPoint present, int j, int limit)
 {
   CPoint 	new_point;
 
@@ -8437,7 +8437,7 @@ CPoint Segment2dCanvas::get_new_point(CPoint present, int j, int limit)
 
 /*--------------------------------------------------------------------*/
 /* Copies the "o_contour" contour points into a temporary array of contours "temp_contours" (global) */
-void Segment2dCanvas::copy_ocontour_into_temp_array()
+void Owen2dCanvas::copy_ocontour_into_temp_array()
 {
 	int i;
 
@@ -8471,7 +8471,7 @@ void Segment2dCanvas::copy_ocontour_into_temp_array()
 /* Saves the temporary MASK file (relative to a given scene) */
 /* Modified: 12/10/99 pixel count changed to 4 bytes by Dewey Odhner. */
 /* Modified: 10/8/01 missing slices set to default value by Dewey Odhner. */
-void Segment2dCanvas::save_mask_proc(int fill_remainder)
+void Owen2dCanvas::save_mask_proc(int fill_remainder)
 {
 	FILE *fp;
 	char code[4];
@@ -8636,7 +8636,7 @@ void Segment2dCanvas::save_mask_proc(int fill_remainder)
 
 /*---------------------------------------------------------------------------*/
 /* Modified: 12/10/99 pixel count changed to 4 bytes by Dewey Odhner. */
-int Segment2dCanvas::load_object_mask(int n)
+int Owen2dCanvas::load_object_mask(int n)
 /* n: index of the mask to be loaded (1dimensional index, 0=first) */
 {
 	FILE *fp;
@@ -8717,7 +8717,7 @@ int Segment2dCanvas::load_object_mask(int n)
 /* This function checks what objects are represented in an object_mask buffer */
 /* and returns the result in the form of a byte, where each object is represented */
 /* as a bit, 0=not present, 1=present) */
-void Segment2dCanvas::check_objects(unsigned char *result)
+void Owen2dCanvas::check_objects(unsigned char *result)
 {
 	int i;
 	int size;
@@ -8732,7 +8732,7 @@ void Segment2dCanvas::check_objects(unsigned char *result)
 /*---------------------------------------------------------------------------*/
 /* Calculates the area of each object in terms of #of pixels */
 /* Modified: 12/10/99 pixel count changed to 4 bytes by Dewey Odhner. */
-void Segment2dCanvas::check_area(unsigned area[8] /* area of each object */)
+void Owen2dCanvas::check_area(unsigned area[8] /* area of each object */)
 {
 	int i;
 	unsigned char value;
@@ -8761,7 +8761,7 @@ void Segment2dCanvas::check_area(unsigned area[8] /* area of each object */)
 }
 
 /*---------------------------------------------------------------------------*/
-void Segment2dCanvas::set_object_mask_bit(int bit /* 0,1,2,3,4,5,6,7, -1 or 8 = all */, int value /* 0=OFF, 1=ON */)
+void Owen2dCanvas::set_object_mask_bit(int bit /* 0,1,2,3,4,5,6,7, -1 or 8 = all */, int value /* 0=OFF, 1=ON */)
 {
 	int i;
 
@@ -8777,7 +8777,7 @@ void Segment2dCanvas::set_object_mask_bit(int bit /* 0,1,2,3,4,5,6,7, -1 or 8 = 
 			object_mask[i] = value;
 	}
 }
-void Segment2dCanvas::check_overlay_color(int overlay_intensity)
+void Owen2dCanvas::check_overlay_color(int overlay_intensity)
 {
 //@
 }
@@ -8789,7 +8789,7 @@ void Segment2dCanvas::check_overlay_color(int overlay_intensity)
 /*					1 -> file didn't exist and it was created */
 /*					2 -> file exists and is not the same */
 /*				   -1 -> if error */
-int Segment2dCanvas::check_mask_file(int *slice, int *volume)
+int Owen2dCanvas::check_mask_file(int *slice, int *volume)
 {
 	FILE *fp, *fpgm;
 	char mother_file[101];
@@ -8952,7 +8952,7 @@ printf("Open greymap.TMP L8597\n");
 	return(1);
 }
 
-void Segment2dCanvas::load_object_proc()
+void Owen2dCanvas::load_object_proc()
 {
 	int i;
 	if( mask_index_different() )
@@ -8980,7 +8980,7 @@ void Segment2dCanvas::load_object_proc()
 	reload();
 }
 
-void Segment2dCanvas::load_mask_from_BIM()
+void Owen2dCanvas::load_mask_from_BIM()
 {
 	wxString filename = wxFileSelector( _T("Select mask file"), _T(""),
 		_T(""), _T(""),
@@ -8998,13 +8998,13 @@ void Segment2dCanvas::load_mask_from_BIM()
 }
 
 /*---------------------------------------------------------------------------*/
-void Segment2dCanvas::set_image_location(IMAGE *img, int px, int py)
+void Owen2dCanvas::set_image_location(IMAGE *img, int px, int py)
 {
 	img->locx = px;
 	img->locy = py;
 }
 /*---------------------------------------------------------------------------*/
-void Segment2dCanvas::set_image_output_size(IMAGE *img, int w, int h)
+void Owen2dCanvas::set_image_output_size(IMAGE *img, int w, int h)
 {
 	img->w = img->framew = w;
 	img->h = img->frameh = h;
@@ -9029,7 +9029,7 @@ void Segment2dCanvas::set_image_output_size(IMAGE *img, int w, int h)
  Modified: 5/23/02 half pixel offset removed by Dewey Odhner.
  Modified: 4/3/08 output image size not changed by Dewey Odhner.
 */
-void Segment2dCanvas::set_image_table(IMAGE *img)
+void Owen2dCanvas::set_image_table(IMAGE *img)
 {
 	float npixel;	/* new pixel size (in respect to the original) */
 	int i;
@@ -9090,7 +9090,7 @@ void Segment2dCanvas::set_image_table(IMAGE *img)
  Modified: 2/17/04 rounding of img->tbl2x, img->tbl2y changed by Dewey Odhner.
  Modified: 4/7/08 output image size not changed by Dewey Odhner.
 */
-void Segment2dCanvas::set_image_table2(IMAGE *img)
+void Owen2dCanvas::set_image_table2(IMAGE *img)
 {
 	int nw, nh;
 	int i;
@@ -9139,7 +9139,7 @@ void Segment2dCanvas::set_image_table2(IMAGE *img)
 
 /*---------------------------------------------------------------------------*/
 /* Free an image */
-void Segment2dCanvas::free_image(IMAGE *img)
+void Owen2dCanvas::free_image(IMAGE *img)
 {
 	if(img->original_data != NULL)
 		free(img->original_data);
@@ -9186,7 +9186,7 @@ void Segment2dCanvas::free_image(IMAGE *img)
 	img->scale = 0.0;
 }
 
-void Segment2dCanvas::bin_to_grey(unsigned char *bin_buffer,
+void Owen2dCanvas::bin_to_grey(unsigned char *bin_buffer,
 	int length_grey, unsigned char *grey_buffer, int min_value, int max_value)
 {
         int j;
@@ -9244,7 +9244,7 @@ static int copy_file(const char src[], const char dst[])
 	return ec;
 }
 
-void Segment2dCanvas::generate_masked_scene(const char *out_file_name,
+void Owen2dCanvas::generate_masked_scene(const char *out_file_name,
 	int out_object)
 {
     wxString text;
@@ -9299,7 +9299,7 @@ void Segment2dCanvas::generate_masked_scene(const char *out_file_name,
 	system((const char *)text.c_str());
 }
 
-void Segment2dCanvas::Run_Statistics()
+void Owen2dCanvas::Run_Statistics()
 {
     unsigned char **hzl_aux, **vert_aux;
 	int j;
@@ -9514,7 +9514,7 @@ void Segment2dCanvas::Run_Statistics()
 	reload();
 }
 
-void Segment2dCanvas::calculate_hzl_features(double sum[6], double sumsq[6],
+void Owen2dCanvas::calculate_hzl_features(double sum[6], double sumsq[6],
 	float fmin[6], float fmax[6], int j, int i)
 {
 	int val1, val2;
@@ -9638,7 +9638,7 @@ void Segment2dCanvas::calculate_hzl_features(double sum[6], double sumsq[6],
     }
 }
 
-void Segment2dCanvas::calculate_vert_features(double sum[6], double sumsq[6],
+void Owen2dCanvas::calculate_vert_features(double sum[6], double sumsq[6],
 	float fmin[6], float fmax[6], int j, int i)
 {
     int val1, val2;
@@ -9765,27 +9765,27 @@ void Segment2dCanvas::calculate_vert_features(double sum[6], double sumsq[6],
 }
 //----------------------------------------------------------------------
 /** \brief Allow the user to scroll through the slices with the mouse wheel. */
-void Segment2dCanvas::OnMouseWheel ( wxMouseEvent& e ) {
-	Segment2dFrame*  sf = dynamic_cast<Segment2dFrame*>(m_parent_frame);
+void Owen2dCanvas::OnMouseWheel ( wxMouseEvent& e ) {
+	Owen2dFrame*  sf = dynamic_cast<Owen2dFrame*>(m_parent_frame);
 	sf->OnMouseWheel(e);
 }
 
 
 //----------------------------------------------------------------------
-IMPLEMENT_DYNAMIC_CLASS ( Segment2dCanvas, wxPanel )
-BEGIN_EVENT_TABLE       ( Segment2dCanvas, wxPanel )
-    EVT_CHAR(             Segment2dCanvas::OnChar         )
+IMPLEMENT_DYNAMIC_CLASS ( Owen2dCanvas, wxPanel )
+BEGIN_EVENT_TABLE       ( Owen2dCanvas, wxPanel )
+    EVT_CHAR(             Owen2dCanvas::OnChar         )
     EVT_ERASE_BACKGROUND( MainCanvas::OnEraseBackground )
-    EVT_LEFT_DOWN(        Segment2dCanvas::OnLeftDown     )
-    EVT_LEFT_UP(          Segment2dCanvas::OnLeftUp       )
-    EVT_MIDDLE_DOWN(      Segment2dCanvas::OnMiddleDown   )
-    EVT_MIDDLE_UP(        Segment2dCanvas::OnMiddleUp     )
-    EVT_MOTION(           Segment2dCanvas::OnMouseMove    )
-	EVT_MOUSEWHEEL(       Segment2dCanvas::OnMouseWheel   )
-	EVT_LEFT_DCLICK(      Segment2dCanvas::OnLeftDClick   )
-    EVT_PAINT(            Segment2dCanvas::OnPaint        )
-    EVT_RIGHT_DOWN(       Segment2dCanvas::OnRightDown    )
-    EVT_RIGHT_UP(         Segment2dCanvas::OnRightUp      )
+    EVT_LEFT_DOWN(        Owen2dCanvas::OnLeftDown     )
+    EVT_LEFT_UP(          Owen2dCanvas::OnLeftUp       )
+    EVT_MIDDLE_DOWN(      Owen2dCanvas::OnMiddleDown   )
+    EVT_MIDDLE_UP(        Owen2dCanvas::OnMiddleUp     )
+    EVT_MOTION(           Owen2dCanvas::OnMouseMove    )
+	EVT_MOUSEWHEEL(       Owen2dCanvas::OnMouseWheel   )
+	EVT_LEFT_DCLICK(      Owen2dCanvas::OnLeftDClick   )
+    EVT_PAINT(            Owen2dCanvas::OnPaint        )
+    EVT_RIGHT_DOWN(       Owen2dCanvas::OnRightDown    )
+    EVT_RIGHT_UP(         Owen2dCanvas::OnRightUp      )
     EVT_SIZE(             MainCanvas::OnSize            )
 END_EVENT_TABLE()
 //======================================================================
