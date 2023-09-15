@@ -7,7 +7,7 @@ elif test $# = 3
 then
 	sigma=$3
 else
-	echo Usage: BIM_to_BS0.sh '<input_file> <output_file> [<sigma>]'
+	echo Usage: BIM_to_BS0_Signed3DT.sh '<input_file> <output_file> [<sigma>]'
 	test $# = 3
 	exit
 fi
