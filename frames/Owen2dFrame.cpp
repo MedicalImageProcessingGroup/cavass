@@ -191,70 +191,29 @@ void Owen2dFrame::initializeMenu ( void ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Owen2dFrame::OnHelp ( wxCommandEvent& e ) {
-#ifdef WIN32
-    string help = "<body bgcolor=\"ivory\"><pre>\
-<b>map 1 button (B) to 3 button (L M R) mouse:</b> \n\
-  B &rarr; L \n\
-  ctrl+B &rarr; M (or shift+B &rarr; M) \n\
-  alt+B &rarr; R\
-<hr/>\
-<b>map 2 button (L R) to 3 button (L M R) mouse:</b> \n\
-  L &rarr; L \n\
-  ctrl+L &rarr; M (or shift+L &rarr; M) \n\
-  R &rarr; R\
-<hr/>\
-<b>One by WACOM tablet (mod. no. CTL-472)</b> \n\
-<b>map stylus/pen w/ 2 buttons (a,b) + tip (t) pressed on tablet:</b> \n\
-  standard tablet behavior: \n\
-    t &rarr; L \n\
-    pen hovering over tablet no more than 0.5cm away and pressing a &rarr; M \n\
-    pen hovering over tablet no more than 0.5cm away and pressing b &rarr; R \n\
-  additionally (in interactive 2d only): \n\
-    ctrl+t (or shift+t) &rarr; M \n\
-    alt+t &rarr; R \n\
-  where a=button closer to tip, b=button further from tip, and t=tip pressed on tablet\
-<hr/>\
-<b>Gaomo Graphics IPS Pen Display (mod. no. PDP1161).</b> \n\
-  Note: You <em>must</em> install their driver. \n\
-  in interactive 2d <em>only</em>: \n\
-    t &rarr; L \n\
-    ctrl+t (or shift+t) &rarr; M \n\
-    alt+t &rarr; R \n\
-  where a=button closer to tip, b=button further from tip, and t=tip pressed on tablet \n\
-</pre></body>";
-#else  //linux (and mac?)
-    string help = "<body bgcolor=\"ivory\"><pre>\
-<b>map 1 button (B) to 3 button (L M R) mouse:</b> \n\
-  B &rarr; L \n\
-  ctrl+B &rarr; M (or shift+B &rarr; M) \n\
-  alt+B &rarr; R\
-<hr/>\
-<b>map 2 button (L R) to 3 button (L M R) mouse:</b> \n\
-  L &rarr; L \n\
-  ctrl+L &rarr; M (or shift+L &rarr; M) \n\
-  R &rarr; R\
-<hr/>\
-<b>One by WACOM tablet (mod. no. CTL-472).</b> \n\
-<b>Gaomo Graphics IPS Pen Display (mod. no. PDP1161).</b> \n\
-<b>map stylus/pen w/ 2 buttons (a,b) + tip (t) pressed on tablet:</b> \n\
-  standard tablet behavior: \n\
-    t &rarr; L \n\
-    pen hovering over tablet no more than 0.5cm away and pressing a &rarr; M \n\
-    pen hovering over tablet no more than 0.5cm away and pressing b &rarr; R \n\
-  additionally (in interactive 2d only): \n\
-    ctrl+t (or shift+t) &rarr; M \n\
-    alt+t &rarr; R \n\
-  where a=button closer to tip, b=button further from tip, and t=tip pressed on tablet \n\
-</pre></body>";
-#endif
-
     wxDialog dlg( NULL, wxID_ANY, wxString(_("Owen2d help")), wxDefaultPosition,
                   wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
     wxBoxSizer* sizer = new wxBoxSizer( wxVERTICAL );
     wxHtmlWindow* html = new wxHtmlWindow( &dlg, wxID_ANY, wxDefaultPosition ); //,
                                            //wxSize(600, 400) ); //, wxHW_SCROLLBAR_NEVER );
     html->SetInitialSize( wxSize(600,400) );
-    html->SetPage( help );
+
+    //set the source of the html help
+    wxString h( "file://" );
+    h += Preferences::getHome();
+    h += "/help/";
+#ifdef WIN32
+    h += "owen2dframe-win.html" );
+#else
+    h += "owen2dframe-mac-linux.html";
+#endif
+    if (!html->LoadPage(h)) {
+        h += " not found.";
+        html->SetPage( h );
+    } else {
+        printf( "loaded %s. \n", (const char*)h.c_str() );
+    }
+
     sizer->Add( html, 1, wxALL | wxEXPAND, 10 );
     wxButton* but = new wxButton( &dlg, wxID_OK, _("OK") );
     but->SetDefault();

@@ -962,6 +962,12 @@ else (MSVC)
         COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials/ ${CAVASS_BINARY_DIR}/tutorials
     )
 endif (MSVC)
+
+#copy html help
+    EXECUTE_PROCESS(
+        COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/help/
+                                        ${CAVASS_BINARY_DIR}/help
+    )
 #------------------------------------------------------------------------------
 if (PARALLEL)
     include_directories( . ${BUILD_PARALLEL_INC} )
