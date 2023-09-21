@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2017, 2020-2022 Medical Image Processing Group
+  Copyright 1993-2017, 2020-2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -44,7 +44,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "VOIROIFrame.h"
 #include  "VOIStandardlizeFrame.h"
 #include  "IntenMapFrame.h"
-#include  "ToStructureFrame.h"
+#include  "ToSceneFrame.h"
 #include  "cavass_icon.xpm"    //icon
 #include  "wx/statline.h"
 #include  "wx/wxhtml.h"
@@ -445,7 +445,7 @@ void MainFrame::OnCopy ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnAbout ( wxCommandEvent& unused ) {
     wxMessageBox(
-"CAVASS version 1.0.29 \n\
+"CAVASS version 1.1 \n\
 \n\
   Xinjian Chen, Ph.D.,\n\
   George J. Grevera, Ph.D.,\n\
@@ -694,15 +694,15 @@ void MainFrame::OnPPScopsVOIStandardize   ( wxCommandEvent& unused )
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-void MainFrame::OnPPStopsToStructure ( wxCommandEvent& unused ) 
+void MainFrame::OnPPStopsToScene ( wxCommandEvent& unused ) 
 {
     wxString  filename = wxFileSelector( _T("Select structure file"), _T(""), 
         _T(""), _T(""),
-        "CAVASS files (*.BS0;*.BS1;*.PLN)|*.BS0;*.BS1;*.PLN", 
+        "CAVASS files (*.BS0)|*.BS0", 
         wxFILE_MUST_EXIST ); 
      
     if (filename.Length()>0) { 
-        ToStructureFrame*  frame = new ToStructureFrame(); 
+        ToSceneFrame*  frame = new ToSceneFrame(); 
         frame->loadFile(filename); 
         if (Preferences::getSingleFrameMode())    Close(); 
     }

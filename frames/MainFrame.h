@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2016 Medical Image Processing Group
+  Copyright 1993-2016, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -199,7 +199,8 @@ class MainFrame : public wxFrame {
     virtual void OnPPScopsFuzzComp ( wxCommandEvent& unused );
 	virtual void OnPPScopsIRFC     ( wxCommandEvent& unused );
     virtual void OnPPScopsThreshold( wxCommandEvent& unused );
-	virtual void OnPPStopsToStructure ( wxCommandEvent& unused );
+	//virtual void OnPPStopsToStructure ( wxCommandEvent& unused );
+	virtual void OnPPStopsToScene  ( wxCommandEvent& unused );
     virtual void OnVisOverlay      ( wxCommandEvent& unused );
     virtual void OnVisSurfView     ( wxCommandEvent& unused );
     virtual void OnVisVolView      ( wxCommandEvent& unused );
@@ -265,7 +266,7 @@ class MainFrame : public wxFrame {
   EVT_MENU( ID_PP_SCOPS_SEGMENT_2DINTERACTIVE,                      \
                                      MainFrame::OnSegment2d    )    \
   EVT_MENU( ID_PP_SCOPS_IRFC,        MainFrame::OnPPScopsIRFC  )    \
-  EVT_MENU( ID_PP_STOPS_TO_STRUCTURE,MainFrame::OnPPStopsToStructure ) \
+  EVT_MENU( ID_PP_STOPS_TO_SCENE,    MainFrame::OnPPStopsToScene )  \
   EVT_MENU( ID_PREFERENCES,          MainFrame::OnPreferences  )    \
   EVT_MENU( ID_PRINT,                MainFrame::OnPrint        )    \
   EVT_MENU( ID_PRINT_PREVIEW,        MainFrame::OnPrintPreview )    \

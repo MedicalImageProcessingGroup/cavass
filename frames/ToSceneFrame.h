@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2013, 2017 Medical Image Processing Group
+  Copyright 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -21,36 +21,26 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 //======================================================================
-/**
- * \file   ToStructureFrame.h
- * \brief  ToStructureFrame definition.
- * \author Ying Zhuge, Ph.D.
- *
- * Copyright: (C) 2003, George Grevera
- *
- * Rise and shine and give God your glory (glory).
- */
-//======================================================================
-#ifndef __ToStructureFrame_h
-#define __ToStructureFrame_h
+#ifndef __ToSceneFrame_h
+#define __ToSceneFrame_h
 
 #include  <algorithm>
 #include  <stack>
 #include  "wx/dnd.h"
 #include  "wx/docview.h"
 #include  "wx/splitter.h"
-#include  "ToStructureCanvas.h"
-//#include  "wxFPSlider.h"
+#include  "ToSceneCanvas.h"
+
 #if ! defined (WIN32) && ! defined (_WIN32)
     #include  <unistd.h>
 #endif
 #include  <stdlib.h>
 
-/** \brief ToStructureFrame class definition.
+/** \brief ToSceneFrame class definition.
  *
  *  a frame with an overlay of two data sets.
  */
-class ToStructureFrame : public MainFrame 
+class ToSceneFrame : public MainFrame 
 {
   
   
@@ -59,26 +49,27 @@ public:
     enum {        
         ID_OVERLAY, ID_BUSY_TIMER,
         ID_OVERWRITE_SCREEN, ID_APPEND_SCREEN, ID_BROWSE_SCREEN, 
-         ID_SAVE
+        ID_STRUCT_NUMBER, ID_SAVE
     };
   
     int            mFileOrDataCount;    ///< two needed for overlay
+    wxString mInputBS0;
   protected:
     wxString       mInputFile;
     wxMenu*        m_options_menu;      ///< options menu
     wxStaticBox*   mSetIndex1Box;
     wxSizer*       mSetIndex1Sizer;
     wxFlexGridSizer*  fgs;
-    wxButton*      m_ToStructureTypeBut;
-    
+    wxButton*      m_structN;
+    int structure_number, number_of_structures;
     
     void initializeMenu ( void );
     void addButtonBox ( void );
     
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   public:
-    ToStructureFrame ();
-    ~ToStructureFrame ( void );
+    ToSceneFrame ();
+    ~ToSceneFrame ( void );
 
     void loadFile ( wxString& fname );
         
@@ -103,19 +94,18 @@ public:
     void OnUpdateUICineSlider    ( wxUpdateUIEvent& e );
 #endif
     
-    void OnToStructureSave             (wxCommandEvent& e );    
+    void OnToSceneSave             (wxCommandEvent& e );    
+    void OnStructNumber ( wxCommandEvent& unused );
 
     void OnSaveScreen   ( wxCommandEvent& e );
     void OnCopy         ( wxCommandEvent& e );
     void OnOpen         ( wxCommandEvent& e );
- //   void OnZoomIn       ( wxCommandEvent& e );
- //   void OnZoomOut      ( wxCommandEvent& e );
-
+    virtual void OnInformation     ( wxCommandEvent& unused );
     
     void OnPrintPreview ( wxCommandEvent& e );
     void OnPrint        ( wxCommandEvent& e );    
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    DECLARE_DYNAMIC_CLASS( ToStructureFrame )
+    DECLARE_DYNAMIC_CLASS( ToSceneFrame )
     DECLARE_EVENT_TABLE()
 };
 

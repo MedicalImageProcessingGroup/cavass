@@ -1,5 +1,5 @@
 /*
-  Copyright 2018, 2021 Medical Image Processing Group
+  Copyright 2018, 2021, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 	double final_factor_bqml;
 
     ris = get_element(fp, 0x0054, 0x0016, AT, buf, 256, &ii);
-    if (ris != 100)
+    if (ris!=100 || dose!=NULL)
     {
         float PatientWeight=specified_weight, SeriesTime,
             RadiopharmaceuticalStartTime,
@@ -101,7 +101,19 @@ int main(int argc, char *argv[])
 				dose = RTD->cData;
         }
 		DicomDataElement *RHL=dr.findEntry(&dr.mRoot, 0x0018, 0x1075);
+		if (RHL == NULL)
+		{
+			RHL = new DicomDataElement;
+			RHL->cData = (char *)malloc(7);
+			strcpy(RHL->cData, "6586.2");
+		}
         DicomDataElement *RPF=dr.findEntry(&dr.mRoot, 0x0018, 0x1076);
+		if (RPF == NULL)
+		{
+			RPF = new DicomDataElement;
+			RPF->cData = (char *)malloc(7);
+			strcpy(RPF->cData, "0.9673");
+		}
         if (starttime && dose &&
 				RHL && RHL->cData)
 		{

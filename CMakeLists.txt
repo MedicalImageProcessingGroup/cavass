@@ -206,6 +206,9 @@ target_link_libraries( correct_min_max ${3DVLIB} )
 add_executable( create_icon  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/create_icon.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_STRUCTURE/gcode.c )
 target_link_libraries( create_icon ${3DVLIB} )
 
+add_executable( BS0_TO_BIM  3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_SCENE/BS0_TO_BIM.c 3dviewnix/PROCESS/PREPROCESS/STRUCTURE_OPERATIONS/TO_SCENE/neighbors.h )
+target_link_libraries( BS0_TO_BIM ${3DVLIB} )
+
 add_executable( deform  registration/deform.c )
 target_link_libraries( deform ${3DVLIB} )
 
@@ -621,10 +624,10 @@ if (wxWidgets_FOUND)
         frames/ThresholdFrame.cpp
         frames/ThresholdFrame.h
         frames/ThresholdPrint.h
-        frames/ToStructureCanvas.cpp
-        frames/ToStructureCanvas.h
-        frames/ToStructureFrame.cpp
-        frames/ToStructureFrame.h
+        frames/ToSceneCanvas.cpp
+        frames/ToSceneCanvas.h
+        frames/ToSceneFrame.cpp
+        frames/ToSceneFrame.h
         frames/VOIIOICanvas.cpp
         frames/VOIIOICanvas.h
         frames/VOIIOIFrame.cpp

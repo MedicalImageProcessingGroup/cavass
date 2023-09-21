@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2016 Medical Image Processing Group
+  Copyright 1993-2016, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -129,7 +129,7 @@ char *argv[];
 
   size = vh1.scn.xysize[0]* vh1.scn.xysize[1];
   bytes = vh1.scn.num_of_bits==1? 1: vh1.scn.num_of_bits/8;
-  pixel_volume= vh1.scn.xypixsz[0]*vh1.scn.xypixsz[1]*
+  pixel_volume = slices1<2? 0: vh1.scn.xypixsz[0]*vh1.scn.xypixsz[1]*
     (vh1.scn.loc_of_subscenes[1]-vh1.scn.loc_of_subscenes[0]);
 
   size1 = (size*vh1.scn.num_of_bits+7)/8;

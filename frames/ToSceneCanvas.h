@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2013 Medical Image Processing Group
+  Copyright 1993-2013, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -22,16 +22,16 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 //======================================================================
 /**
- * \file   ToStructureCanvas.h
- * \brief  ToStructureCanvas definition.
+ * \file   ToSceneCanvas.h
+ * \brief  ToSceneCanvas definition.
  * \author 
  *
  * Copyright 2013 University of Pennsylvania
  *
  */
 //======================================================================
-#ifndef __ToStructureCanvas_h
-#define __ToStructureCanvas_h
+#ifndef __ToSceneCanvas_h
+#define __ToSceneCanvas_h
 
 #include  <deque>
 #include  <math.h>
@@ -42,15 +42,15 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 #define NUM_FEATURE_LINES 11
 //#define MSG_WIDTH  200
-//class ToStructureCanvas : public wxScrolledWindow {
-/** \brief ToStructureCanvas - the canvas on which images and other things
+//class ToSceneCanvas : public wxScrolledWindow {
+/** \brief ToSceneCanvas - the canvas on which images and other things
  *  are drawn (i.e., the drawing area of the window).
  */
-class ToStructureCanvas : public MainCanvas 
+class ToSceneCanvas : public MainCanvas 
 {
   int  mOverallXSize, mOverallYSize, mOverallZSize;
                                          ///< max count of pixels of displayed images in x,y,z  
-  bool           m_bToStructureDone;
+  bool           m_bToSceneDone;
   int            m_nROIType;
   int            m_nGradType;
   int            mFileOrDataCount;  
@@ -59,7 +59,7 @@ class ToStructureCanvas : public MainCanvas
   int            m_nRefFrame;
 
 public:
-    /////////////// for ToStructure Algorithm	 /////////
+    /////////////// for ToScene Algorithm	 /////////
 	Surf_Info *surf;
 	char *strDisplay;
 	int  nInstancesNum;
@@ -68,7 +68,7 @@ public:
 	int  SaveProfile ( unsigned char* cFilename );
 	
 
-	/////////////// for ToStructure Algorithm	 /////////
+	/////////////// for ToScene Algorithm	 /////////
 
 
 	SliceData*        m_sliceIn;
@@ -88,11 +88,11 @@ protected:
                                          ///< \todo make scale independent in each direction
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 public:
-    ToStructureCanvas ( void );
-    ToStructureCanvas ( wxWindow* parent, MainFrame* parent_frame, wxWindowID id,
+    ToSceneCanvas ( void );
+    ToSceneCanvas ( wxWindow* parent, MainFrame* parent_frame, wxWindowID id,
                    const wxPoint &pos, const wxSize &size );
 
-    ~ToStructureCanvas ( void );
+    ~ToSceneCanvas ( void );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   protected:
     /** \brief free any allocated images (of type wxImage) and/or bitmaps (of type wxBitmap) */
@@ -151,7 +151,7 @@ public:
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   bool   isLoaded    ( const int which ) const;
  
-  bool   getToStructureDone(void) const;
+  bool   getToSceneDone(void) const;
  
  
   int getInstances() const
@@ -164,9 +164,9 @@ public:
 	  return m_nRefFrame;
   }  
  
-  void   setToStructureDone(bool done)
+  void   setToSceneDone(bool done)
   {
-    m_bToStructureDone = done;
+    m_bToSceneDone = done;
   }  
  
    void setInstances(int ntimeInstances)
@@ -180,11 +180,11 @@ public:
   }
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  void RunToStructure();
+  void RunToScene();
   void CreateDisplayImage(int which);
   float normal(float x, float sigma);
 
-    DECLARE_DYNAMIC_CLASS(ToStructureCanvas)
+    DECLARE_DYNAMIC_CLASS(ToSceneCanvas)
     DECLARE_EVENT_TABLE()
 };
 

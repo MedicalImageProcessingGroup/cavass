@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2014, 2017 Medical Image Processing Group
+  Copyright 1993-2014, 2017-2018, 2022 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -48,12 +48,20 @@ char *argv[];
 	unsigned char *in_buffer, *cur_buffer, *max_buffer, *cum_buffer;
 	Point cur, nex, scanning;
 	unsigned long cur_size, max_size=0, cum_size=0, tot_size=0;
+	int slicewise, cur_slice;
 
 
+	if (argc>3 && strcmp(argv[argc-1], "-2D")==0)
+	{
+		slicewise = 1;
+		argc--;
+	}
+	else
+		slicewise = 0;
 	if(argc != 3)
 	{
 		fprintf(stderr, "Usage:\n");
-		fprintf(stderr, "largest_component in.BIM out.BIM\n");
+		fprintf(stderr, "largest_component in.BIM out.BIM [-2D]\n");
 		exit(1);
 	}
 
@@ -116,68 +124,137 @@ char *argv[];
 				  } \
 				 }
 
-#define Enqueue_nex { Set_Bit(cur_buffer, nex); Enqueue(nex); cur_size++; }
+#define Enqueue_nex { Set_Bit(cur_buffer, nex); Enqueue(nex); cur_size++; cum_size++; }
 
-	scanning.x = scanning.y = scanning.z = 0;
-	while (scanning.z < slices)
-	{
-		if (Is_Set(in_buffer, scanning))
-			tot_size++;
-		Step_Fwd
-	}
 	memset(cum_buffer, 0, (width*height+7)/8*slices);
-	scanning.x = scanning.y = scanning.z = 0;
-	while (max_size < tot_size-cum_size)
-	{
-		memset(cur_buffer, 0, (width*height+7)/8*slices);
-		cur_size = 0;
-		while (!Is_Set(in_buffer, scanning) || Is_Set(cum_buffer, scanning))
-			Step_Fwd
-		ClearQueue;
-		cur = scanning;
-		Set_Bit(cur_buffer, cur);
-		Enqueue(cur);
-		while (!QueueIsEmpty)
-		{
-			Dequeue(cur);
-			nex.x = cur.x-1;
-			nex.y = cur.y;
-			nex.z = cur.z;
-			if (cur.x>0 && !Is_Set(cur_buffer, nex) &&
-					Is_Set(in_buffer, nex))
-				Enqueue_nex
-			nex.x = cur.x+1;
-			if (cur.x<width-1 && !Is_Set(cur_buffer, nex) &&
-					Is_Set(in_buffer, nex))
-				Enqueue_nex
-			nex.x = cur.x;
-			nex.y = cur.y-1;
-			if (cur.y>0 && !Is_Set(cur_buffer, nex) &&
-					Is_Set(in_buffer, nex))
-				Enqueue_nex
-			nex.y = cur.y+1;
-			if (cur.y<height-1 && !Is_Set(cur_buffer, nex) &&
-					Is_Set(in_buffer, nex))
-				Enqueue_nex
-			nex.y = cur.y;
-			nex.z = cur.z-1;
-			if (cur.z>0 && !Is_Set(cur_buffer, nex) &&
-					Is_Set(in_buffer, nex))
-				Enqueue_nex
-			nex.z = cur.z+1;
-			if (cur.z<slices-1 && !Is_Set(cur_buffer, nex) &&
-					Is_Set(in_buffer, nex))
-				Enqueue_nex
-		}
-		if (cur_size > max_size)
-		{
-			max_size = cur_size;
-			memcpy(max_buffer, cur_buffer, (width*height+7)/8*slices);
-		}
-		for (j=0; j<(width*height+7)/8*slices; j++)
-			cum_buffer[j] |= cur_buffer[j];
-		cum_size += cur_size;
-	}
+
+    if (slicewise)
+    {
+        for (cur_slice=0; cur_slice<slices; cur_slice++)
+        {
+			tot_size = 0;
+            scanning.x = scanning.y = 0;
+			scanning.z = cur_slice;
+            while (scanning.z == cur_slice)
+            {
+                if (Is_Set(in_buffer, scanning))
+                    tot_size++;
+                Step_Fwd
+            }
+			max_size = cum_size = 0;
+            scanning.x = scanning.y = 0;
+			scanning.z = cur_slice;
+            while (max_size < tot_size-cum_size)
+            {
+                memset(cur_buffer, 0, (width*height+7)/8*slices);
+                cur_size = 0;
+                while (!Is_Set(in_buffer, scanning) ||
+                        Is_Set(cum_buffer, scanning))
+                    Step_Fwd
+                ClearQueue;
+                cur = scanning;
+                Set_Bit(cur_buffer, cur);
+                Enqueue(cur);
+				cum_size++;
+                while (!QueueIsEmpty)
+                {
+                    Dequeue(cur);
+                    nex.x = cur.x-1;
+                    nex.y = cur.y;
+                    nex.z = cur.z;
+                    if (cur.x>0 && !Is_Set(cur_buffer, nex) &&
+                            Is_Set(in_buffer, nex))
+                        Enqueue_nex
+                    nex.x = cur.x+1;
+                    if (cur.x<width-1 && !Is_Set(cur_buffer, nex) &&
+                            Is_Set(in_buffer, nex))
+                        Enqueue_nex
+                    nex.x = cur.x;
+                    nex.y = cur.y-1;
+                    if (cur.y>0 && !Is_Set(cur_buffer, nex) &&
+                            Is_Set(in_buffer, nex))
+                        Enqueue_nex
+                    nex.y = cur.y+1;
+                    if (cur.y<height-1 && !Is_Set(cur_buffer, nex) &&
+                            Is_Set(in_buffer, nex))
+                        Enqueue_nex
+					assert(nex.z == cur_slice);
+                }
+                if (cur_size > max_size)
+                {
+                    max_size = cur_size;
+                    memcpy(max_buffer+(width*height+7)/8*cur_slice,
+					    cur_buffer+(width*height+7)/8*cur_slice,
+						(width*height+7)/8);
+                }
+                for (j=(width*height+7)/8*cur_slice;
+				        j<(width*height+7)/8*(cur_slice+1); j++)
+                    cum_buffer[j] |= cur_buffer[j];
+            }
+        }
+    }
+    else
+    {
+        scanning.x = scanning.y = scanning.z = 0;
+        while (scanning.z < slices)
+        {
+            if (Is_Set(in_buffer, scanning))
+                tot_size++;
+            Step_Fwd
+        }
+        scanning.x = scanning.y = scanning.z = 0;
+        while (max_size < tot_size-cum_size)
+        {
+            memset(cur_buffer, 0, (width*height+7)/8*slices);
+            cur_size = 0;
+            while (!Is_Set(in_buffer, scanning) || Is_Set(cum_buffer,scanning))
+                Step_Fwd
+            ClearQueue;
+            cur = scanning;
+            Set_Bit(cur_buffer, cur);
+            Enqueue(cur);
+			cum_size++;
+            while (!QueueIsEmpty)
+            {
+                Dequeue(cur);
+                nex.x = cur.x-1;
+                nex.y = cur.y;
+                nex.z = cur.z;
+                if (cur.x>0 && !Is_Set(cur_buffer, nex) &&
+                        Is_Set(in_buffer, nex))
+                    Enqueue_nex
+                nex.x = cur.x+1;
+                if (cur.x<width-1 && !Is_Set(cur_buffer, nex) &&
+                        Is_Set(in_buffer, nex))
+                    Enqueue_nex
+                nex.x = cur.x;
+                nex.y = cur.y-1;
+                if (cur.y>0 && !Is_Set(cur_buffer, nex) &&
+                        Is_Set(in_buffer, nex))
+                    Enqueue_nex
+                nex.y = cur.y+1;
+                if (cur.y<height-1 && !Is_Set(cur_buffer, nex) &&
+                        Is_Set(in_buffer, nex))
+                    Enqueue_nex
+                nex.y = cur.y;
+                nex.z = cur.z-1;
+                if (cur.z>0 && !Is_Set(cur_buffer, nex) &&
+                        Is_Set(in_buffer, nex))
+                    Enqueue_nex
+                nex.z = cur.z+1;
+                if (cur.z<slices-1 && !Is_Set(cur_buffer, nex) &&
+                        Is_Set(in_buffer, nex))
+                    Enqueue_nex
+            }
+            if (cur_size > max_size)
+            {
+                max_size = cur_size;
+                memcpy(max_buffer, cur_buffer, (width*height+7)/8*slices);
+            }
+            for (j=0; j<(width*height+7)/8*slices; j++)
+                cum_buffer[j] |= cur_buffer[j];
+        }
+    }
 
 	/* Get the filenames right (own and parent) */
     strncpy(vh.gen.filename1, argv[1], sizeof(vh.gen.filename1)-1);

@@ -50,6 +50,40 @@ int get_element_from(const char dir[], const char filename[],
     unsigned short group, unsigned short element, int type, void *result,
     unsigned maxlen /* bytes at result */, int *items_read);
 
+int get_num_of_structures(const char filename[])
+{
+    FILE *infile;
+    ViewnixHeader file_header;
+    int num_of_structures, error_code;
+    char bad_group[5], bad_element[5];
+
+    if ((infile=fopen(filename, "rb"))==NULL)
+    {
+        fprintf(stderr, "Could not open %s\n", filename);
+        return (0);
+    }
+    error_code = VReadHeader(infile, &file_header, bad_group, bad_element);
+    switch (error_code)
+    {   case 0:
+        case 107:
+        case 106:
+            break;
+        default:
+            fprintf(stderr, "Group %s element %s undefined in VReadHeader\n",
+                bad_group, bad_element);
+            fclose(infile);
+            return (0);
+    }
+    fclose(infile);
+    if (file_header.str.num_of_structures_valid)
+        num_of_structures = file_header.str.num_of_structures;
+    else
+        num_of_structures = 0;
+    destroy_file_header(&file_header);
+    return (num_of_structures);
+}
+
+
 //----------------------------------------------------------------------
 /** \brief Constructor for ExportFrame class.
  *
@@ -459,12 +493,7 @@ void ExportFrame::createExportFrame ( wxFrame* parentFrame, bool useHistory,
             frame = new ExportStlFrame( false, 800, 600 );
         }
 
-        unsigned short s;
-        int ii;
-        wxFileName wxfn(filename);
-        if (get_element_from((const char *)wxfn.GetPath().c_str(),
-                (const char *)wxfn.GetFullName().c_str(), 0x2b, 0x8005, BI, &s, 2, &ii) == 0)
-            frame->number_of_structures = s;
+        frame->number_of_structures = get_num_of_structures((const char *)filename.c_str());
         frame->mInputBS2 = filename;
 		frame->loadFile( filename.c_str() );
     }
@@ -572,10 +601,7 @@ void ExportFrame::loadFile ( const char* const fname ) {
     wxFileName wxfn(fname);
     if (m_frame_type == EXPORT_STL)
     {
-        if (get_element_from((const char *)wxfn.GetPath().c_str(),
-                (const char *)wxfn.GetFullName().c_str(), 0x2b, 0x8005, BI, &s,
-                2, &ii) == 0)
-            number_of_structures = s;
+        number_of_structures = get_num_of_structures(fname);
         return;
     }
     ExportCanvas*  canvas = dynamic_cast<ExportCanvas*>(mCanvas);

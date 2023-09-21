@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2011, 2016, 2017 Medical Image Processing Group
+  Copyright 1993-2011, 2016, 2017, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -60,14 +60,19 @@ char *argv[];
   int height;
   FILE *in1, *out;
   char group[6],elem[6];
+  int dimension_flag=0;
   /**********************************************************************/
   /*  Input parameters   */
   if (argc>3 && strcmp(argv[argc-2],"-o")==0 && (out=fopen(argv[argc-1],"wb")))
     argc -= 2;
   else
     out = stdout;
+  if (argc>2 && strcmp(argv[argc-1],"-d")==0) {
+    dimension_flag = 1;
+    argc--;
+  }
   if (argc!=2 && (argc!=3 || strcmp(argv[2], "-s"))) {
-    fprintf(stderr, "\nUsage: get_slices <input> [-s] [-o <output>]\n");
+    fprintf(stderr, "\nUsage: get_slices <input> [-s] [-d] [-o <output>]\n");
     return (-1);
     }
   in1=fopen(argv[1],"rb");
@@ -91,6 +96,8 @@ char *argv[];
   width = vh1.scn.xysize[0];
   height = vh1.scn.xysize[1];
   slices=get_slices(vh1.scn.dimension,vh1.scn.num_of_subscenes);
+  if (dimension_flag)
+    fprintf(out, "%d\n", vh1.scn.dimension);
   if (argc == 3)
   {
     fprintf(out, "%f %f %f\n", x_size, y_size, z_size);

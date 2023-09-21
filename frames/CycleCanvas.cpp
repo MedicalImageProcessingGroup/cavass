@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2011, 2015-2016, 2018, 2021 Medical Image Processing Group
+  Copyright 1993-2011, 2015-2016, 2018, 2021, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -1077,6 +1077,7 @@ void CycleCanvas::OnReset ( void ) {
     CycleFrame*  mf = dynamic_cast<CycleFrame*>( m_parent_frame );
     if (mf->mTextControls && mf->mTextControls->mList)
         mf->mTextControls->mList->Clear();
+    mf->mMeasurements.Empty();
 }
 //----------------------------------------------------------------------
 void CycleCanvas::OnLeftDown ( wxMouseEvent& e ) {

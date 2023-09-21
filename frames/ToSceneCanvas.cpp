@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2013, 2015-2016 Medical Image Processing Group
+  Copyright 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -22,21 +22,21 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 //======================================================================
 /**
- * \file:  ToStructureCanvas.cpp
- * \brief  ToStructureCanvas class implementation
+ * \file:  ToSceneCanvas.cpp
+ * \brief  ToSceneCanvas class implementation
  *
  * Copyright 2013 University of Pennsylvania
  *
  */
 //======================================================================
 #include  "cavass.h"
-#include  "ToStructureCanvas.h"
+#include  "ToSceneCanvas.h"
 
 using namespace std;
 //----------------------------------------------------------------------
-ToStructureCanvas::ToStructureCanvas ( void )  {  puts("ToStructureCanvas()");  }
+ToSceneCanvas::ToSceneCanvas ( void )  {  puts("ToSceneCanvas()");  }
 //----------------------------------------------------------------------
-ToStructureCanvas::ToStructureCanvas ( wxWindow* parent, MainFrame* parent_frame,
+ToSceneCanvas::ToSceneCanvas ( wxWindow* parent, MainFrame* parent_frame,
     wxWindowID id, const wxPoint &pos, const wxSize &size )
     : MainCanvas ( parent, parent_frame, id, pos, size )
 {
@@ -58,16 +58,16 @@ ToStructureCanvas::ToStructureCanvas ( wxWindow* parent, MainFrame* parent_frame
     lastX = lastY = -1;
 
 	mFileOrDataCount = 0;
-	m_bToStructureDone = false;	
+	m_bToSceneDone = false;	
 
 	surf = NULL;
 	strDisplay = NULL;
 	mListCtrl =NULL;
 }
 //----------------------------------------------------------------------
-ToStructureCanvas::~ToStructureCanvas ( void ) {
-    cout << "ToStructureCanvas::~ToStructureCanvas" << endl;
-    wxLogMessage( "ToStructureCanvas::~ToStructureCanvas" );
+ToSceneCanvas::~ToSceneCanvas ( void ) {
+    cout << "ToSceneCanvas::~ToSceneCanvas" << endl;
+    wxLogMessage( "ToSceneCanvas::~ToSceneCanvas" );
     freeImagesAndBitmaps(); 
     release(); /* mCanvassData released in MainCanvas */
 	
@@ -84,38 +84,38 @@ ToStructureCanvas::~ToStructureCanvas ( void ) {
 
 	free( surf );
 	surf = NULL;
-	//ToStructureRelease();	
+	//ToSceneRelease();	
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::release ( void ) {
+void ToSceneCanvas::release ( void ) {
 }
 //----------------------------------------------------------------------
 //----------------------------------------------------------------------
-void ToStructureCanvas::loadFile ( const char* const fn ) 
+void ToSceneCanvas::loadFile ( const char* const fn ) 
 {
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::initLUT ( const int which ) {
+void ToSceneCanvas::initLUT ( const int which ) {
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::CreateDisplayImage(int which)
+void ToSceneCanvas::CreateDisplayImage(int which)
 {	
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::reload ( void ) 
+void ToSceneCanvas::reload ( void ) 
 {  
 }
 
 //----------------------------------------------------------------------
-void ToStructureCanvas::mapWindowToData ( int wx, int wy,
+void ToSceneCanvas::mapWindowToData ( int wx, int wy,
                                  int& x, int& y, int& z ) {
 }
 //----------------------------------------------------------------------
 /** \brief note: spacebar mimics middle mouse button.
  */
-void ToStructureCanvas::OnChar ( wxKeyEvent& e ) {
-    //cout << "ToStructureCanvas::OnChar" << endl;
-    wxLogMessage( "ToStructureCanvas::OnChar" );
+void ToSceneCanvas::OnChar ( wxKeyEvent& e ) {
+    //cout << "ToSceneCanvas::OnChar" << endl;
+    wxLogMessage( "ToSceneCanvas::OnChar" );
     if (e.m_keyCode==' ') {
         if (isLoaded(1)) {
             mCavassData->mNext->mDisplay = !mCavassData->mNext->mDisplay;
@@ -124,21 +124,21 @@ void ToStructureCanvas::OnChar ( wxKeyEvent& e ) {
     }
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnMouseMove ( wxMouseEvent& e ) 
+void ToSceneCanvas::OnMouseMove ( wxMouseEvent& e ) 
 {   
    
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnRightDown ( wxMouseEvent& e ) 
+void ToSceneCanvas::OnRightDown ( wxMouseEvent& e ) 
 {
     SetFocus();  //to regain/recapture keypress events	
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnRightUp ( wxMouseEvent& e ) 
+void ToSceneCanvas::OnRightUp ( wxMouseEvent& e ) 
 {
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnMiddleDown ( wxMouseEvent& e ) 
+void ToSceneCanvas::OnMiddleDown ( wxMouseEvent& e ) 
 {
     SetFocus();  //to regain/recapture keypress events
     if (isLoaded(1)) 
@@ -148,7 +148,7 @@ void ToStructureCanvas::OnMiddleDown ( wxMouseEvent& e )
     }	
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnMiddleUp ( wxMouseEvent& e ) {
+void ToSceneCanvas::OnMiddleUp ( wxMouseEvent& e ) {
     if (isLoaded(1)) {
         mCavassData->mNext->mDisplay = true;
         reload();
@@ -156,7 +156,7 @@ void ToStructureCanvas::OnMiddleUp ( wxMouseEvent& e ) {
 }
 
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnLeftDown ( wxMouseEvent& e ) 
+void ToSceneCanvas::OnLeftDown ( wxMouseEvent& e ) 
 {
     cout << "OnLeftDown" << endl;    wxLogMessage("OnLeftDown");
     SetFocus();  //to regain/recapture keypress events
@@ -179,14 +179,14 @@ void ToStructureCanvas::OnLeftDown ( wxMouseEvent& e )
 
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnLeftUp ( wxMouseEvent& e ) {
+void ToSceneCanvas::OnLeftUp ( wxMouseEvent& e ) {
     cout << "OnLeftUp" << endl;
     wxLogMessage("OnLeftUp");
     lastX = lastY = -1;
     SetCursor( *wxSTANDARD_CURSOR );
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnPaint ( wxPaintEvent& e ) 
+void ToSceneCanvas::OnPaint ( wxPaintEvent& e ) 
 {
     wxMemoryDC  m;
     int         w, h;
@@ -213,7 +213,7 @@ void ToStructureCanvas::OnPaint ( wxPaintEvent& e )
     //dc.DrawBitmap( bitmap, 0, 0 );  //doesn't work on windblows
 }
 //----------------------------------------------------------------------
-void ToStructureCanvas::paint ( wxDC* dc ) 
+void ToSceneCanvas::paint ( wxDC* dc ) 
 {
 	int  w, h;	
 	dc->GetSize( &w, &h );
@@ -222,7 +222,7 @@ void ToStructureCanvas::paint ( wxDC* dc )
 	dc->SetTextForeground( wxColour(Yellow) );
 	dc->SetPen( wxPen(wxColour(Yellow)) );
 	
-	if( m_bToStructureDone )
+	if( m_bToSceneDone )
 	{
 		for( int i=0; i<NUM_FEATURE_LINES; i++ )
 		{
@@ -234,11 +234,11 @@ void ToStructureCanvas::paint ( wxDC* dc )
 
 
 //----------------------------------------------------------------------
-void ToStructureCanvas::OnSize ( wxSizeEvent& e ) {
+void ToSceneCanvas::OnSize ( wxSizeEvent& e ) {
     //called when the size of the window/viewing area changes
 }
 //----------------------------------------------------------------------
-bool ToStructureCanvas::isLoaded ( const int which ) const {
+bool ToSceneCanvas::isLoaded ( const int which ) const {
     if (which==0) {
         if (mCavassData==NULL)    return false;
         const CavassData&  cd = *mCavassData;
@@ -257,25 +257,25 @@ bool ToStructureCanvas::isLoaded ( const int which ) const {
     return false;
 }
 
-bool ToStructureCanvas::getToStructureDone (void) const
+bool ToSceneCanvas::getToSceneDone (void) const
 {
-	return m_bToStructureDone;
+	return m_bToSceneDone;
 }
 //----------------------------------------------------------------------
 
 //----------------------------------------------------------------------
-IMPLEMENT_DYNAMIC_CLASS ( ToStructureCanvas, wxPanel )
-BEGIN_EVENT_TABLE       ( ToStructureCanvas, wxPanel )
-    EVT_PAINT(            ToStructureCanvas::OnPaint        )
+IMPLEMENT_DYNAMIC_CLASS ( ToSceneCanvas, wxPanel )
+BEGIN_EVENT_TABLE       ( ToSceneCanvas, wxPanel )
+    EVT_PAINT(            ToSceneCanvas::OnPaint        )
     EVT_ERASE_BACKGROUND( MainCanvas::OnEraseBackground )
-    EVT_MOTION(           ToStructureCanvas::OnMouseMove    )
+    EVT_MOTION(           ToSceneCanvas::OnMouseMove    )
     EVT_SIZE(             MainCanvas::OnSize         )
-    EVT_LEFT_DOWN(        ToStructureCanvas::OnLeftDown     )
-    EVT_LEFT_UP(          ToStructureCanvas::OnLeftUp       )
-    EVT_MIDDLE_DOWN(      ToStructureCanvas::OnMiddleDown   )
-    EVT_MIDDLE_UP(        ToStructureCanvas::OnMiddleUp     )
-    EVT_RIGHT_DOWN(       ToStructureCanvas::OnRightDown    )
-    EVT_RIGHT_UP(         ToStructureCanvas::OnRightUp      )
-    EVT_CHAR(             ToStructureCanvas::OnChar         )
+    EVT_LEFT_DOWN(        ToSceneCanvas::OnLeftDown     )
+    EVT_LEFT_UP(          ToSceneCanvas::OnLeftUp       )
+    EVT_MIDDLE_DOWN(      ToSceneCanvas::OnMiddleDown   )
+    EVT_MIDDLE_UP(        ToSceneCanvas::OnMiddleUp     )
+    EVT_RIGHT_DOWN(       ToSceneCanvas::OnRightDown    )
+    EVT_RIGHT_UP(         ToSceneCanvas::OnRightUp      )
+    EVT_CHAR(             ToSceneCanvas::OnChar         )
 END_EVENT_TABLE()
 //======================================================================
