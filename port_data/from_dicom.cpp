@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2019, 2021 Medical Image Processing Group
+  Copyright 1993-2019, 2021, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -1104,6 +1104,9 @@ int main(int argc, char *argv[])
 		floats[1] = -1;
 		vh.scn.xypixsz_valid = get_element(fpin, 0x0028, 0x0030, AN,
 			an, sizeof(an), &items_read) == 0;
+		if (vh.scn.xypixsz_valid == 0)
+			vh.scn.xypixsz_valid = get_element(fpin, 0x0018, 0x1164, AN,
+				an, sizeof(an), &items_read) == 0;
 		if (vh.scn.xypixsz_valid)
 			extract_floats(an, 2, floats);
 		else
@@ -1193,6 +1196,9 @@ int main(int argc, char *argv[])
 		/* PIXEL SIZE */
 		vh.dsp.xypixsz_valid = get_element(fpin, 0x0028, 0x0030, AN,
 			an, sizeof(an), &items_read) == 0;
+		if (vh.dsp.xypixsz_valid == 0)
+			vh.dsp.xypixsz_valid = get_element(fpin, 0x0018, 0x1164, AN,
+				an, sizeof(an), &items_read) == 0;
 		if (vh.dsp.xypixsz_valid)
 			extract_floats(an, 1, floats);
 		else
