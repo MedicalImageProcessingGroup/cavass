@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2015, 2017 Medical Image Processing Group
+  Copyright 1993-2015, 2017, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -1581,7 +1581,7 @@ char *argv[];
 			nxsize, nysize, method[0], method[1], bmethod);
 		for (j=0; j<4; j++)
 		{
-			assert(slice_buffers[j][2].slice_number >
+			assert(slice_buffers[j][2].slice_number >=
 				slice_buffers[j][0].slice_number);
 			degree_z[j] = method[2];
 			if (degree_z[j]>1 && slice_buffers[j][1].slice_number==
@@ -1601,6 +1601,8 @@ char *argv[];
 						slice_buffers[j][0].z_location;
 			zeta[j] = (nlocation[0][t_nslice]-slice_buffers[j][1].z_location)/
 				slsp;
+			if (slsp <= 0)
+				slsp = 1;
 			if (degree_z[j]>2 && (slice_buffers[j][1].slice_number==
 					slice_buffers[j][0].slice_number ||
 					slice_buffers[j][2].slice_number==
