@@ -1676,7 +1676,7 @@ int main(int argc, char *argv[])
                             short *p=(short *)data;
                             for (int i=0; i<vh.scn.xysize[0]*vh.scn.xysize[1]*
 						    		fframes; i++)
-                                p[i] += add_value;
+                                p[i] = p[i]> -add_value? p[i]+add_value: 0;
                         }
 						if (!bigendian)
 							swap_bytes(data, data, image_size*fframes);
