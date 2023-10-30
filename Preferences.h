@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2013, 2015 Medical Image Processing Group
+  Copyright 1993-2013, 2015, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -39,11 +39,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  *  This (singleton) class allows the caller to check and modify the
  *  status/state of user preferences.  This class allows preferences
  *  to persist via loading and storing preferences in a wxConfig object.
- *  Changes are automatically stored (to the file ~/.cavass.ini on Linux,
- *  ~/Library/Preferences/.cavass.ini on Mac OS, or
- *  C:\Users\ggrevera\AppData\Roaming\cavass.ini on Windows for example).
- *  On Windows, one should avoid the Windows registry and use a file 
- *  instead.
+ *  Changes are automatically stored (to the file ~/.CAVASS on Linux).
  */
 class Preferences {
   public:
@@ -118,6 +114,8 @@ class Preferences {
         _CTBoneWidth        = _preferences->Read( "CTBoneWidth",        _CTBoneWidth        );
         _PETCenter       = _preferences->Read( "PETCenter",       _PETCenter       );
         _PETWidth        = _preferences->Read( "PETWidth",        _PETWidth        );
+
+		_OverlayScale       = _preferences->Read( "OverlayScale",        _OverlayScale      );
 
         for (int i=0; i<FileCount; i++) {
             wxString  tmp = wxString::Format( "file%d", i );
@@ -226,6 +224,14 @@ class Preferences {
     static int getPETWidth ( void ) {
         Preferences::Instance();
         return _PETWidth;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for overlay scale. */
+    static double getOverlayScale ( void ) {
+        Preferences::Instance();
+		double val;
+		_OverlayScale.ToDouble(&val);
+        return val;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     static wxString getFile ( int which ) {
@@ -529,6 +535,13 @@ class Preferences {
         Preferences::DeleteInstance();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setOverlayScale ( double newValue ) {
+        Preferences::Instance();
+        _OverlayScale = wxString::Format("%.2f", newValue);
+        _preferences->Write( "OverlayScale", _OverlayScale );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief mutator for input file preference.
      *  \param which is the file preference number.
      *  \param newValue is the value for the particular file preference number.
@@ -812,6 +825,8 @@ private:
     static int       _CTSoftTissueCenter, _CTSoftTissueWidth; ///< gray window
     static int       _CTBoneCenter, _CTBoneWidth;             ///< gray window
     static int       _PETCenter, _PETWidth;             ///< gray window
+
+	static wxString  _OverlayScale;             ///< image scale
 
     static wxString  _file[ Preferences::FileCount ];
 

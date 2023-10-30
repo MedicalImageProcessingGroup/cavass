@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2017, 2022 Medical Image Processing Group
+  Copyright 1993-2017, 2022-2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -45,7 +45,9 @@ OverlayCanvas::OverlayCanvas ( wxWindow* parent, MainFrame* parent_frame,
   : MainCanvas ( parent, parent_frame, id, pos, size )
 {
     mFileOrDataCount = 0;
-    m_scale          = 1.0;
+    m_scale          = Preferences::getOverlayScale();
+	if (m_scale == 0)
+		m_scale      = 1.5;
     m_overlay        = true;
     m_rows           = 0;
     m_cols           = 0;
@@ -137,6 +139,14 @@ void OverlayCanvas::loadData ( char* name,
         m_rows = (int)(h / (mOverallYSize * m_scale));
         if (m_cols!=1)  m_cols=1;
         if (m_rows!=1)  m_rows=1;
+		m_tx = (w - m_scale*mOverallXSize)/2;
+		m_ty = (h - m_scale*mOverallYSize)/2;
+		if (Preferences::getCTSoftTissueCenter() < mCavassData->m_max)
+		{
+			mCavassData->m_center = Preferences::getCTSoftTissueCenter();
+			mCavassData->m_width = Preferences::getCTSoftTissueWidth();
+			mCavassData->initLUT();
+		}
         reload();
     }
     SetCursor( *wxSTANDARD_CURSOR );
@@ -209,6 +219,14 @@ void OverlayCanvas::loadFile ( const char* const fn ) {
         m_rows = (int)(h / (mOverallYSize * m_scale));
         if (m_cols!=1)  m_cols=1;
         if (m_rows!=1)  m_rows=1;
+		m_tx = (w - m_scale*mOverallXSize)/2;
+		m_ty = (h - m_scale*mOverallYSize)/2;
+		if (Preferences::getCTSoftTissueCenter() < mCavassData->m_max)
+		{
+			mCavassData->m_center = Preferences::getCTSoftTissueCenter();
+			mCavassData->m_width = Preferences::getCTSoftTissueWidth();
+			mCavassData->initLUT();
+		}
         reload();
     }
     SetCursor( *wxSTANDARD_CURSOR );
@@ -298,6 +316,12 @@ bool OverlayCanvas::loadNext ( void ) {
     m_rows = (int)(h / (mOverallYSize * m_scale));
     if (m_cols!=1)  m_cols=1;
     if (m_rows!=1)  m_rows=1;
+	if (Preferences::getCTSoftTissueCenter() < cd->m_max)
+	{
+		cd->m_center = Preferences::getCTSoftTissueCenter();
+		cd->m_width = Preferences::getCTSoftTissueWidth();
+		cd->initLUT();
+	}
 	if (mCavassData->m_center<=cd->m_max && mCavassData->m_width<=cd->m_max)
 	{
 		cd->m_center = mCavassData->m_center;

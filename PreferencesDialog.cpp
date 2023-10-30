@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2014, 2017, 2020 Medical Image Processing Group
+  Copyright 1993-2014, 2017, 2020, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -78,6 +78,7 @@ PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
 #endif
     wxPanel*  stereoSettings      = CreateStereoSettingsPage(      notebook );
 	wxPanel*  CTWindowSettings    = CreateCTWindowSettingsPage(    notebook );
+	wxPanel*  ImageScale          = CreateImageScalePage(          notebook );
 
     notebook->AddPage( generalSettings,     _("General")     );
     notebook->AddPage( directoriesSettings, _("Directories") );
@@ -87,6 +88,7 @@ PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
 #endif
     notebook->AddPage( stereoSettings,      _("Stereo")      );
 	notebook->AddPage( CTWindowSettings,    _("CT Windows")  );
+	notebook->AddPage( ImageScale,          _("Image Scale") );
 
     LayoutDialog();
 }
@@ -201,7 +203,7 @@ wxPanel* PreferencesDialog::CreateAppearanceSettingsPage ( wxWindow* parent )
     return panel;
 }
 //----------------------------------------------------------------------
-/** \brief create the appearance settings page. */
+/** \brief create the CT window settings page. */
 wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
 {
     wxPanel*       panel    = new wxPanel( parent, wxID_ANY );
@@ -221,7 +223,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mCTLungSt = new wxStaticText( panel, wxID_ANY, "lung (center - width):" );
     bs->Add( mCTLungSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getCTLungCenter() );
-    mCTLungCenter = new wxTextCtrl( panel, ID_CT_LUNG_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
+    mCTLungCenter = new wxTextCtrl( panel, ID_CT_LUNG_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
     bs->Add( mCTLungCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getCTLungWidth() );
     mCTLungWidth = new wxTextCtrl( panel, ID_CT_LUNG_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -235,7 +237,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mCTSoftTissueSt = new wxStaticText( panel, wxID_ANY, "soft tissue (center - width):" );
     bs->Add( mCTSoftTissueSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getCTSoftTissueCenter() );
-    mCTSoftTissueCenter = new wxTextCtrl( panel, ID_CT_SOFT_TISSUE_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
+    mCTSoftTissueCenter = new wxTextCtrl( panel, ID_CT_SOFT_TISSUE_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
     bs->Add( mCTSoftTissueCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getCTSoftTissueWidth() );
     mCTSoftTissueWidth = new wxTextCtrl( panel, ID_CT_SOFT_TISSUE_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -250,7 +252,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mCTBoneSt = new wxStaticText( panel, wxID_ANY, "bone (center - width):" );
     bs->Add( mCTBoneSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getCTBoneCenter() );
-    mCTBoneCenter = new wxTextCtrl( panel, ID_CT_BONE_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
+    mCTBoneCenter = new wxTextCtrl( panel, ID_CT_BONE_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
     bs->Add( mCTBoneCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getCTBoneWidth() );
     mCTBoneWidth = new wxTextCtrl( panel, ID_CT_BONE_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -265,7 +267,7 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     mPETSt = new wxStaticText( panel, wxID_ANY, "PET (center - width):" );
     bs->Add( mPETSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%d", Preferences::getPETCenter() );
-    mPETCenter = new wxTextCtrl( panel, ID_PET_CENTER, tmp, wxDefaultPosition, wxSize(100,-1) );
+    mPETCenter = new wxTextCtrl( panel, ID_PET_CENTER, tmp, wxDefaultPosition, wxSize(50,-1) );
     bs->Add( mPETCenter, 1 );
     tmp = wxString::Format( "%d", Preferences::getPETWidth() );
     mPETWidth = new wxTextCtrl( panel, ID_PET_WIDTH, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -283,6 +285,51 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     bs->Add( 10, 10, 0 );
 
     item->Add( bs, 0, wxGROW|wxALL, 0 );
+
+    //reminder message
+    bs = new wxBoxSizer( wxHORIZONTAL );
+    wxStaticText*  st = new wxStaticText( panel, wxID_ANY, "Note: Any changes will affect new windows and upon restart." );
+    bs->Add( st, wxALIGN_CENTER_HORIZONTAL );
+    item->Add( bs, 1 );
+
+    //add some space
+    bs = new wxBoxSizer( wxHORIZONTAL );
+    bs->Add( 20, 20, 0 );
+    item->Add( bs, 0, wxGROW|wxALL, 0 );
+
+    //finish up
+    topSizer->Add( item );
+    panel->SetSizer( topSizer );
+    topSizer->Fit( panel );
+
+    return panel;
+}
+//----------------------------------------------------------------------
+/** \brief create the image scale settings page. */
+wxPanel* PreferencesDialog::CreateImageScalePage ( wxWindow* parent )
+{
+    wxPanel*       panel    = new wxPanel( parent, wxID_ANY );
+    wxBoxSizer*    topSizer = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer*    item     = new wxBoxSizer( wxVERTICAL );
+    wxBoxSizer*    bs       = NULL;
+    wxString       tmp;
+
+    //add some space
+    bs = new wxBoxSizer( wxHORIZONTAL );
+    bs->Add( 20, 20, 0 );
+    item->Add( bs, 0, wxGROW|wxALL, 0 );
+
+    //overlay
+    bs = new wxBoxSizer( wxHORIZONTAL );
+
+    mOvrlScaleSt = new wxStaticText( panel, wxID_ANY, "overlay (pixel replication factor):" );
+    bs->Add( mOvrlScaleSt, 2, wxALIGN_CENTER_VERTICAL );
+    tmp = wxString::Format( "%.1f", Preferences::getOverlayScale() );
+    mOverlayScale = new wxTextCtrl( panel, ID_OVERLAY_SCALE, tmp, wxDefaultPosition, wxSize(50,-1) );
+    bs->Add( mOverlayScale, 1 );
+    bs->Add( 10, 10, 0 );
+
+    item->Add( bs, 1 );
 
     //reminder message
     bs = new wxBoxSizer( wxHORIZONTAL );
@@ -838,6 +885,9 @@ void PreferencesDialog::OnOK ( wxCommandEvent& unused ) {
 	Preferences::setCTBoneWidth(       (int)b );
 	mPETWidth->GetValue().ToDouble(       &r );
 	Preferences::setPETWidth(       (int)r );
+
+	mOverlayScale->GetValue().ToDouble(       &r );
+	Preferences::setOverlayScale( r );
 
     Preferences::setHome( mHome->GetValue() );
     //when the home directory changes, we must also change the 3dviewnix

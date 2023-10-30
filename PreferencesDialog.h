@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2015 Medical Image Processing Group
+  Copyright 1993-2015, 2017, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -93,6 +93,9 @@ protected:
     wxTextCtrl*    mPETCenter;
     wxTextCtrl*    mPETWidth;
 
+	wxStaticText*  mOvrlScaleSt;
+	wxTextCtrl*    mOverlayScale;
+
     bool           mParallelMode;
     wxGrid*        mSystemListCtrl;
     wxTextCtrl*    mMPIDirectory;
@@ -162,7 +165,7 @@ public:
         bs->Add( cb, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
         item->Add( bs, 0, wxGROW|wxALL, 0 );
 
-        topSizer->Add( item, 1, wxGROW|wxALIGN_CENTRE|wxALL, 5 );
+        topSizer->Add( item, 1, wxALIGN_CENTRE|wxALL, 5 );
         panel->SetSizer( topSizer );
         topSizer->Fit( panel );
 
@@ -172,12 +175,15 @@ public:
     wxPanel* CreateDirectoriesSettingsPage ( wxWindow* parent );
     wxPanel* CreateAppearanceSettingsPage  ( wxWindow* parent );
     wxPanel* CreateCTWindowSettingsPage    ( wxWindow* parent );
+	wxPanel* CreateImageScalePage          ( wxWindow* parent );
 
     void OnChooseFg    ( wxCommandEvent& unused );
     void OnChooseBg    ( wxCommandEvent& unused );
     void OnDefault     ( wxCommandEvent& unused );
 
 	void OnCTDefault   ( wxCommandEvent& unused );
+
+	void OnImageScale  ( wxCommandEvent& unused );
 
     wxPanel* CreateParallelSettingsPage ( wxWindow* parent );
 
@@ -295,6 +301,8 @@ public:
         ID_CT_BONE_CENTER, ID_CT_BONE_WIDTH,
         ID_PET_CENTER, ID_PET_WIDTH,
         ID_CT_DEFAULT,
+
+		ID_OVERLAY_SCALE,
 
         ID_NEW_ROW, ID_CLEAR_ROWS, ID_DELETE_ROWS, ID_TEST
     };

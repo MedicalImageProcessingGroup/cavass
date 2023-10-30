@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2013, 2015 Medical Image Processing Group
+  Copyright 1993-2013, 2015, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -71,6 +71,8 @@ int            Preferences::_CTBoneCenter    = 2000;
 int            Preferences::_CTBoneWidth     = 4000;
 int            Preferences::_PETCenter    = 1200;
 int            Preferences::_PETWidth     = 3500;
+
+wxString       Preferences::_OverlayScale = "0";
 
 #if defined (WIN32) || defined (_WIN32)
     wxString   Preferences::_home( "c:/cavass-build/debug" );
