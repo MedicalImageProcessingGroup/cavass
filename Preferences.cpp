@@ -72,7 +72,17 @@ int            Preferences::_CTBoneWidth     = 4000;
 int            Preferences::_PETCenter    = 1200;
 int            Preferences::_PETWidth     = 3500;
 
-wxString       Preferences::_OverlayScale = "0";
+wxString       Preferences::_OverlayScale = "1.5";
+int            Preferences::_IM0onIM0Red   = 100;
+int            Preferences::_IM0onIM0Green = 50;
+int            Preferences::_IM0onIM0Blue  = 0;
+int            Preferences::_BIMonIM0Red   = 0;
+int            Preferences::_BIMonIM0Green = 25;
+int            Preferences::_BIMonIM0Blue  = 0;
+int            Preferences::_BIMonBIMRed   = 100;
+int            Preferences::_BIMonBIMGreen = 50;
+int            Preferences::_BIMonBIMBlue  = 0;
+
 
 #if defined (WIN32) || defined (_WIN32)
     wxString   Preferences::_home( "c:/cavass-build/debug" );

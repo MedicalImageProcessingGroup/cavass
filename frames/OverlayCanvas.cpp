@@ -100,12 +100,18 @@ void OverlayCanvas::loadData ( char* name,
         {
             if (B.m_max <= 1)
             {
-                A.mR = 1.0;  A.mG = 0.5;  A.mB = 0.0;
-                B.mR = 0.0;  B.mG = 0.5;  B.mB = 1.0;
+				B.mR = .01*Preferences::getBIMonBIMRed();
+				B.mG = .01*Preferences::getBIMonBIMGreen();
+				B.mB = .01*Preferences::getBIMonBIMBlue();
+				A.mR = 1.0 - B.mR;
+				A.mG = 1.0 - B.mG;
+				A.mB = 1.0 - B.mB;
             }
             else
             {
-                A.mR = 0.0;  A.mG = 0.25; A.mB = 0.0;
+                A.mR = .01*Preferences::getBIMonIM0Red();
+				A.mG = .01*Preferences::getBIMonIM0Green();
+				A.mB = .01*Preferences::getBIMonIM0Blue();
                 B.mR = 1.0;  B.mG = 1.0;  B.mB = 1.0;
             }
         }
@@ -114,12 +120,16 @@ void OverlayCanvas::loadData ( char* name,
             if (B.m_max <= 1)
             {
                 A.mR = 1.0;  A.mG = 1.0;  A.mB = 1.0;
-                B.mR = 0.0;  B.mG = 0.25; B.mB = 0.0;
+                B.mR = .01*Preferences::getBIMonIM0Red();
+				B.mG = .01*Preferences::getBIMonIM0Green();
+				B.mB = .01*Preferences::getBIMonIM0Blue();
             }
             else
             {
                 A.mR = 1.0;  A.mG = 1.0;  A.mB = 1.0;
-                B.mR = 1.0;  B.mG = 0.5;  B.mB = 0.0;
+                B.mR = .01*Preferences::getIM0onIM0Red();
+				B.mG = .01*Preferences::getIM0onIM0Green();
+				B.mB = .01*Preferences::getIM0onIM0Blue();
             }
         }
 
@@ -184,12 +194,18 @@ void OverlayCanvas::loadFile ( const char* const fn ) {
         {
             if (B.m_max <= 1)
             {
-                A.mR = 1.0;  A.mG = 0.5;  A.mB = 0.0;
-                B.mR = 0.0;  B.mG = 0.5;  B.mB = 1.0;
+				B.mR = .01*Preferences::getBIMonBIMRed();
+				B.mG = .01*Preferences::getBIMonBIMGreen();
+				B.mB = .01*Preferences::getBIMonBIMBlue();
+				A.mR = 1.0 - B.mR;
+				A.mG = 1.0 - B.mG;
+				A.mB = 1.0 - B.mB;
             }
             else
             {
-                A.mR = 0.0;  A.mG = 0.25; A.mB = 0.0;
+                A.mR = .01*Preferences::getBIMonIM0Red();
+				A.mG = .01*Preferences::getBIMonIM0Green();
+				A.mB = .01*Preferences::getBIMonIM0Blue();
                 B.mR = 1.0;  B.mG = 1.0;  B.mB = 1.0;
             }
         }
@@ -198,12 +214,16 @@ void OverlayCanvas::loadFile ( const char* const fn ) {
             if (B.m_max <= 1)
             {
                 A.mR = 1.0;  A.mG = 1.0;  A.mB = 1.0;
-                B.mR = 0.0;  B.mG = 0.25; B.mB = 0.0;
+                B.mR = .01*Preferences::getBIMonIM0Red();
+				B.mG = .01*Preferences::getBIMonIM0Green();
+				B.mB = .01*Preferences::getBIMonIM0Blue();
             }
             else
             {
                 A.mR = 1.0;  A.mG = 1.0;  A.mB = 1.0;
-                B.mR = 1.0;  B.mG = 0.5;  B.mB = 0.0;
+                B.mR = .01*Preferences::getIM0onIM0Red();
+				B.mG = .01*Preferences::getIM0onIM0Green();
+				B.mB = .01*Preferences::getIM0onIM0Blue();
             }
         }
 

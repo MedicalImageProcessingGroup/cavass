@@ -96,6 +96,21 @@ protected:
 	wxStaticText*  mOvrlScaleSt;
 	wxTextCtrl*    mOverlayScale;
 
+    wxStaticText*  mIM0onIM0St;
+    wxTextCtrl*    mIM0onIM0Red;
+    wxTextCtrl*    mIM0onIM0Green;
+    wxTextCtrl*    mIM0onIM0Blue;
+
+    wxStaticText*  mBIMonIM0St;
+    wxTextCtrl*    mBIMonIM0Red;
+    wxTextCtrl*    mBIMonIM0Green;
+    wxTextCtrl*    mBIMonIM0Blue;
+
+    wxStaticText*  mBIMonBIMSt;
+    wxTextCtrl*    mBIMonBIMRed;
+    wxTextCtrl*    mBIMonBIMGreen;
+    wxTextCtrl*    mBIMonBIMBlue;
+
     bool           mParallelMode;
     wxGrid*        mSystemListCtrl;
     wxTextCtrl*    mMPIDirectory;
@@ -175,7 +190,7 @@ public:
     wxPanel* CreateDirectoriesSettingsPage ( wxWindow* parent );
     wxPanel* CreateAppearanceSettingsPage  ( wxWindow* parent );
     wxPanel* CreateCTWindowSettingsPage    ( wxWindow* parent );
-	wxPanel* CreateImageScalePage          ( wxWindow* parent );
+	wxPanel* CreateOverlaySettingsPage     ( wxWindow* parent );
 
     void OnChooseFg    ( wxCommandEvent& unused );
     void OnChooseBg    ( wxCommandEvent& unused );
@@ -183,7 +198,7 @@ public:
 
 	void OnCTDefault   ( wxCommandEvent& unused );
 
-	void OnImageScale  ( wxCommandEvent& unused );
+	void OnOverlaySettings  ( wxCommandEvent& unused );
 
     wxPanel* CreateParallelSettingsPage ( wxWindow* parent );
 
@@ -303,6 +318,9 @@ public:
         ID_CT_DEFAULT,
 
 		ID_OVERLAY_SCALE,
+		ID_IM0_ON_IM0_RED, ID_IM0_ON_IM0_GREEN, ID_IM0_ON_IM0_BLUE,
+		ID_BIM_ON_IM0_RED, ID_BIM_ON_IM0_GREEN, ID_BIM_ON_IM0_BLUE,
+		ID_BIM_ON_BIM_RED, ID_BIM_ON_BIM_GREEN, ID_BIM_ON_BIM_BLUE,
 
         ID_NEW_ROW, ID_CLEAR_ROWS, ID_DELETE_ROWS, ID_TEST
     };

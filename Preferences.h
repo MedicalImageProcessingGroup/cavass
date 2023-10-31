@@ -116,6 +116,15 @@ class Preferences {
         _PETWidth        = _preferences->Read( "PETWidth",        _PETWidth        );
 
 		_OverlayScale       = _preferences->Read( "OverlayScale",        _OverlayScale      );
+		_IM0onIM0Red   = _preferences->Read( "IM0onIM0Red",   _IM0onIM0Red   );
+		_IM0onIM0Green = _preferences->Read( "IM0onIM0Green", _IM0onIM0Green );
+		_IM0onIM0Blue  = _preferences->Read( "IM0onIM0Blue",  _IM0onIM0Blue  );
+		_BIMonIM0Red   = _preferences->Read( "BIMonIM0Red",   _BIMonIM0Red   );
+		_BIMonIM0Green = _preferences->Read( "BIMonIM0Green", _BIMonIM0Green );
+		_BIMonIM0Blue  = _preferences->Read( "BIMonIM0Blue",  _BIMonIM0Blue  );
+		_BIMonBIMRed   = _preferences->Read( "BIMonBIMRed",   _BIMonBIMRed   );
+		_BIMonBIMGreen = _preferences->Read( "BIMonBIMGreen", _BIMonBIMGreen );
+		_BIMonBIMBlue  = _preferences->Read( "BIMonBIMBlue",  _BIMonBIMBlue  );
 
         for (int i=0; i<FileCount; i++) {
             wxString  tmp = wxString::Format( "file%d", i );
@@ -232,6 +241,60 @@ class Preferences {
 		double val;
 		_OverlayScale.ToDouble(&val);
         return val;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for red component of overlay color. */
+    static int getIM0onIM0Red ( void ) {
+        Preferences::Instance();
+        return _IM0onIM0Red;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for green component of overlay color. */
+    static int getIM0onIM0Green ( void ) {
+        Preferences::Instance();
+        return _IM0onIM0Green;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for blue component of overlay color. */
+    static int getIM0onIM0Blue ( void ) {
+        Preferences::Instance();
+        return _IM0onIM0Blue;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for red component of overlay color. */
+    static int getBIMonIM0Red ( void ) {
+        Preferences::Instance();
+        return _BIMonIM0Red;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for green component of overlay color. */
+    static int getBIMonIM0Green ( void ) {
+        Preferences::Instance();
+        return _BIMonIM0Green;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for blue component of overlay color. */
+    static int getBIMonIM0Blue ( void ) {
+        Preferences::Instance();
+        return _BIMonIM0Blue;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for red component of overlay color. */
+    static int getBIMonBIMRed ( void ) {
+        Preferences::Instance();
+        return _BIMonBIMRed;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for green component of overlay color. */
+    static int getBIMonBIMGreen ( void ) {
+        Preferences::Instance();
+        return _BIMonBIMGreen;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for blue component of overlay color. */
+    static int getBIMonBIMBlue ( void ) {
+        Preferences::Instance();
+        return _BIMonBIMBlue;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     static wxString getFile ( int which ) {
@@ -542,6 +605,87 @@ class Preferences {
         Preferences::DeleteInstance();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setIM0onIM0Red ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _IM0onIM0Red = newValue;
+        _preferences->Write( "IM0onIM0Red", _IM0onIM0Red );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setIM0onIM0Green ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _IM0onIM0Green = newValue;
+        _preferences->Write( "IM0onIM0Green", _IM0onIM0Green );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setIM0onIM0Blue ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _IM0onIM0Blue = newValue;
+        _preferences->Write( "IM0onIM0Blue", _IM0onIM0Blue );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setBIMonIM0Red ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _BIMonIM0Red = newValue;
+        _preferences->Write( "BIMonIM0Red", _BIMonIM0Red );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setBIMonIM0Green ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _BIMonIM0Green = newValue;
+        _preferences->Write( "BIMonIM0Green", _BIMonIM0Green );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setBIMonIM0Blue ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _BIMonIM0Blue = newValue;
+        _preferences->Write( "BIMonIM0Blue", _BIMonIM0Blue );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setBIMonBIMRed ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _BIMonBIMRed = newValue;
+        _preferences->Write( "BIMonBIMRed", _BIMonBIMRed );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setBIMonBIMGreen ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _BIMonBIMGreen = newValue;
+        _preferences->Write( "BIMonBIMGreen", _BIMonBIMGreen );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static void setBIMonBIMBlue ( int newValue ) {
+        Preferences::Instance();
+        if (newValue<0)    newValue=0;
+        if (newValue>255)  newValue=255;
+        _BIMonBIMBlue = newValue;
+        _preferences->Write( "BIMonBIMBlue", _BIMonBIMBlue );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief mutator for input file preference.
      *  \param which is the file preference number.
      *  \param newValue is the value for the particular file preference number.
@@ -827,6 +971,9 @@ private:
     static int       _PETCenter, _PETWidth;             ///< gray window
 
 	static wxString  _OverlayScale;             ///< image scale
+	static int       _IM0onIM0Red, _IM0onIM0Green, _IM0onIM0Blue,
+                     _BIMonIM0Red, _BIMonIM0Green, _BIMonIM0Blue,
+                     _BIMonBIMRed, _BIMonBIMGreen, _BIMonBIMBlue; ///< overlay
 
     static wxString  _file[ Preferences::FileCount ];
 

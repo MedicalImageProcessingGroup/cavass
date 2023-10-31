@@ -78,7 +78,7 @@ PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
 #endif
     wxPanel*  stereoSettings      = CreateStereoSettingsPage(      notebook );
 	wxPanel*  CTWindowSettings    = CreateCTWindowSettingsPage(    notebook );
-	wxPanel*  ImageScale          = CreateImageScalePage(          notebook );
+	wxPanel*  OverlaySettings     = CreateOverlaySettingsPage(     notebook );
 
     notebook->AddPage( generalSettings,     _("General")     );
     notebook->AddPage( directoriesSettings, _("Directories") );
@@ -88,7 +88,7 @@ PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
 #endif
     notebook->AddPage( stereoSettings,      _("Stereo")      );
 	notebook->AddPage( CTWindowSettings,    _("CT Windows")  );
-	notebook->AddPage( ImageScale,          _("Image Scale") );
+	notebook->AddPage( OverlaySettings,     _("Overlay")     );
 
     LayoutDialog();
 }
@@ -305,8 +305,8 @@ wxPanel* PreferencesDialog::CreateCTWindowSettingsPage ( wxWindow* parent )
     return panel;
 }
 //----------------------------------------------------------------------
-/** \brief create the image scale settings page. */
-wxPanel* PreferencesDialog::CreateImageScalePage ( wxWindow* parent )
+/** \brief create the overlay settings page. */
+wxPanel* PreferencesDialog::CreateOverlaySettingsPage ( wxWindow* parent )
 {
     wxPanel*       panel    = new wxPanel( parent, wxID_ANY );
     wxBoxSizer*    topSizer = new wxBoxSizer( wxVERTICAL );
@@ -319,10 +319,10 @@ wxPanel* PreferencesDialog::CreateImageScalePage ( wxWindow* parent )
     bs->Add( 20, 20, 0 );
     item->Add( bs, 0, wxGROW|wxALL, 0 );
 
-    //overlay
+    //scale
     bs = new wxBoxSizer( wxHORIZONTAL );
 
-    mOvrlScaleSt = new wxStaticText( panel, wxID_ANY, "overlay (pixel replication factor):" );
+    mOvrlScaleSt = new wxStaticText( panel, wxID_ANY, "scale (pixel replication factor):" );
     bs->Add( mOvrlScaleSt, 2, wxALIGN_CENTER_VERTICAL );
     tmp = wxString::Format( "%.1f", Preferences::getOverlayScale() );
     mOverlayScale = new wxTextCtrl( panel, ID_OVERLAY_SCALE, tmp, wxDefaultPosition, wxSize(50,-1) );
@@ -330,6 +330,58 @@ wxPanel* PreferencesDialog::CreateImageScalePage ( wxWindow* parent )
     bs->Add( 10, 10, 0 );
 
     item->Add( bs, 1 );
+
+	//color
+	bs = new wxBoxSizer( wxHORIZONTAL );
+
+	mIM0onIM0St = new wxStaticText( panel, wxID_ANY, "IM0 on IM0: (RGB)" );
+	bs->Add( mIM0onIM0St, 2, wxALIGN_CENTER_VERTICAL );
+	tmp = wxString::Format( "%d", Preferences::getIM0onIM0Red() );
+	mIM0onIM0Red = new wxTextCtrl( panel, ID_IM0_ON_IM0_RED, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mIM0onIM0Red, 1 );
+	tmp = wxString::Format( "%d", Preferences::getIM0onIM0Green() );
+	mIM0onIM0Green = new wxTextCtrl( panel, ID_IM0_ON_IM0_GREEN, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mIM0onIM0Green, 1 );
+	tmp = wxString::Format( "%d", Preferences::getIM0onIM0Blue() );
+	mIM0onIM0Blue = new wxTextCtrl( panel, ID_IM0_ON_IM0_BLUE, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mIM0onIM0Blue, 1 );
+	bs->Add( 10, 10, 0 );
+
+	item->Add( bs, 1 );
+
+	bs = new wxBoxSizer( wxHORIZONTAL );
+
+	mBIMonIM0St = new wxStaticText( panel, wxID_ANY, "BIM on IM0: (RGB)" );
+	bs->Add( mBIMonIM0St, 2, wxALIGN_CENTER_VERTICAL );
+	tmp = wxString::Format( "%d", Preferences::getBIMonIM0Red() );
+	mBIMonIM0Red = new wxTextCtrl( panel, ID_BIM_ON_IM0_RED, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mBIMonIM0Red, 1 );
+	tmp = wxString::Format( "%d", Preferences::getBIMonIM0Green() );
+	mBIMonIM0Green = new wxTextCtrl( panel, ID_BIM_ON_IM0_GREEN, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mBIMonIM0Green, 1 );
+	tmp = wxString::Format( "%d", Preferences::getBIMonIM0Blue() );
+	mBIMonIM0Blue = new wxTextCtrl( panel, ID_BIM_ON_IM0_BLUE, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mBIMonIM0Blue, 1 );
+	bs->Add( 10, 10, 0 );
+
+	item->Add( bs, 1 );
+
+	bs = new wxBoxSizer( wxHORIZONTAL );
+
+	mBIMonBIMSt = new wxStaticText( panel, wxID_ANY, "BIM on BIM: (RGB)" );
+	bs->Add( mBIMonBIMSt, 2, wxALIGN_CENTER_VERTICAL );
+	tmp = wxString::Format( "%d", Preferences::getBIMonBIMRed() );
+	mBIMonBIMRed = new wxTextCtrl( panel, ID_BIM_ON_BIM_RED, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mBIMonBIMRed, 1 );
+	tmp = wxString::Format( "%d", Preferences::getBIMonBIMGreen() );
+	mBIMonBIMGreen = new wxTextCtrl( panel, ID_BIM_ON_BIM_GREEN, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mBIMonBIMGreen, 1 );
+	tmp = wxString::Format( "%d", Preferences::getBIMonBIMBlue() );
+	mBIMonBIMBlue = new wxTextCtrl( panel, ID_BIM_ON_BIM_BLUE, tmp, wxDefaultPosition, wxSize(50,-1) );
+	bs->Add( mBIMonBIMBlue, 1 );
+	bs->Add( 10, 10, 0 );
+
+	item->Add( bs, 1 );
 
     //reminder message
     bs = new wxBoxSizer( wxHORIZONTAL );
@@ -888,6 +940,27 @@ void PreferencesDialog::OnOK ( wxCommandEvent& unused ) {
 
 	mOverlayScale->GetValue().ToDouble(       &r );
 	Preferences::setOverlayScale( r );
+
+	mIM0onIM0Red->GetValue().ToDouble(   &r );
+	mIM0onIM0Green->GetValue().ToDouble( &g );
+	mIM0onIM0Blue->GetValue().ToDouble(  &b );
+	Preferences::setIM0onIM0Red(   (int)r );
+	Preferences::setIM0onIM0Green( (int)g );
+	Preferences::setIM0onIM0Blue(  (int)b );
+
+	mBIMonIM0Red->GetValue().ToDouble(   &r );
+	mBIMonIM0Green->GetValue().ToDouble( &g );
+	mBIMonIM0Blue->GetValue().ToDouble(  &b );
+	Preferences::setBIMonIM0Red(   (int)r );
+	Preferences::setBIMonIM0Green( (int)g );
+	Preferences::setBIMonIM0Blue(  (int)b );
+
+	mBIMonBIMRed->GetValue().ToDouble(   &r );
+	mBIMonBIMGreen->GetValue().ToDouble( &g );
+	mBIMonBIMBlue->GetValue().ToDouble(  &b );
+	Preferences::setBIMonBIMRed(   (int)r );
+	Preferences::setBIMonBIMGreen( (int)g );
+	Preferences::setBIMonBIMBlue(  (int)b );
 
     Preferences::setHome( mHome->GetValue() );
     //when the home directory changes, we must also change the 3dviewnix
