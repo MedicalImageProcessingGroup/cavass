@@ -157,6 +157,12 @@ void OverlayCanvas::loadData ( char* name,
 			mCavassData->m_width = Preferences::getCTSoftTissueWidth();
 			mCavassData->initLUT();
 		}
+		if (Preferences::getCTSoftTissueCenter() < B.m_max)
+		{
+			B.m_center = Preferences::getCTSoftTissueCenter();
+			B.m_width = Preferences::getCTSoftTissueWidth();
+			B.initLUT();
+		}
         reload();
     }
     SetCursor( *wxSTANDARD_CURSOR );
@@ -246,6 +252,12 @@ void OverlayCanvas::loadFile ( const char* const fn ) {
 			mCavassData->m_center = Preferences::getCTSoftTissueCenter();
 			mCavassData->m_width = Preferences::getCTSoftTissueWidth();
 			mCavassData->initLUT();
+		}
+		if (Preferences::getCTSoftTissueCenter() < B.m_max)
+		{
+			B.m_center = Preferences::getCTSoftTissueCenter();
+			B.m_width = Preferences::getCTSoftTissueWidth();
+			B.initLUT();
 		}
         reload();
     }
