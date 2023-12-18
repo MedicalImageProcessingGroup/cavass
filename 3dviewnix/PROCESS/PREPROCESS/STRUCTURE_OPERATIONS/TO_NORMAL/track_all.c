@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2015, 2017-2018 Medical Image Processing Group
+  Copyright 1993-2015, 2017-2018, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -117,7 +117,7 @@ static struct OUT {
 
 void (*Calculate_Norm)();
 static int param_on;
-static char param_file[400];
+static char *param_file;
 static float *str_volume, *str_surface_area;
 
 				   
@@ -216,7 +216,7 @@ char *argv[];
 
   if (argc==10) {
     param_on=TRUE;
-    strcpy(param_file,argv[9]);
+	param_file = argv[9];
   }
   else
     param_on=FALSE;

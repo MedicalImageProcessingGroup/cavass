@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2018 Medical Image Processing Group
+  Copyright 1993-2018, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -49,8 +49,8 @@ FromDicomFrame::FromDicomFrame ( bool maximize, int w, int h ): MainFrame( 0 ){
 
     ::gFrameList.push_back( this );
     if (!Preferences::getSingleFrameMode()) {
-        gWhere += cWhereIncr;
-        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
+        gWhere += 20;
+        if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = 20;
     }
     initializeMenu();
     ::setColor( this );
@@ -917,7 +917,7 @@ void FromDicomFrame::OnFromDicomSave(wxCommandEvent &e)
 		if (has_PET_info)
 		{
 			cmnd.Truncate(cmnd.Len()-(mPatient->GetValue()? 8:5));
-			cmnd += "-slope.IM0\" -slopex1000";
+			cmnd += "-slope100.IM0\" -slopex100";
 			wxLogMessage( "FromDicomFrame::OnFromDicomSave: " + cmnd );
 			ProcessManager p2 = ProcessManager( "fromDicom started", cmnd,
 				mForeground->GetValue() );
@@ -934,8 +934,8 @@ void FromDicomFrame::OnFromDicomSave(wxCommandEvent &e)
 			fclose(fp);
 			cmnd.Truncate(cmnd.Len()-9);
 			cmnd = wxString("algebra \"")+cmnd+".IM0\" \""+cmnd+
-				"-slope.IM0\" \""+cmnd+"-SUV100.IM0\" "+
-				wxString::Format("%.9fxy", .1*final_factor_bqml);
+				"-slope100.IM0\" \""+cmnd+"-SUV100.IM0\" "+
+				wxString::Format("%.9fxy", final_factor_bqml);
 			wxLogMessage( "FromDicomFrame::OnFromDicomSave: " + cmnd );
 			ProcessManager p3 = ProcessManager( "fromDicom started", cmnd,
 				mForeground->GetValue() );

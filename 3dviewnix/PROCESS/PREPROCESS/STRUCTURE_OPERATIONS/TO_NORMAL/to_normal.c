@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2014 Medical Image Processing Group
+  Copyright 1993-2014, 2023 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -552,7 +552,7 @@ static int number_of_triangles[255];
 int error;
 
 
-char shell_name[100],image_name[100];
+char *shell_name, *image_name;
 int max_structs,cur_struct,cur_volume,neighbors;
 
 
@@ -646,8 +646,8 @@ char *argv[];
   }
 
 
-  strcpy(shell_name,argv[1]);
-  strcpy(image_name,argv[3]);
+  shell_name = argv[1];
+  image_name = argv[3];
   
   if (sscanf(argv[2],"%d",&cur_struct)!=1) {
     printf("Invalid structure number specified\n");

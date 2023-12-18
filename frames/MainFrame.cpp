@@ -445,7 +445,7 @@ void MainFrame::OnCopy ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnAbout ( wxCommandEvent& unused ) {
     wxMessageBox(
-"CAVASS version 1.1.1 \n\
+"CAVASS version 1.1.2 \n\
 \n\
   Xinjian Chen, Ph.D.,\n\
   George J. Grevera, Ph.D.,\n\
