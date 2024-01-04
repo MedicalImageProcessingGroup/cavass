@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2017, 2020-2023 Medical Image Processing Group
+  Copyright 1993-2017, 2020-2024 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -445,7 +445,7 @@ void MainFrame::OnCopy ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnAbout ( wxCommandEvent& unused ) {
     wxMessageBox(
-"CAVASS version 1.1.2 \n\
+"CAVASS version 1.1.3 \n\
 \n\
   Xinjian Chen, Ph.D.,\n\
   George J. Grevera, Ph.D.,\n\
@@ -458,7 +458,7 @@ void MainFrame::OnAbout ( wxCommandEvent& unused ) {
   Xiaofen Zheng, Ph.D.,\n\
   Ying (Ronald) Zhuge, Ph.D.                    \n\
 \n\
-Copyright 1993-2023 University of Pennsylvania",
+Copyright 1993-2024 University of Pennsylvania",
         _T("About CAVASS"),
         wxICON_INFORMATION | wxOK );
 }

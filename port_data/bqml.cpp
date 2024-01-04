@@ -1,5 +1,5 @@
 /*
-  Copyright 2018, 2021, 2023 Medical Image Processing Group
+  Copyright 2018, 2021, 2023-2024 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -72,11 +72,11 @@ int main(int argc, char *argv[])
 	}
 
     int ris=100, ii, has_PET_info;
-    char buf[256];
+    char buf[8192];
     float av;
 	double final_factor_bqml;
 
-    ris = get_element(fp, 0x0054, 0x0016, AT, buf, 256, &ii);
+    ris = get_element(fp, 0x0054, 0x0016, AT, buf, 8192, &ii);
     if (ris!=100 || dose!=NULL)
     {
         float PatientWeight=specified_weight, SeriesTime,
@@ -117,10 +117,10 @@ int main(int argc, char *argv[])
         if (starttime && dose &&
 				RHL && RHL->cData)
 		{
-			has_PET_info = get_element(fp,
-				0x0010, 0x1030, AN, buf, 256, &ii)==0 &&
-				(specified_weight>0 ||sscanf(buf, "%f", &PatientWeight)==1) &&
-				get_element(fp, 0x0008, 0x0031, AN, buf, 256, &ii)==0 &&
+			has_PET_info = (PatientWeight>0 ||
+                (get_element(fp, 0x0010, 0x1030, AN, buf, 8192, &ii)==0 &&
+				sscanf(buf, "%f", &PatientWeight)==1)) &&
+				get_element(fp, 0x0008, 0x0031, AN, buf, 8192, &ii)==0 &&
 				sscanf(buf, "%f", &SeriesTime)==1 &&
 				sscanf(starttime, "%f", &RadiopharmaceuticalStartTime)==1 &&
 				sscanf(dose, "%f", &RadionuclideTotalDose)==1 &&

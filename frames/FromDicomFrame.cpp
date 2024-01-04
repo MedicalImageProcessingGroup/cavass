@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2018, 2023 Medical Image Processing Group
+  Copyright 1993-2018, 2023-2024 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -558,16 +558,16 @@ void FromDicomFrame::OnInput ( wxCommandEvent& unused ) {
                 }
                 series[j] = ser;
                 series_slices[j] = 0;
-                unrecognized_filename[j] = (char **)malloc(256*sizeof(char *));
+                unrecognized_filename[j] = (char **)malloc(8192*sizeof(char *));
                 series_filename[j] =
-                    (wxFileName **)malloc(256*sizeof(wxFileName *));
+                    (wxFileName **)malloc(8192*sizeof(wxFileName *));
                 if (unrecognized_filename[j]==NULL ||
                         series_filename[j]==NULL)
                 {
                     wxMessageBox("ERROR: Out of memory");
                     continue;
                 }
-                max_unrecognized_names[j] = 256;
+                max_unrecognized_names[j] = 8192;
                 nseries++;
                 int er = get_element_from((const char *)path.c_str(), (const char *)dir_entry.c_str(),
                     0x8, 0x103e, AT, series_description[j],
@@ -602,7 +602,7 @@ void FromDicomFrame::OnInput ( wxCommandEvent& unused ) {
             if (series_slices[j] >= max_unrecognized_names[j])
             {
                 tmpptr = (char **)realloc(unrecognized_filename[j],
-                    (max_unrecognized_names[j]+256)*sizeof(char *));
+                    (max_unrecognized_names[j]+8192)*sizeof(char *));
                 if (tmpptr == NULL)
                 {
                     wxMessageBox("ERROR: Out of memory");
@@ -610,14 +610,14 @@ void FromDicomFrame::OnInput ( wxCommandEvent& unused ) {
                 }
                 wxFileName **tmpfnptr =
                     (wxFileName **)realloc(series_filename[j],
-                    (max_unrecognized_names[j]+256)*sizeof(wxFileName *));
+                    (max_unrecognized_names[j]+8192)*sizeof(wxFileName *));
                 if (tmpfnptr == NULL)
                 {
                     wxMessageBox("ERROR: Out of memory");
                     free(tmpptr);
                     continue;
                 }
-                max_unrecognized_names[j] += 256;
+                max_unrecognized_names[j] += 8192;
                 unrecognized_filename[j] = tmpptr;
                 series_filename[j] = tmpfnptr;
             }
@@ -786,25 +786,25 @@ void FromDicomFrame::OnFromDicomSave(wxCommandEvent &e)
                 for (int k=0; k<series_slices[j]; k++)
                 {
 					int ris=100, ii;
-					char buf[256];
+					char buf[8192];
 					float av;
 					if (k == 0)
 					{
 					  ris = get_element_from(
 						(const char *)series_filename[j][k]->GetPath().c_str(),
 						(const char *)series_filename[j][k]->GetFullName().
-						c_str(), 0x0054, 0x0016, AT, buf, 256, &ii);
+						c_str(), 0x0054, 0x0016, AT, buf, 8192, &ii);
 					  if (ris == 100)
 					  {
 					    if (get_element_from((const char *)series_filename[j][
 						      k]->GetPath().c_str(), (const char *)
 							  series_filename[j][k]->GetFullName().c_str(),
-							  0x0008, 0x0060, AT, buf, 256, &ii)==0 &&
+							  0x0008, 0x0060, AT, buf, 8192, &ii)==0 &&
 							  (strcmp(buf, "CT")==0||strcmp(buf, "CT ")==0) &&
 							  get_element_from((const char *)series_filename[j]
 							  [k]->GetPath().c_str(), (const char *)
 							  series_filename[j][k]->GetFullName().c_str(),
-							  0x0028, 0x1052, AN, buf, 256, &ii)==0)
+							  0x0028, 0x1052, AN, buf, 8192, &ii)==0)
 						{
 						  if (sscanf(buf, "%f", &av) != 1)
 						    wxMessageBox("Bad rescale intercept value");
@@ -834,12 +834,12 @@ void FromDicomFrame::OnFromDicomSave(wxCommandEvent &e)
 					   has_PET_info = get_element_from(
 						(const char *)series_filename[j][k]->GetPath().c_str(),
 						(const char *)series_filename[j][k]->GetFullName().
-						c_str(), 0x0010, 0x1030, AN, buf, 256, &ii)==0 &&
+						c_str(), 0x0010, 0x1030, AN, buf, 8192, &ii)==0 &&
 						sscanf(buf, "%f", &PatientWeight)==1 &&
 						get_element_from(
 						(const char *)series_filename[j][k]->GetPath().c_str(),
 						(const char *)series_filename[j][k]->GetFullName().
-						c_str(), 0x0008, 0x0031, AN, buf, 256, &ii)==0 &&
+						c_str(), 0x0008, 0x0031, AN, buf, 8192, &ii)==0 &&
 						sscanf(buf, "%f", &SeriesTime)==1 &&
 						sscanf(RST->cData, "%f", &RadiopharmaceuticalStartTime)
 						==1 &&
