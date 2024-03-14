@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2019, 2021, 2023 Medical Image Processing Group
+  Copyright 1993-2019, 2021, 2023-2024 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -201,6 +201,7 @@ int main(int argc, char *argv[])
 	void *tmpptr;
 	char *(series_uid[MAX_SERIES]), *suid;
 	float vol_time[MAX_SERIES], slice_spacing=1;
+	float cine_rate = -1; // to read from 0018,0040
 	int input_list_from_file, retain_patient, order_by_time, wrt_patient=0;
 	int add_value=0;
 	int rename_dicom=0;
@@ -820,6 +821,16 @@ int main(int argc, char *argv[])
 				== 0)
 			extract_floats(an, 1, &slice_spacing);
 
+		/* to  check the delta_t and fps= cine_rate , and then write it into the header, by yubing */		
+		if (get_element(fpin, 0x0018, 0x0040, AN, an, sizeof(an), &items_read)
+				== 0)
+			extract_floats(an, 1, &cine_rate);	
+			if (cine_rate > 0)
+			{
+				slice_spacing = 1.0 / cine_rate;	
+			}
+
+
 		vh.scn.axis_label_valid =
 			get_element(fpin, 0x0020,0x0020, AT, at,sizeof(at),&items_read)==0;
 		if (items_read==0 || at[0]==0)
@@ -997,7 +1008,7 @@ int main(int argc, char *argv[])
 		vh.scn.measurement_unit = (short *) calloc(4, sizeof(short));
 		vh.scn.measurement_unit[0] = 3;
 		vh.scn.measurement_unit[1] = 3;
-		vh.scn.measurement_unit[2] = order_by_time? 5: 3;
+		vh.scn.measurement_unit[2] = order_by_time || cine_rate>0? 5: 3;
 		vh.scn.measurement_unit[3] = 5;
 
 		vh.scn.num_of_density_values_valid = 1;
