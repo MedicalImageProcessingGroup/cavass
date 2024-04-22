@@ -14,9 +14,10 @@ You need to install Gnome development software and cmake.
     with gtk2-devel.
 
 You also need to install wxWidgets:
-  go to wxwidgets.org, download wxWidgets-3.2.2.1.tar.bz2,
-  tar xjf wxWidgets-3.2.2.1.tar.bz2
-  cd wxWidgets-3.2.2.1
+  go to wxwidgets.org
+  download wxWidgets-3.2.4.tar.bz2 (or current release)
+  tar xjf wxWidgets-3.2.4.tar.bz2
+  cd wxWidgets-3.2.4
   mkdir buildgtk
   cd buildgtk
   ../configure --with-gtk
@@ -27,10 +28,11 @@ You also need to install wxWidgets:
   sudo /sbin/ldconfig
 
 You may optionally install ITK:
-  go to http://www.itk.org/ITK/resources/software.html, download InsightToolkit-5.3.0.tar.gz,
-  mkdir itk
-  cd itk
-  ccmake ../InsightToolkit-5.3.0
+  go to http://www.itk.org/ITK/resources/software.html
+  download InsightToolkit-5.3.0.tar.gz (or current release version)
+  mkdir itk-build
+  cd itk-build
+  ccmake ../InsightToolkit-5.3.0 (or current release version)
   c [configure]
   go down to BUILD_TESTING, if OFF enter to turn ON
   c [configure]
@@ -48,16 +50,16 @@ Then you install CAVASS:
   e [exit help]
   go down to CMAKE_BUILD_TYPE, press "enter", type "Release", press "enter"
   optionally go down to ITK_DIR, press "enter", type "../itk-build", press "enter"
-  go down to wxWidgets_CONFIG_EXECUTABLE, press "enter", type "../wxWidgets-3.2.2.1/buildgtk/wx-config, press "enter"
-  go down to wxWidgets_wxrc/EXECUTABLE, press "enter", type "../wxWidgets-3.2.2.1/buildgtk/utils/wxrc/wxrc", press "enter"
+  go down to wxWidgets_CONFIG_EXECUTABLE, press "enter", type "../wxWidgets-3.2.4/buildgtk/wx-config, press "enter"
+  go down to wxWidgets_wxrc/EXECUTABLE, press "enter", type "../wxWidgets-3.2.4/buildgtk/utils/wxrc/wxrc", press "enter"
   c [configure]
   g [generate and exit]
   make
   [wait]
 
-in /etc/profile.local put the commands:
+in /etc/profile.local and in .bashrc in your home directory put the commands:
   VIEWNIX_ENV=~/cavass-build
-  PATH=$PATH:~/cavass-build
+  PATH=$PATH:$VIEWNIX_ENV
   export PATH VIEWNIX_ENV
     but instead of ~ put the directory where cavass-build is.  Those commands
     will take effect on your next login.
