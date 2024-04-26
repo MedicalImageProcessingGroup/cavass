@@ -1,0 +1,138 @@
+--------------------------------------------
+ Prerequisites (Installing package manager)
+--------------------------------------------
+
+Install homebrew as “apt-get" package installer doesn’t work in MacOS
+
+  Go to the following link and install homebrew: https://brew.sh/
+
+You can also try “xcode-select --install”
+(Alternative to homebrew to run gcc, make, & git to run. But may vary for other MacOS versions)
+
+
+Once homebrew is installed, install cmake and gcc:
+  
+  brew install cmake
+  brew install gcc
+
+
+Check if cmake is installed using:
+
+  cmake –version 
+
+
+Note: gcc --version
+      shows that gcc on the mac is clang.
+
+--------------------------------------------
+ Installing third-party software/libraries
+--------------------------------------------
+Obtain wxWidgets source code. Then:
+  tar xjf ~/Downloads/wxWidgets-3.2.1.tar.bz2 
+  mkdir wx-build
+  cd wx-build
+  ../wxWidgets-3.2.1/configure
+  make
+
+(optional) Obtain ITK source code.
+  last seen at https://itk.org/download/
+  tar xvf ~/Downloads/InsightToolkit-5.3.0.tar
+  mkdir itk-build
+  run cmake gui
+
+--------------------------------------------------
+ Obtaining cavass source code and building cavass
+--------------------------------------------------
+  git clone https://github.com/MedicalImageProcessingGroup/cavass.git
+  mkdir cavass-build
+  cd cavass-build
+  ccmake ../cavass
+  
+If it shows: "EMPTY CACHE", simply press Return key and the ccmake cariables should appear.
+
+For the following variables, use the values based on the architecture and OS version:
+
+  CMAKE_BUILD_TYPE: Release
+  CMAKE_OSX_ARCHITECTURES: arm64
+  CMAKE_OSX_DEPLOYMENT_TARGET: arm64
+  wxWidgets_CONFIG_EXECUTABLE: ~/wx-build/wx-config
+  wxWidgets_wxrc_EXECUTABLE: ~/wx-build/utils/wxrc/wxrc
+  (Replace the ~ with the pathname)
+
+Then toggle (t) to edit additional parameters:
+
+Ifthe following parameters already have values present, then make sure that the current OS version is present at the end. Check for OS version by -> 'System Settings' -> 'General' -> 'About' -> Under 'macOS' check the version number (e.g. Version 14.4.1), then make sure this version number is used at the end of the following parameter value.
+
+  CMAKE_CXX_FLAGS: -target arm64-apple-macos14.4.1
+  CMAKE_C_FLAGS: -target arm64-apple-macos14.4.1
+
+
+Edit (create, if necessary) ~/.zshrc. Add the following lines to the end:
+  export VIEWNIX_ENV=~/cavass-build
+  #the export below is necessary to run cavass w/ an icon
+  export PATH=$PATH:~/cavass-build/cavass.app/Contents/MacOS
+  export PATH=$PATH:~/cavass-build
+  export WXSUPPRESS_SIZER_FLAGS_CHECK=1
+Open a new terminal window for these changes to take effect.
+
+
+-------------------------------------
+cavass & git (source code repository)
+-------------------------------------
+Note: All git commands (except clone) must be in CAVASS source dir.
+Useful git commands:
+  1. obtain a complete copy of CAVASS (from a remote repository)
+       git clone george@grevera.ddns.net:/home/george/repos/cavass.git/
+  2. list my changes
+       git status
+  3. add my changes to the staging area
+       git add *
+  4. commit my changes (in the staging area) to my local repo
+       git commit -m "my notes that will be added to these changes"
+         or
+       git commit -F ../notes.txt  (<-- notes.txt NOT in cavass source dir)
+  5. update my copy with updates in the remote repo:
+       git pull
+  6. push my changes to the remote repo:
+       git push -u origin master
+
+My personal/suggested workflow:
+  A. I start working in the morning and do the following:
+       git pull
+     to update my code with any changes in the remote repo.
+
+  B. I change the source code.
+
+  C. Do
+       make
+     in cavass-build, and test my changes.
+
+  D. At the end of the day, I do the following:
+     1. update my code with any updates in the remote repo:
+          git pull
+     2. All conflicts MUST be resolved before the remote repo is updated.
+     3. Do
+          make
+        to rebuild my code.
+     4. Test my code again.
+     5. Update the remote with my changes:
+          git push -u origin master
+  Note: One may repeat this throughout the day as often as one wishes.
+
+--------------------
+cavass and clion ide
+--------------------
+1. Build cavass as per above.
+2. Open cavass-build as a makefile (not cmake) project.
+3. Clean and rebuild all of cavass.
+4. To debug cavass using the clion, you must tell clion where it is.
+   Select cavass from the menu between the hammer and run and debug icons.
+   Select cavass --> > --> Edit... and specify executable (e.g.,
+   ~/monday/cavass-build/cavass.app/Contents/MacOS/cavass).
+5. Source code appears in Project --> External Sources.
+   main.cpp is where cavass starts (in CavassMain::OnInit()).
+
+Note: cavass --> > --> Run 'cavass' with Valgring Memcheck is available
+   (but needs to be installed).
+
+
