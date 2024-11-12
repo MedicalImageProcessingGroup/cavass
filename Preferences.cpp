@@ -72,6 +72,31 @@ int            Preferences::_CTBoneWidth     = 4000;
 int            Preferences::_PETCenter    = 1200;
 int            Preferences::_PETWidth     = 3500;
 
+//owen vals
+//layout values
+double Preferences::_scale = 1.8; //canvas scale
+bool Preferences::_onLabel = true; //labels on/off
+//paint values
+int Preferences::_brushSize = 2; //paint brush size
+//gray map values
+int Preferences::_grayLevel = 0; //gray map level
+int Preferences::_grayWidth = 0; //gray map width
+bool Preferences::_invert = false; //gray map invert on/off
+//button size values
+int Preferences::_buttonWidth = 90; //button width default
+int Preferences::_buttonHeight = 22; //button height default
+//radio button values
+bool Preferences::_smallPressed = true;
+bool Preferences::_medPressed = false;
+bool Preferences::_largePressed = false;
+//default scalars
+double Preferences::_smallSize = 1;
+double Preferences::_medSize = 2;
+double Preferences::_largeSize = 3;
+
+//new scalar for UI; to be used with the slider
+double Preferences::_uiScalar = 1.0;
+
 #if defined (WIN32) || defined (_WIN32)
     wxString   Preferences::_home( "c:/cavass-build/debug" );
     wxString   Preferences::_MPIDirectory( "c:/Program Files/MPICH2/bin" );
