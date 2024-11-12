@@ -249,6 +249,38 @@ public:
         mStereoLeftOdd = e.IsChecked();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    //owen funcs
+    /* \brief deprecated function*/
+    void OnSmallButton(wxCommandEvent& e) {
+        int s = Preferences::getSmallScalar();
+        Preferences::setButtonWidth(s);
+        Preferences::setButtonHeight(s);
+        Preferences::setSmallPressed();
+    }
+    /* \brief deprecated function*/
+    void OnMedButton(wxCommandEvent& e) {
+        int s = Preferences::getMedScalar();
+        Preferences::setButtonWidth(s);
+        Preferences::setButtonHeight(s);
+        Preferences::setMedPressed();
+    }
+    /* \brief deprecated function*/
+    void OnBigButton(wxCommandEvent& e) {
+        int s = Preferences::getLargeScalar();
+        Preferences::setButtonWidth(s);
+        Preferences::setButtonHeight(s);
+        Preferences::setLargePressed();
+    }
+    /* \brief gets UI scalar slider value and writes it to cavass.ini*/
+    void OnScalarSlider(wxScrollEvent& e) {
+        //get position of slider
+        int readValue = e.GetPosition();
+        //convert to scalar (i.e., convert to double btwn 1-3)
+        double scalarValue = (double)readValue / 100;
+        //set preferences scalar to converted value
+        Preferences::setSliderScalar(scalarValue);
+    }
+    //end owen funcs
     void handleStereoModeChange ( void ) {
         mStereoAngleSt->Enable(    mStereoMode != Preferences::StereoModeOff        );
         mStereoAngle->Enable(      mStereoMode != Preferences::StereoModeOff        );
@@ -274,6 +306,9 @@ public:
         ID_SHOW_TOOL_TIPS,
         ID_SINGLE_FRAME_MODE,
         ID_USE_INPUT_HISTORY,
+        ID_SMALL_BUTTONS,ID_MED_BUTTONS, ID_BIG_BUTTONS,
+
+        ID_SCALAR_SLIDER,
 
         ID_STEREO_MODE_OFF, ID_STEREO_ANGLE,
         ID_STEREO_MODE_INTERLACED, ID_STEREO_LEFT_ODD,
