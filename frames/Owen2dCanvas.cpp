@@ -32,6 +32,9 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 //======================================================================
 #include  "cavass.h"
+#include "Owen2dFrame.h"
+#include "SuperUndo.h"
+#include <vector>
 
 
 #define QueueItem X_Point
@@ -102,6 +105,14 @@ const int  Owen2dCanvas::sSpacing=1;  ///< space, in pixels, between each slice 
 static const unsigned char onbit[9] = { 1, 2, 4, 8, 16, 32, 64, 128, 255};
 static const unsigned char offbit[9] = { 254, 253, 251, 247, 239, 223, 191, 127, 0};
 //----------------------------------------------------------------------
+
+//owen undo/redo implementation
+vector<SuperUndo*> mask_state; //stores all mask segment states -- that is it stores UndoPaint and XPaint objects
+int index_mask_state = 0; //global index for the mask_state vector
+bool fake_obj = false; //tells afterUndo() if the object being drawn is part of the XPaint undo/redo process or not
+bool at_zero = false; //tells d if it needs to redo at zero or not
+//end owen undo/redo implementation
+
 /** \brief Owen2dCanvas ctor. */
 Owen2dCanvas::Owen2dCanvas ( void ) {
     init();
@@ -212,10 +223,30 @@ void Owen2dCanvas::init ( void ) {
 	overlay_flag     = true;
 	overlay_intensity= 0;
 	straight_path    = false;
+	//owen undo/redo
+	mask_state.clear();
+	index_mask_state = 0;
+	fake_obj = false;
+	at_zero = false;
+	//end owen undo/redo
 #ifdef FindStraightPath_TEST
 	straight_path    = true;
 #endif
 }
+
+//owen undo/redo implementation
+enum undo_redo_nums {
+	ACTION_PAINT = 0,
+	ACTION_ERASE = 1,
+	UNDO_ACTION = 90,
+	REDO_ACTION = 89,
+	CLUMP_BUFFER = 1000,
+	BOT_LEFT_Y = 891,
+	BOT_RIGHT_X = 921,
+	BOT_RIGHT_Y = 891,
+	TOP_RIGHT_X = 921
+};
+
 //----------------------------------------------------------------------
 /** \brief Owen2dCanvas dtor. */
 Owen2dCanvas::~Owen2dCanvas ( void ) {
@@ -794,6 +825,58 @@ void Owen2dCanvas::OnChar ( wxKeyEvent& e ) {
         //m_parent_frame->ProcessEvent( e );
     }
 }
+//owen undo/redo implementation 
+/* \brief wxKeyEvent func for undo / redo; see doc: https://docs.wxwidgets.org/3.0/classwx_key_event.html
+   \param e wxKeyEvent which gives keycode to be passed to urhandler*/
+void Owen2dCanvas::OnUndoRedo(wxKeyEvent& e) {
+	int code = e.GetKeyCode();
+	if (code == UNDO_ACTION || code == REDO_ACTION) {
+		urhandler(code);
+	}
+}
+/* \brief urhandler ("Undo/Redo Handler") takes care of all undoing and redoing.
+It is written this way for the following reason: having Undo() and Redo() 
+both manipulate index_mask_state simply became too complicated.
+   \param kc keycode passed from OnUndoRedo*/
+void Owen2dCanvas::urhandler(int kc) {
+	int imchecking = index_mask_state;
+	bool imcheckingagain = at_zero;
+	int sizeChecking = mask_state.size();
+	if (mask_state.size() == 0) {
+		return;
+	}
+	if (kc == UNDO_ACTION) {
+		undo(index_mask_state);
+		index_mask_state--;
+		if (index_mask_state < 0) {
+			at_zero = true;
+			index_mask_state = 0;
+		}
+	}
+	else if (kc == REDO_ACTION) {
+		if (!at_zero) index_mask_state++;
+		if (index_mask_state >= mask_state.size()) {
+			index_mask_state = mask_state.size() - 1;
+		}
+		redo(index_mask_state);
+		if (at_zero) {
+			at_zero = false;
+		}
+	}
+}
+/* \brief afterUndo handles refactoring the mask_state vector when an object
+is added to it. if the index is NOT at size()-1, we know that an undo
+has been performed at some point, so we should erase all objects in
+mask_state from index:size()-1.*/
+void Owen2dCanvas::afterUndo() {
+	if (mask_state.size() == 0 || fake_obj) { return; }
+	if (index_mask_state < mask_state.size() - 1) {
+		int beginning = index_mask_state + 1;
+		int end = mask_state.size();
+		mask_state.erase(mask_state.begin() + beginning, mask_state.begin() + end);
+	}
+}
+//end owen
 //----------------------------------------------------------------------
 /** \brief callback for mouse move events */
 void Owen2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
@@ -863,33 +946,39 @@ void Owen2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
 		pt.x = orig.tblx[wx - orig.locx];
 		switch (detection_mode)
 		{
-			case ILW:
-			case LSNAKE:
-				if (phase == 1)
+		case ILW:
+		case LSNAKE:
+			if (phase == 1)
+			{
+				int path_found = FALSE;
+				if (straight_path)
 				{
-					int path_found=FALSE;
-					if (straight_path)
+					if (FindStraightPath(&orig, circular.pt, pt, OPEN) &&
+						e.LeftIsDown() &&
+						sl.slice_index[VolNo][mCavassData->m_sliceNo] ==
+						o_contour.slice_index)
 					{
-						if (FindStraightPath(&orig, circular.pt, pt, OPEN) &&
-								e.LeftIsDown() && 
-								sl.slice_index[VolNo][mCavassData->m_sliceNo]==
-								o_contour.slice_index)
-						{
-							path_found = !Live_Wire(&orig, wx, wy, OPEN);
-							Point_Selected(&orig, wx, wy);
-							UpdateCircular(pt, &orig);
-						}
+						path_found = !Live_Wire(&orig, wx, wy, OPEN);
+						Point_Selected(&orig, wx, wy);
+						UpdateCircular(pt, &orig);
 					}
-					else
-						path_found = FindShortestPath(circular.pt, pt, OPEN);
-					if (path_found)
-						Live_Wire(&orig, wx, wy, OPEN);
 				}
-				break;
-			case PAINT:
-				if ( (e.MiddleIsDown() && phase==0 && paint_brush_size>0)
-                                     || (e.LeftIsDown() && leftToMiddleModifier(e) && phase==0 && paint_brush_size>0) )
-					erase_mask(wx, wy);
+				else
+					path_found = FindShortestPath(circular.pt, pt, OPEN);
+				if (path_found)
+					Live_Wire(&orig, wx, wy, OPEN);
+			}
+			break;
+		case PAINT:
+			if ((e.MiddleIsDown() && phase == 0 && paint_brush_size > 0)
+				|| (e.LeftIsDown() && leftToMiddleModifier(e) && phase == 0 && paint_brush_size > 0)) {
+				//owen undo/redp implementation
+				UndoPaint* u = new UndoPaint(wx, wy, paint_brush_size, ACTION_ERASE, e.GetTimestamp());
+				afterUndo();
+				mask_state.push_back(u);
+				index_mask_state = mask_state.size() - 1;
+				//end undo/redo
+				erase_mask(wx, wy);}
 				else if (e.LeftIsDown() && !leftToMiddleModifier(e) && !leftToRightModifier(e))
 				{
 					if (paint_brush_size == 0)
@@ -900,8 +989,16 @@ void Owen2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
 							painting = true;
 						}
 					}
-					else if (phase == 0)
+					else if (phase == 0) {
+						//owen undo/redo implementation
+						UndoPaint* u = new UndoPaint(wx, wy, paint_brush_size, ACTION_PAINT, e.GetTimestamp());
+						afterUndo();
+						mask_state.push_back(u);
+						index_mask_state = mask_state.size() - 1;
+						long x = wx;
+						long y = wy;
 						paint_mask(wx, wy);
+					}
 				}
 				if (paint_brush_size==0 && phase==1 && o_contour.slice_index==
 						sl.slice_index[VolNo][mCavassData->m_sliceNo])
@@ -1489,7 +1586,11 @@ void Owen2dCanvas::OnRightDown ( wxMouseEvent& e ) {
 			if (paint_brush_size == 0)
 			{
 				NumPoints = 0;
+				//owen undo/redo implementation
+				mask_state.at(index_mask_state)->addPoint(wx, wy);
 				draw_and_save_vertices(-1, -1, wx, wy);
+				mask_state.at(index_mask_state)->setLen(mask_state.at(index_mask_state)->getLen() + 1); //inc len
+				//end owen undo/redo
 				draw_and_save_vertices(-1, -1,
 					orig.tbl2x[o_contour.vertex[0].x],
 					orig.tbl2y[o_contour.vertex[0].y]);
@@ -1521,6 +1622,10 @@ void Owen2dCanvas::OnRightDown ( wxMouseEvent& e ) {
 			return;
 		o_contour.last = -1;
 		NumPoints = 0;
+		//owen undo/redo implementation
+		mask_state.erase(mask_state.begin()+index_mask_state);
+		index_mask_state = mask_state.size() - 1;
+		//end owen undo/redo
 		clear_Vedges_array();
 		reset_object_vertex_of_temparrays();
 		clear_temporary_contours_array();
@@ -1582,7 +1687,13 @@ void Owen2dCanvas::OnMiddleDown ( wxMouseEvent& e ) {
 			PrepareDC(dc);
 			const long  wx = dc.DeviceToLogicalX(e.GetPosition().x) - mTx;
 			const long  wy = dc.DeviceToLogicalY(e.GetPosition().y) - mTy;
+			//owen undo/redo implementation
+			UndoPaint* u = new UndoPaint(wx, wy, paint_brush_size, ACTION_ERASE, e.GetTimestamp());
+			afterUndo();
+			mask_state.push_back(u);
+			index_mask_state = mask_state.size() - 1;
 			erase_mask(wx, wy);
+			//end owen undo/redo
 			return;
 		}
 		X_Point pt;
@@ -1734,6 +1845,8 @@ void Owen2dCanvas::OnMiddleDown ( wxMouseEvent& e ) {
 				copy_ocontour_into_temp_array();
 				o_contour.last = -1;
 				clear_Vedges_array();
+				//owen undo/redo implementation
+				mask_state.at(index_mask_state)->setAct(ACTION_ERASE); //change current action to erase
 				painting = true;
 			}
 		}
@@ -1750,6 +1863,7 @@ void Owen2dCanvas::OnMiddleDown ( wxMouseEvent& e ) {
 void Owen2dCanvas::OnMiddleUp ( wxMouseEvent& e ) {
     log( "OnMiddleUp" );
 }
+
 //----------------------------------------------------------------------
 /** \brief Callback to handle left mouse button down events. */
 void Owen2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
@@ -1877,6 +1991,9 @@ void Owen2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
 					if (detection_mode == PAINT)
 					{
 						if (paint_brush_size == 0)
+							//owen undo/redo implementation
+							mask_state.at(index_mask_state)->addPoint(wx, wy);
+							mask_state.at(index_mask_state)->setLen(mask_state.at(index_mask_state)->getLen() + 1); //inc len
 							draw_and_save_vertices(-1, -1, wx, wy);
 						painting = true;
 						return;
@@ -1893,14 +2010,25 @@ void Owen2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
 			}
 			else if (detection_mode!=PAINT || paint_brush_size==0)
 			{
+				//owen undo/redo implementation
+				XPaint* x = new XPaint(wx, wy, e.GetTimestamp());
+				afterUndo();
+				mask_state.push_back(x);
+				index_mask_state = mask_state.size() - 1;
 				phase = InitialPoint_Selected(&orig, wx, wy);
 				straight_path = false;
 				reload();
 			}
 			if (detection_mode != PAINT)
 				add_anchor_point(pt.x, pt.y, &o_contour);
-			else if (phase==0 && paint_brush_size)
+			else if (phase == 0 && paint_brush_size) {
+				//owen undo/redo implementation
+				UndoPaint* u = new UndoPaint(wx, wy, paint_brush_size, ACTION_PAINT, e.GetTimestamp());
+				afterUndo();
+				mask_state.push_back(u);
+				index_mask_state = mask_state.size() - 1;
 				paint_mask(wx, wy);
+			}
 		}
 	}
 	else if (phase==2 && sl.slice_index[VolNo][mCavassData->m_sliceNo]==
@@ -1976,6 +2104,7 @@ void Owen2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
 				copy_ocontour_into_temp_array();
 				o_contour.last = -1;
 				clear_Vedges_array();
+				mask_state.at(index_mask_state)->setAct(ACTION_PAINT); //owen undo/redo implementation
 				painting = true;
 			}
 		}
@@ -9693,88 +9822,437 @@ void Owen2dCanvas::calculate_vert_features(double sum[6], double sumsq[6],
         sum[4] += (double)fval;
         sumsq[4] += (double)(fval*fval);
  
-        /*====== Abs_Grad4 =======*/
-        fval = (1.0/4) * (
-                     abs((int)ptr8[*(tblr+j-1)+i-1] - (int)ptr8[*(tblr+j)+i])
-                    +abs((int)ptr8[*(tblr+j)+i-1] - (int)ptr8[*(tblr+j-1)+i])
-                    +abs((int)ptr8[*(tblr+j)+i-1] - (int)ptr8[*(tblr+j+1)+i])
-                    +abs((int)ptr8[*(tblr+j+1)+i-1] - (int)ptr8[*(tblr+j)+i]));
-		fmin[5] = (fmin[5]==-1.0) ? fval : MIN( fmin[5], fval);
-        fmax[5] = (fmax[5]==-1.0) ? fval : MAX( fmax[5], fval);
-        sum[5] += (double)fval;
-        sumsq[5] += (double)(fval*fval);
-    }
-    else
-    if (orig.bits == 16)
-    {
-        ptr16= (unsigned short *)mCavassData->getSlice(mCavassData->m_sliceNo);
-        val1 = (int)
-			ptr16[*(tblr+j-1)+i-1]+ptr16[*(tblr+j)+i-1]+ptr16[*(tblr+j+1)+i-1];
-        val2 = (int)
-			ptr16[*(tblr+j-1)+i] + ptr16[*(tblr+j)+i] + ptr16[*(tblr+j+1)+i];
- 
- 
-        /*====== Hi Density ======*/
-        fval = (1.0/3)*(val1>val2 ? val1 : val2);
-        fmin[0] = (fmin[0]==-1.0) ? fval : MIN( fmin[0], fval);
-        fmax[0] = (fmax[0]==-1.0) ? fval : MAX( fmax[0], fval);
-        sum[0] += (double)fval;
-        sumsq[0] += (double)(fval*fval);
- 
-        /*====== Lo Density ======*/
-        fval = (1.0/3)*(val1<val2 ? val1 : val2);
-        fmin[1] = (fmin[1]==-1.0) ? fval : MIN( fmin[1], fval);
-        fmax[1] = (fmax[1]==-1.0) ? fval : MAX( fmax[1], fval);
-        sum[1] += (double)fval;
-        sumsq[1] += (double)(fval*fval);
- 
-        /*====== Abs_Grad1 =======*/
-        fval = abs( (int)ptr16[*(tblr+j)+i-1] - (int)ptr16[*(tblr+j)+i] );
-        fmin[2] = (fmin[2]==-1.0) ? fval : MIN( fmin[2], fval);
-        fmax[2] = (fmax[2]==-1.0) ? fval : MAX( fmax[2], fval);
-        sum[2] += (double)fval;
-        sumsq[2] += (double)(fval*fval);
- 
-        /*====== Abs_Grad2 =======*/
-        fval = (1.0/3)*abs((int)val1 - (int)val2);
-        fmin[3] = (fmin[3]==-1.0) ? fval : MIN( fmin[3], fval);
-        fmax[3] = (fmax[3]==-1.0) ? fval : MAX( fmax[3], fval);
-        sum[3] += (double)fval;
-        sumsq[3] += (double)(fval*fval);
- 
-        /*====== Abs_Grad3 =======*/
-		fval = 0.5*abs((int)ptr16[*(tblr+j)+i-1] - (int)ptr16[*(tblr+j)+i] +
-                 ((int)ptr16[*(tblr+j-1)+i-1] + (int)ptr16[*(tblr+j+1)+i-1]
-                - (int)ptr16[*(tblr+j-1)+i] - (int)ptr16[*(tblr+j+1)+i])/2 );
-        fmin[4] = (fmin[4]==-1.0) ? fval : MIN( fmin[4], fval);
-        fmax[4] = (fmax[4]==-1.0) ? fval : MAX( fmax[4], fval);
-        sum[4] += (double)fval;
-        sumsq[4] += (double)(fval*fval);
- 
-        /*====== Abs_Grad4 =======*/
-        fval = (1.0/4) * (
-                  abs((int)ptr16[*(tblr+j-1)+i-1] - (int)ptr16[*(tblr+j)+i])
-                 +abs((int)ptr16[*(tblr+j)+i-1] - (int)ptr16[*(tblr+j-1)+i])
-                 +abs((int)ptr16[*(tblr+j)+i-1] - (int)ptr16[*(tblr+j+1)+i])
-                 +abs((int)ptr16[*(tblr+j+1)+i-1] - (int)ptr16[*(tblr+j)+i]) );
-        fmin[5] = (fmin[5]==-1.0) ? fval : MIN( fmin[5], fval);
-        fmax[5] = (fmax[5]==-1.0) ? fval : MAX( fmax[5], fval);
-        sum[5] += (double)fval;
-        sumsq[5] += (double)(fval*fval);
-    }
+/*====== Abs_Grad4 =======*/
+fval = (1.0 / 4) * (
+	abs((int)ptr8[*(tblr + j - 1) + i - 1] - (int)ptr8[*(tblr + j) + i])
+	+ abs((int)ptr8[*(tblr + j) + i - 1] - (int)ptr8[*(tblr + j - 1) + i])
+	+ abs((int)ptr8[*(tblr + j) + i - 1] - (int)ptr8[*(tblr + j + 1) + i])
+	+ abs((int)ptr8[*(tblr + j + 1) + i - 1] - (int)ptr8[*(tblr + j) + i]));
+fmin[5] = (fmin[5] == -1.0) ? fval : MIN(fmin[5], fval);
+fmax[5] = (fmax[5] == -1.0) ? fval : MAX(fmax[5], fval);
+sum[5] += (double)fval;
+sumsq[5] += (double)(fval * fval);
+	}
+	else
+	if (orig.bits == 16)
+	{
+	ptr16 = (unsigned short*)mCavassData->getSlice(mCavassData->m_sliceNo);
+	val1 = (int)
+		ptr16[*(tblr + j - 1) + i - 1] + ptr16[*(tblr + j) + i - 1] + ptr16[*(tblr + j + 1) + i - 1];
+	val2 = (int)
+		ptr16[*(tblr + j - 1) + i] + ptr16[*(tblr + j) + i] + ptr16[*(tblr + j + 1) + i];
+
+
+	/*====== Hi Density ======*/
+	fval = (1.0 / 3) * (val1 > val2 ? val1 : val2);
+	fmin[0] = (fmin[0] == -1.0) ? fval : MIN(fmin[0], fval);
+	fmax[0] = (fmax[0] == -1.0) ? fval : MAX(fmax[0], fval);
+	sum[0] += (double)fval;
+	sumsq[0] += (double)(fval * fval);
+
+	/*====== Lo Density ======*/
+	fval = (1.0 / 3) * (val1 < val2 ? val1 : val2);
+	fmin[1] = (fmin[1] == -1.0) ? fval : MIN(fmin[1], fval);
+	fmax[1] = (fmax[1] == -1.0) ? fval : MAX(fmax[1], fval);
+	sum[1] += (double)fval;
+	sumsq[1] += (double)(fval * fval);
+
+	/*====== Abs_Grad1 =======*/
+	fval = abs((int)ptr16[*(tblr + j) + i - 1] - (int)ptr16[*(tblr + j) + i]);
+	fmin[2] = (fmin[2] == -1.0) ? fval : MIN(fmin[2], fval);
+	fmax[2] = (fmax[2] == -1.0) ? fval : MAX(fmax[2], fval);
+	sum[2] += (double)fval;
+	sumsq[2] += (double)(fval * fval);
+
+	/*====== Abs_Grad2 =======*/
+	fval = (1.0 / 3) * abs((int)val1 - (int)val2);
+	fmin[3] = (fmin[3] == -1.0) ? fval : MIN(fmin[3], fval);
+	fmax[3] = (fmax[3] == -1.0) ? fval : MAX(fmax[3], fval);
+	sum[3] += (double)fval;
+	sumsq[3] += (double)(fval * fval);
+
+	/*====== Abs_Grad3 =======*/
+	fval = 0.5 * abs((int)ptr16[*(tblr + j) + i - 1] - (int)ptr16[*(tblr + j) + i] +
+		((int)ptr16[*(tblr + j - 1) + i - 1] + (int)ptr16[*(tblr + j + 1) + i - 1]
+			- (int)ptr16[*(tblr + j - 1) + i] - (int)ptr16[*(tblr + j + 1) + i]) / 2);
+	fmin[4] = (fmin[4] == -1.0) ? fval : MIN(fmin[4], fval);
+	fmax[4] = (fmax[4] == -1.0) ? fval : MAX(fmax[4], fval);
+	sum[4] += (double)fval;
+	sumsq[4] += (double)(fval * fval);
+
+	/*====== Abs_Grad4 =======*/
+	fval = (1.0 / 4) * (
+		abs((int)ptr16[*(tblr + j - 1) + i - 1] - (int)ptr16[*(tblr + j) + i])
+		+ abs((int)ptr16[*(tblr + j) + i - 1] - (int)ptr16[*(tblr + j - 1) + i])
+		+ abs((int)ptr16[*(tblr + j) + i - 1] - (int)ptr16[*(tblr + j + 1) + i])
+		+ abs((int)ptr16[*(tblr + j + 1) + i - 1] - (int)ptr16[*(tblr + j) + i]));
+	fmin[5] = (fmin[5] == -1.0) ? fval : MIN(fmin[5], fval);
+	fmax[5] = (fmax[5] == -1.0) ? fval : MAX(fmax[5], fval);
+	sum[5] += (double)fval;
+	sumsq[5] += (double)(fval * fval);
+	}
 }
 //----------------------------------------------------------------------
 /** \brief Allow the user to scroll through the slices with the mouse wheel. */
-void Owen2dCanvas::OnMouseWheel ( wxMouseEvent& e ) {
-	Owen2dFrame*  sf = dynamic_cast<Owen2dFrame*>(m_parent_frame);
+void Owen2dCanvas::OnMouseWheel(wxMouseEvent& e) {
+	Owen2dFrame* sf = dynamic_cast<Owen2dFrame*>(m_parent_frame);
 	sf->OnMouseWheel(e);
 }
+
+//owen undo/redo func implementations
+/** \brief undo will render undone the most recent action performed on the mask.
+    this means that it will do the opposite of what action is stored on the object in mask_state
+    \param ind index of object in mask_state which will be undone*/
+void Owen2dCanvas::undo(int ind) {
+	if (ind > 0) ind = clump(ind); //call clump only if ind > 0
+	int tempBrush = paint_brush_size; //save copy of current brush size
+	if (mask_state.at(ind)->getAct() == ACTION_PAINT) {
+		//brush size positive -> UndoPaint obj
+		if (mask_state.at(ind)->getBrushSize() > 0) {
+			paint_brush_size = mask_state.at(ind)->getBrushSize(); //set brush size to indexed obj size
+			erase_mask(mask_state.at(ind)->getX(), mask_state.at(ind)->getY());
+		}
+		//else if has positive timestamp -> XPaint obj
+		else if (mask_state.at(ind)->getTime() > 0 || mask_state.at(ind)->getTime() == -1) {
+			wipeCanvas(ind);
+		}
+	}
+	redraw(ind); //redraw prior objs
+	paint_brush_size = tempBrush; //reset brush size
+	index_mask_state = ind; //if clump did anything, then the index would have changed! we need to indicate as much.
+}
+/** \brief redo will render redone the most recent action performed on the mask.
+	this means that it will do that action which is stored on the object in mask_state
+	\param ind index of object in mask_state which will be redone*/
+void Owen2dCanvas::redo(int ind) {
+	int tempBrush = paint_brush_size; //store temp brush size
+	//brush size positive -> UndoPaint obj
+	if (mask_state.at(ind)->getBrushSize() > 0) {
+		paint_brush_size = mask_state.at(ind)->getBrushSize(); //set brush size to indexed obj size
+		if (mask_state.at(ind)->getAct() == ACTION_PAINT) {
+			paint_mask(mask_state.at(ind)->getX(), mask_state.at(ind)->getY());
+		}
+		else {
+			erase_mask(mask_state.at(ind)->getX(), mask_state.at(ind)->getY());
+		}
+	}
+	//else -> XPaint obj
+	else if (mask_state.at(ind)->getTime() > 0) {
+		//simulate clicks at stored coords
+		fake_obj = true;
+		paint_brush_size = 0;
+		wxMouseEvent e;
+		//have to apply the x,y offsets
+		e.SetX(mask_state.at(ind)->getX()+mTx);
+		e.SetY(mask_state.at(ind)->getY()+mTy);
+		OnLeftDown(e);
+		for (int i = 0; i < mask_state.at(ind)->getLen(); i++) {
+			e.SetX(mask_state.at(ind)->getPointX(i)+mTx);
+			e.SetY(mask_state.at(ind)->getPointY(i)+mTy);
+			//call OnLeftDown() for pointsInX up to the second last;
+			//on second last OnRightDown() should be called which automatically reconnects to anchor
+			if (i < mask_state.at(ind)->getLen() - 1) {
+				OnLeftDown(e);
+			}
+			else {
+				OnRightDown(e);
+			}
+		}
+		if (mask_state.at(ind)->getAct() == ACTION_PAINT) OnLeftDown(e);
+		else OnMiddleDown(e);
+		//must erase new object made at index_mask_state
+		mask_state.erase(mask_state.begin() + mask_state.size() - 1);
+		index_mask_state = ind; //set index_mask_state back to what it originally was (ind)
+		fake_obj = false;
+	}
+	else if (mask_state.at(ind)->getTime() == -1) {
+		//iterate through the psx's pointsInX vector and perform the respective actions
+		int i = 0, curLen = 0, subind = 0;
+		int checkMaskInd = mask_state.at(ind)->getLen();
+		while (i < mask_state.at(ind)->getLen()) {
+			if (mask_state.at(ind)->getPointBrush(i) > 0) {
+				handleU(ind, ACTION_PAINT, i);
+				i++;
+				continue;
+			}
+			else {
+				curLen = mask_state.at(ind)->getPointLen(i);
+				handleX(ind, ACTION_PAINT, i);
+			}
+			i += curLen;
+		}
+		//could be an extra little UndoPaint obj hanging onto the end if the psx was filled w XPaint objs
+		if (mask_state.at(ind)->getPointBrush(checkMaskInd - 1) > 0) {
+			handleU(ind, ACTION_PAINT, checkMaskInd - 1);
+		}
+	}
+	if (mask_state.at(ind)->getAct() == ACTION_PAINT) redraw(ind); //redraw prior objs
+	paint_brush_size = tempBrush; //reset brush size
+}
+/* \brief clump is a function that "clumps" together, in what I am
+calling a "pseudo-XPaint" object, the current indexed object in
+mask_state and those objects prior to it that have timestamps within
+CLUMP_BUFFER milliseconds.
+   \param index index from which this function will iterate backwards to clump other objects*/
+int Owen2dCanvas::clump(int index) {
+	int check = index;
+	if (mask_state.at(index)->getAct() != ACTION_PAINT) { return index; }
+	//"pseudo-XPaint" object; code with -1 for time field
+	XPaint* psx = new XPaint(0, 0, ACTION_PAINT, -1);
+	//is there even anything to clump?
+	long threshold = mask_state.at(index_mask_state)->getTime() - CLUMP_BUFFER; //calc ms threshold to be elligible to clump.
+	int elligible = 0; //num elligible objects prior to indexed object.
+	for (int h = index_mask_state-1; h >= 0; h--) {
+		if (mask_state.at(h)->getAct() == ACTION_PAINT && mask_state.at(h)->getTime() >= threshold) {
+			elligible++;
+			break;
+		}
+	}
+	//if there are no elligible objects to clump, then just return.
+	if (!elligible) { return index; }
+	//otherwise, get clumping!!!
+	if (mask_state.at(index)->getBrushSize() > 0) {
+		long x = mask_state.at(index)->getX();
+		long y = mask_state.at(index)->getY();
+		int b = mask_state.at(index)->getBrushSize();
+		UndoPaint* u = new UndoPaint(x, y, b, -1, -1);
+		psx->addPoint(u);
+		psx->setLen(psx->getLen() + 1);
+		mask_state.erase(mask_state.begin() + index);
+	}
+	else {
+		long x = mask_state.at(index)->getX();
+		long y = mask_state.at(index)->getY();
+		UndoPaint* u = new UndoPaint(x, y, -1, -1, -1); //XPaint objects will be coded as UndoPaint objects by making brushSize -1.
+		psx->addPoint(u);
+		psx->setLen(psx->getLen() + 1);
+		psx->setPointLen(psx->getLen() - 1, mask_state.at(index)->getLen()+1);
+		int checklen = psx->getPointLen(psx->getLen() - 1);
+		for (int i = 0; i < mask_state.at(index)->getLen(); i++) {
+			x = mask_state.at(index)->getPointX(i);
+			y = mask_state.at(index)->getPointY(i);
+			u = new UndoPaint(x, y, -1, -1, -1);
+			psx->addPoint(u);
+			psx->setLen(psx->getLen() + 1);
+		}
+		mask_state.erase(mask_state.begin() + index);
+	}
+	//now we need to add the rest of the objects prior to index_mask_state that are within CLUMP_BUFFER ms.
+	UndoPaint* u1;
+	int lastIndex = 0;
+	for (int j = index-1; j >= 0; j--) {
+		if (mask_state.at(j)->getAct() == ACTION_PAINT && mask_state.at(j)->getTime() >= threshold) {
+			//UndoPaint.
+			if (mask_state.at(j)->getBrushSize() > 0) {
+				long x = mask_state.at(j)->getX();
+				long y = mask_state.at(j)->getY();
+				int b = mask_state.at(j)->getBrushSize();
+				u1 = new UndoPaint(x, y, b, -1, -1);
+				psx->addPoint(u1);
+				psx->setLen(psx->getLen() + 1);
+			}
+			//XPaint.
+			else {
+				long x = mask_state.at(j)->getX();
+				long y = mask_state.at(j)->getY();
+				UndoPaint* u2 = new UndoPaint(x, y, -1, -1, -1); //XPaint objects will be coded as UndoPaint objects by making brushSize -1.
+				psx->addPoint(u2);
+				int check = mask_state.at(j)->getLen();
+				psx->setLen(psx->getLen() + 1);
+				psx->setPointLen(psx->getLen() - 1, mask_state.at(j)->getLen()+1);
+				for (int k = 0; k < mask_state.at(j)->getLen(); k++) {
+					x = mask_state.at(j)->getPointX(k);
+					y = mask_state.at(j)->getPointY(k);
+					u2 = new UndoPaint(x, y, -1, -1, -1);
+					psx->addPoint(u2);
+					psx->setLen(psx->getLen() + 1);
+				}
+			}
+			lastIndex = j; //update lastIndex
+			mask_state.erase(mask_state.begin() + j); //now delete currently indexed object from mask_state.
+		}
+	}
+	//now insert the clump at index_mask_state
+	mask_state.insert(mask_state.begin() + lastIndex, psx);
+	return lastIndex;
+}
+/* \brief handleX handles drawing/erasing XPaint objects;
+passes index of obj in mask_state, the subindex (if UndoPaint-coded XPaint obj in psuedo x-paint),
+and the kind of action that needs to be performed.
+THE HANDLER EXECUTES THE ACTION GIVEN! I.E., IF YOU PASS ACTION_PAINT, IT WILL PAINT THE INDEXED OBJ!
+    \param index index of object in mask_state to be handled
+	\param act action to be done by this function
+	\param subindex default value = 0; only used if psx object*/
+void Owen2dCanvas::handleX(int index, int act, int subindex = 0) {
+	if (act != ACTION_PAINT && act != ACTION_ERASE) return;
+	//if not psx
+	if (mask_state.at(index)->getTime() > 0) {
+		//simulate clicks at stored coords
+		fake_obj = true;
+		paint_brush_size = 0;
+		wxMouseEvent e;
+		//have to apply the x,y offsets
+		e.SetX(mask_state.at(index)->getX() + mTx);
+		e.SetY(mask_state.at(index)->getY() + mTy);
+		OnLeftDown(e);
+		for (int i = 0; i < mask_state.at(index)->getLen(); i++) {
+			e.SetX(mask_state.at(index)->getPointX(i) + mTx);
+			e.SetY(mask_state.at(index)->getPointY(i) + mTy);
+			//call OnLeftDown() for pointsInX up to the second last;
+			//on second last OnRightDown() should be called which automatically reconnects to anchor
+			if (i < mask_state.at(index)->getLen() - 1) {
+				OnLeftDown(e);
+			}
+			else {
+				OnRightDown(e);
+			}
+		}
+		if (act == ACTION_PAINT) OnLeftDown(e);
+		else OnMiddleDown(e);
+		//must erase new object made at index_mask_state
+		mask_state.erase(mask_state.begin() + mask_state.size() - 1);
+		index_mask_state = index; //set index_mask_state back to what it originally was (ind)
+		fake_obj = false;
+	}
+	//if psx, mostly the same as above except we traverse through the psx object
+	else {
+		//simulate clicks at stored coords
+		fake_obj = true;
+		paint_brush_size = 0;
+		wxMouseEvent e;
+		//have to apply the x,y offsets
+		e.SetX(mask_state.at(index)->getPointX(subindex) + mTx);
+		e.SetY(mask_state.at(index)->getPointY(subindex) + mTy);
+		int checkSubIndexLen = mask_state.at(index)->getPointLen(subindex);
+		OnLeftDown(e);
+		for (int i = subindex+1; i < subindex + mask_state.at(index)->getPointLen(subindex); i++) {
+			e.SetX(mask_state.at(index)->getPointX(i) + mTx);
+			e.SetY(mask_state.at(index)->getPointY(i) + mTy);
+			//call OnLeftDown() for pointsInX up to the second last;
+			//on second last OnRightDown() should be called which automatically reconnects to anchor
+			if (i < subindex + mask_state.at(index)->getPointLen(subindex) - 1) {
+				OnLeftDown(e);
+			}
+			else {
+				OnRightDown(e);
+			}
+		}
+		if (act == ACTION_PAINT) OnLeftDown(e);
+		else OnMiddleDown(e);
+		//must erase new object made at index_mask_state
+		mask_state.erase(mask_state.begin() + mask_state.size() - 1);
+		index_mask_state = index; //set index_mask_state back to what it originally was (ind)
+		fake_obj = false;
+	}
+}
+/* \brief handleU handles drawing/erasing UndoPaint objects;
+passes index of obj in mask_state, the subindex (if UndoPaint-coded XPaint obj in psuedo x-paint),
+and the kind of action that needs to be performed.
+THE HANDLER EXECUTES THE ACTION GIVEN! I.E., IF YOU PASS ACTION_PAINT, IT WILL PAINT THE INDEXED OBJ!
+	\param index index of object in mask_state to be handled
+	\param act action to be done by this function
+	\param subindex default value = 0; only used if psx object*/
+void Owen2dCanvas::handleU(int index, int act, int subindex = 0) {
+	if (act != ACTION_PAINT && act != ACTION_ERASE) return;
+	//if not psx
+	if (mask_state.at(index)->getTime() > 0) {
+		paint_brush_size = mask_state.at(index)->getBrushSize();
+		if (act == ACTION_PAINT) {
+			paint_mask(mask_state.at(index)->getX(), mask_state.at(index)->getY());
+		}
+		else {
+			erase_mask(mask_state.at(index)->getX(), mask_state.at(index)->getY());
+		}
+	}
+	else {
+		paint_brush_size = mask_state.at(index)->getPointBrush(subindex);
+		if (act == ACTION_PAINT) {
+			paint_mask(mask_state.at(index)->getPointX(subindex), mask_state.at(index)->getPointY(subindex));
+		}
+		else {
+			erase_mask(mask_state.at(index)->getPointX(subindex), mask_state.at(index)->getPointY(subindex));
+		}
+	}
+}
+/* \brief redraws all objects added before the specified index.
+this is done so that if, for example, the user performs an
+undo/redo that overlaps with previously drawn mask segments,
+the original shapes of those prior mask segments will be maintained.
+   \param index redraws objects starting at index-1*/
+void Owen2dCanvas::redraw(int index) {
+	if (index == 0) return;
+	int k;
+	//at zero but not at_zero == false
+	if (index == 0) k = 0;
+	else k = index - 1;
+	for (int p = k; p >= 0; p--) {
+		//only need to redraw what was actually drawn
+		if (mask_state.at(p)->getAct() == ACTION_PAINT) {
+			if (mask_state.at(p)->getBrushSize() > 0) handleU(p, mask_state.at(p)->getAct());
+			else if (mask_state.at(p)->getTime() > 0) handleX(p, mask_state.at(p)->getAct());
+			else {
+				int i = 0, curLen = 0, subind = 0;
+				int checkMaskInd = mask_state.at(p)->getLen();
+				while (i < checkMaskInd) {
+					if (mask_state.at(p)->getPointBrush(i) > 0) {
+						handleU(p, ACTION_PAINT, i);
+						i++;
+						continue;
+					}
+					else {
+						curLen = mask_state.at(p)->getPointLen(i);
+						handleX(p, ACTION_PAINT, i);
+					}
+					i += curLen;
+				}
+				//could be an extra little UndoPaint obj hanging onto the end if the psx was filled w XPaint objs
+				if (mask_state.at(p)->getPointBrush(checkMaskInd - 1) > 0) {
+					handleU(p, ACTION_PAINT, checkMaskInd - 1);
+				}
+			}
+		}
+	}
+}
+
+/** \brief wipeCanvas simulates an XPaint object to erase the whole mask on on this slice.
+*   could probably be implemented  better via CAVASS's delete object funtion.
+*   \param index used to reset index_mask_state so indexing is not messed up*/
+void Owen2dCanvas::wipeCanvas(int index) {
+	fake_obj = true;
+	paint_brush_size = 0;
+	wxMouseEvent e;
+	//have to apply the x,y offsets
+	e.SetX(0+mTx); e.SetY(0+mTy);
+	OnLeftDown(e);
+	e.SetX(0+mTx); e.SetY(BOT_LEFT_Y+mTy);
+	OnLeftDown(e);
+	e.SetX(BOT_RIGHT_X+mTx); e.SetY(BOT_RIGHT_Y+mTy);
+	OnLeftDown(e);
+	e.SetX(TOP_RIGHT_X+mTx); e.SetY(0+mTy);
+	OnRightDown(e);
+	OnMiddleDown(e);
+	//must erase new object made at index_mask_state
+	mask_state.erase(mask_state.begin() + mask_state.size() - 1);
+	index_mask_state = index;
+	fake_obj = false;
+}
+
+/* \brief ResetStates should only be called when the user changes the slice they're on;
+it resets the state vector and index so undo/redo functionality is slice dependent*/
+void Owen2dCanvas::ResetStates() {
+	mask_state.clear();
+	index_mask_state = 0;
+	fake_obj = false;
+	at_zero = false;
+}
+//end owen undo/redo implementations
 
 
 //----------------------------------------------------------------------
 IMPLEMENT_DYNAMIC_CLASS ( Owen2dCanvas, wxPanel )
 BEGIN_EVENT_TABLE       ( Owen2dCanvas, wxPanel )
     EVT_CHAR(             Owen2dCanvas::OnChar         )
+	EVT_KEY_UP       ( Owen2dCanvas::OnUndoRedo)
     EVT_ERASE_BACKGROUND( MainCanvas::OnEraseBackground )
     EVT_LEFT_DOWN(        Owen2dCanvas::OnLeftDown     )
     EVT_LEFT_UP(          Owen2dCanvas::OnLeftUp       )
