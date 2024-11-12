@@ -119,6 +119,32 @@ class Preferences {
         _PETCenter       = _preferences->Read( "PETCenter",       _PETCenter       );
         _PETWidth        = _preferences->Read( "PETWidth",        _PETWidth        );
 
+        //owen save/load prefs values
+        //layout values
+        _scale = _preferences->ReadDouble("Scale", _scale);
+        _onLabel = _preferences->Read("Labels", _onLabel);
+        //paint values
+        _brushSize = _preferences->Read("BrushSize", _brushSize);
+        //gray map values
+        _grayLevel = _preferences->Read("GrayLevel", _grayLevel);
+        _grayWidth = _preferences->Read("GrayWidth", _grayWidth);
+        _invert = _preferences->Read("GrayInvert", _invert);
+
+        //owen button size values
+        _buttonWidth = _preferences->Read("ButtonWidth", _buttonWidth);
+        _buttonHeight = _preferences->Read("ButtonHeight", _buttonHeight);
+        //for radio button
+        _smallPressed = _preferences->Read("SmallPressed", _smallPressed);
+        _medPressed = _preferences->Read("MedPressed", _medPressed);
+        _largePressed = _preferences->Read("LargePressed", _largePressed);
+        //default scalar vals
+        _smallSize = _preferences->ReadDouble("SmallScalar", _smallSize);
+        _medSize = _preferences->ReadDouble("MedScalar", _medSize);
+        _largeSize = _preferences->ReadDouble("LargeScalar", _largeSize);
+        //more ui scalar stuff; this is for the slider
+        _uiScalar = _preferences->ReadDouble("UIScalar", _uiScalar);
+        //end owen values
+
         for (int i=0; i<FileCount; i++) {
             wxString  tmp = wxString::Format( "file%d", i );
             _file[i] = _preferences->Read( tmp, _file[i] );
@@ -228,6 +254,103 @@ class Preferences {
         return _PETWidth;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    //owen implementations
+    /* \brief accessor for canvas scale*/
+    static double getScaleVal(void) {
+        Preferences::Instance();
+        return _scale;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for canvas label*/
+    static bool getLabelVal(void) {
+        Preferences::Instance();
+        return _onLabel;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for paint brush size*/
+    static int getBrushSize(void) {
+        Preferences::Instance();
+        return _brushSize;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for gray map center*/
+    static int getGrayLevel(void) {
+        Preferences::Instance();
+        return _grayLevel;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for gray map width*/
+    static int getGrayWidth(void) {
+        Preferences::Instance();
+        return _grayWidth;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for canvas invert*/
+    static bool getInvertVal(void) {
+        Preferences::Instance();
+        return _invert;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for button width*/
+    static int getButtonWidth(void) {
+        Preferences::Instance();
+        return _buttonWidth;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for button height*/
+    static int getButtonHeight(void) {
+        Preferences::Instance();
+        return _buttonHeight;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for small pressed; true - small last pressed*/
+    static bool getSmallPressed(void) {
+        Preferences::Instance();
+        if (_smallPressed)
+            return true;
+        return false;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for medium pressed; true - medium last pressed*/
+    static bool getMedPressed(void) {
+        Preferences::Instance();
+        if (_medPressed)
+            return true;
+        return false;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for large pressed; true - large last pressed*/
+    static bool getLargePressed(void) {
+        Preferences::Instance();
+        if (_largePressed)
+            return true;
+        return false;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for scalar associated with small button*/
+    static int getSmallScalar(void) {
+        Preferences::Instance();
+        return _smallSize;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for scalar associated with medium button*/
+    static int getMedScalar(void) {
+        Preferences::Instance();
+        return _medSize;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for scalar associated with large button*/
+    static int getLargeScalar(void) {
+        Preferences::Instance();
+        return _largeSize;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief accessor for continuous scalar value*/
+    static double getSliderScalar(void) {
+        Preferences::Instance();
+        return _uiScalar;
+    }
+    //end owen impementations
     static wxString getFile ( int which ) {
         assert( 0<=which && which<FileCount );
         Preferences::Instance();
@@ -774,7 +897,125 @@ class Preferences {
     /** \todo add additional preference mutators here. */
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    //owen implementations
+    /* \brief mutator for canvas scale value*/
+    static void setScaleVal(double newValue) {
+        Preferences::Instance();
+        _scale = newValue;
+        _preferences->Write("Scale", _scale);
+        Preferences::DeleteInstance();
+    }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief mutator for canvas label value*/
+    static void setLabelVal(bool newValue) {
+        Preferences::Instance();
+        _onLabel = newValue;
+        _preferences->Write("Labels", _onLabel);
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief mutator for paint brush size*/
+    static void setBrushSize(int newValue) {
+        Preferences::Instance();
+        _brushSize = newValue;
+        _preferences->Write("BrushSize", _brushSize);
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief mutator for gray map center*/
+    static void setGrayLevel(int newValue) {
+        Preferences::Instance();
+        _grayLevel = newValue;
+        _preferences->Write("GrayLevel", _grayLevel);
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief mutator for gray map width*/
+    static void setGrayWidth(int newValue) {
+        Preferences::Instance();
+        _grayWidth = newValue;
+        _preferences->Write("GrayWidth", _grayWidth);
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief mutator for gray map invert*/
+    static void setInvertVal(bool newValue) {
+        Preferences::Instance();
+        _invert = newValue;
+        _preferences->Write("GrayInvert", _invert);
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief mutator for button width*/
+    static void setButtonWidth(int newValue) {
+        Preferences::Instance();
+        _buttonWidth = newValue * 90;
+        _preferences->Write("ButtonWidth", _buttonWidth);
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /* \brief mutator for button height*/
+    static void setButtonHeight(int newValue) {
+        Preferences::Instance();
+        _buttonHeight = newValue * 22;
+        _preferences->Write("ButtonHeight", _buttonHeight);
+        Preferences::DeleteInstance();
+    }
+    /* \brief mutator for small pressed*/
+    static void setSmallPressed() {
+        Preferences::Instance();
+        _smallPressed = true;
+        _medPressed = false;
+        _largePressed = false;
+        _preferences->Write("SmallPressed", _smallPressed);
+        _preferences->Write("MedPressed", _medPressed);
+        _preferences->Write("LargePressed", _largePressed);
+    }
+    /* \brief mutator for medium pressed*/
+    static void setMedPressed() {
+        Preferences::Instance();
+        _smallPressed = false;
+        _medPressed = true;
+        _largePressed = false;
+        _preferences->Write("SmallPressed", _smallPressed);
+        _preferences->Write("MedPressed", _medPressed);
+        _preferences->Write("LargePressed", _largePressed);
+    }
+    /* \brief mutator for large pressed*/
+    static void setLargePressed() {
+        Preferences::Instance();
+        _smallPressed = false;
+        _medPressed = false;
+        _largePressed = true;
+        _preferences->Write("SmallPressed", _smallPressed);
+        _preferences->Write("MedPressed", _medPressed);
+        _preferences->Write("LargePressed", _largePressed);
+    }
+    /* \brief mutator for small scalar*/
+    static void setSmallScalar(double d) {
+        Preferences::Instance();
+        _smallSize = d;
+        _preferences->Write("SmallSize", _smallSize);
+    }
+    /* \brief mutator for medium scalar*/
+    static void setMedScalar(double d) {
+        Preferences::Instance();
+        _medSize = d;
+        _preferences->Write("MedSize", _medSize);
+    }
+    /* \brief mutator for large scalar*/
+    static void setLargeScalar(double d) {
+        Preferences::Instance();
+        _largeSize = d;
+        _preferences->Write("LargeSize", _largeSize);
+    }
+    /* \brief mutator for slider scalar*/
+    static void setSliderScalar(double d) {
+        Preferences::Instance();
+        _uiScalar = d;
+        _preferences->Write("UIScalar", _uiScalar);
+    }
+    //end owen implementations
   private:
     /** \brief ctor - do not use! this is a singleton. */
     Preferences ( void ) { }
@@ -812,6 +1053,34 @@ private:
     static int       _CTSoftTissueCenter, _CTSoftTissueWidth; ///< gray window
     static int       _CTBoneCenter, _CTBoneWidth;             ///< gray window
     static int       _PETCenter, _PETWidth;             ///< gray window
+
+    //owen values
+    //save/load prefs values
+    //layout
+    static double _scale; //canvas scale
+    static bool _onLabel; //labels on/off
+    //paint
+    static int _brushSize; //paint brush size
+    //gray map
+    static int _grayLevel; //gray map level
+    static int _grayWidth; //gray map width
+    static bool _invert; //gray map invert on/off
+
+    //owen button size values
+    static int _buttonWidth;  //button width
+    static int _buttonHeight; //button height
+    //need these for radio button
+    static bool _smallPressed; //small was last pressed
+    static bool _medPressed; //medium was last pressed
+    static bool _largePressed; //large was last pressed
+    //default scalar vals
+    static double _smallSize;
+    static double _medSize;
+    static double _largeSize;
+
+    //more ui scalar stuff; this is for the slider
+    static double _uiScalar;
+    //end owen values
 
     static wxString  _file[ Preferences::FileCount ];
 
