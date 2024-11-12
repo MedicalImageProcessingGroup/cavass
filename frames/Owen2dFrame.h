@@ -198,7 +198,8 @@ class Owen2dFrame : public MainFrame {
 		ID_FEATURE_DISPLAY, ID_FEATURE, ID_FEATURE_STATUS,
 		ID_TRANSFORM, ID_TRANSFORM_SELECT, ID_FEATURE_UPDATE,
 		ID_MIN_POINTS, ID_ALPHA, ID_BETA, ID_GAMMA,
-		ID_WEIGHT, ID_MEAN, ID_STD_DEV, ID_FEATURE_MIN, ID_FEATURE_MAX
+		ID_WEIGHT, ID_MEAN, ID_STD_DEV, ID_FEATURE_MIN, ID_FEATURE_MAX,
+		ID_SAVE_PREFS, ID_LOAD_PREFS, ID_UNDO_BUTTON, ID_REDO_BUTTON
     };
     int  mFileOrDataCount;  ///< count data/datafiles used (1 for this example).
 	Owen2dCanvas *tCanvas;
@@ -224,6 +225,10 @@ class Owen2dFrame : public MainFrame {
 	wxCheckBox    *m_overlay;
 	wxCheckBox    *m_layout;
 	wxButton*      m_setOutputBut;
+	wxButton*      m_savePrefs;
+	wxButton*      m_loadPrefs;
+	wxButton*      m_undoButton;
+	wxButton*      m_redoButton;
 	int out_object;
 	int OUTPUT_DATA_TYPE;
 
@@ -253,6 +258,12 @@ class Owen2dFrame : public MainFrame {
     virtual void OnInput           ( wxCommandEvent& unused );
 	virtual void OnMouseWheel      ( wxMouseEvent& e );
     virtual void OnNext            ( wxCommandEvent& unused );
+	//owen funcs
+	virtual void OnSavePrefs       (wxCommandEvent& unused);
+	virtual void OnLoadPrefs       (wxCommandEvent& unused);
+	virtual void OnUndo            (wxCommandEvent& unused);
+	virtual void OnRedo            (wxCommandEvent& unused);
+	//end owen
     virtual void OnOpen            ( wxCommandEvent& unused );
     virtual void OnPrevious        ( wxCommandEvent& unused );
     virtual void OnPrint           ( wxCommandEvent& unused );
