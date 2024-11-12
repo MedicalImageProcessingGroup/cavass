@@ -343,6 +343,19 @@ protected:
     void reload ( void );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     void OnChar       ( wxKeyEvent&   e );
+	//owen funcs
+    void OnUndoRedo   ( wxKeyEvent&   e );
+	void undo         ( int ind         );
+	void redo         ( int ind         );
+	void ResetStates  (                 );
+	void urhandler    ( int kc          );
+	void afterUndo    (                 );
+	int clump         ( int index       );
+	void handleX      (int index, int act, int subindex);
+	void handleU      (int index, int act, int subindex);
+	void redraw       (int index        );
+	void wipeCanvas   (int index        );
+	//end owen funcs
     void OnLeftDown   ( wxMouseEvent& e );
     void OnLeftUp     ( wxMouseEvent& e );
     void OnMiddleDown ( wxMouseEvent& e );
