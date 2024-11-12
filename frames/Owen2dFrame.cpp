@@ -32,9 +32,15 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 //======================================================================
 #include  "cavass.h"
+#include "SuperUndo.h"
 #include  "wx/html/htmlwin.h"
+#include <iostream>
+#include <vector>
+#include <wx/log.h>
+using namespace std;
 
 #define s2dControlsHeight ((buttonHeight+1)*8+50)
+#define log(S)  {  cout << S << endl;  wxLogMessage( S );  }
 
 extern Vector  gFrameList;
 
@@ -77,6 +83,12 @@ Owen2dFrame::Owen2dFrame ( bool maximize, int w, int h )
 	m_setOutputBut = NULL;
 	m_buttonBox = NULL;
 	m_buttonSizer = NULL;
+	//owen
+	m_savePrefs = NULL;
+	m_loadPrefs = NULL;
+	m_undoButton = NULL;
+	m_redoButton = NULL;
+	//end owen
 	fgs = NULL;
 	mAuxControls = NULL;
 	modeName[Owen2dCanvas::LWOF] = "LWOF";
@@ -191,29 +203,70 @@ void Owen2dFrame::initializeMenu ( void ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Owen2dFrame::OnHelp ( wxCommandEvent& e ) {
+#ifdef WIN32
+    string help = "<body bgcolor=\"ivory\"><pre>\
+<b>map 1 button (B) to 3 button (L M R) mouse:</b> \n\
+  B &rarr; L \n\
+  ctrl+B &rarr; M (or shift+B &rarr; M) \n\
+  alt+B &rarr; R\
+<hr/>\
+<b>map 2 button (L R) to 3 button (L M R) mouse:</b> \n\
+  L &rarr; L \n\
+  ctrl+L &rarr; M (or shift+L &rarr; M) \n\
+  R &rarr; R\
+<hr/>\
+<b>One by WACOM tablet (mod. no. CTL-472)</b> \n\
+<b>map stylus/pen w/ 2 buttons (a,b) + tip (t) pressed on tablet:</b> \n\
+  standard tablet behavior: \n\
+    t &rarr; L \n\
+    pen hovering over tablet no more than 0.5cm away and pressing a &rarr; M \n\
+    pen hovering over tablet no more than 0.5cm away and pressing b &rarr; R \n\
+  additionally (in interactive 2d only): \n\
+    ctrl+t (or shift+t) &rarr; M \n\
+    alt+t &rarr; R \n\
+  where a=button closer to tip, b=button further from tip, and t=tip pressed on tablet\
+<hr/>\
+<b>Gaomo Graphics IPS Pen Display (mod. no. PDP1161).</b> \n\
+  Note: You <em>must</em> install their driver. \n\
+  in interactive 2d <em>only</em>: \n\
+    t &rarr; L \n\
+    ctrl+t (or shift+t) &rarr; M \n\
+    alt+t &rarr; R \n\
+  where a=button closer to tip, b=button further from tip, and t=tip pressed on tablet \n\
+</pre></body>";
+#else  //linux (and mac?)
+    string help = "<body bgcolor=\"ivory\"><pre>\
+<b>map 1 button (B) to 3 button (L M R) mouse:</b> \n\
+  B &rarr; L \n\
+  ctrl+B &rarr; M (or shift+B &rarr; M) \n\
+  alt+B &rarr; R\
+<hr/>\
+<b>map 2 button (L R) to 3 button (L M R) mouse:</b> \n\
+  L &rarr; L \n\
+  ctrl+L &rarr; M (or shift+L &rarr; M) \n\
+  R &rarr; R\
+<hr/>\
+<b>One by WACOM tablet (mod. no. CTL-472).</b> \n\
+<b>Gaomo Graphics IPS Pen Display (mod. no. PDP1161).</b> \n\
+<b>map stylus/pen w/ 2 buttons (a,b) + tip (t) pressed on tablet:</b> \n\
+  standard tablet behavior: \n\
+    t &rarr; L \n\
+    pen hovering over tablet no more than 0.5cm away and pressing a &rarr; M \n\
+    pen hovering over tablet no more than 0.5cm away and pressing b &rarr; R \n\
+  additionally (in interactive 2d only): \n\
+    ctrl+t (or shift+t) &rarr; M \n\
+    alt+t &rarr; R \n\
+  where a=button closer to tip, b=button further from tip, and t=tip pressed on tablet \n\
+</pre></body>";
+#endif
+
     wxDialog dlg( NULL, wxID_ANY, wxString(_("Owen2d help")), wxDefaultPosition,
                   wxDefaultSize, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER );
     wxBoxSizer* sizer = new wxBoxSizer( wxVERTICAL );
     wxHtmlWindow* html = new wxHtmlWindow( &dlg, wxID_ANY, wxDefaultPosition ); //,
                                            //wxSize(600, 400) ); //, wxHW_SCROLLBAR_NEVER );
     html->SetInitialSize( wxSize(600,400) );
-
-    //set the source of the html help
-    wxString h( "file://" );
-    h += Preferences::getHome();
-    h += "/help/";
-#ifdef WIN32
-    h += "owen2dframe-win.html" );
-#else
-    h += "owen2dframe-mac-linux.html";
-#endif
-    if (!html->LoadPage(h)) {
-        h += " not found.";
-        html->SetPage( h );
-    } else {
-        printf( "loaded %s. \n", (const char*)h.c_str() );
-    }
-
+    html->SetPage( help );
     sizer->Add( html, 1, wxALL | wxEXPAND, 10 );
     wxButton* but = new wxButton( &dlg, wxID_OK, _("OK") );
     but->SetDefault();
@@ -225,40 +278,60 @@ void Owen2dFrame::OnHelp ( wxCommandEvent& e ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief add the button box that appears on the lower right. */
 void Owen2dFrame::addButtonBox ( void ) {
+	/*
+	int bWidth = Preferences::getButtonWidth();
+	int bHeight = Preferences::getButtonHeight();
+	*/
+	//new UI scaling implementation: first get the scalar from preferences
+	double uiScalar = Preferences::getSliderScalar();
+	//now multiply by the scalar and round down (cast to int)
+	int bWidth = (int)(buttonWidth * uiScalar);
+	int bHeight = (int)(buttonHeight * uiScalar);
     //box for buttons
     mBottomSizer->Add( 0, 5, 10, wxGROW );  //spacer
     m_buttonBox = new wxStaticBox( mControlPanel, -1, "" );
     ::setColor( m_buttonBox );
     m_buttonSizer = new wxStaticBoxSizer( m_buttonBox, wxHORIZONTAL );
     fgs = new wxFlexGridSizer( 2, 1, 1 );  //2 cols,vgap,hgap
+	//owen adding undo/redo
+	//add save preferences button (written by owen)
+	//undo button
+	m_undoButton = new wxButton(mControlPanel, ID_UNDO_BUTTON, "Undo", wxDefaultPosition, wxSize(bWidth, bHeight));
+	::setColor(m_undoButton);
+	fgs->Add(m_undoButton, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 0);
+	//redo button
+	//add save preferences button (written by owen)
+	m_redoButton = new wxButton(mControlPanel, ID_REDO_BUTTON, "Redo", wxDefaultPosition, wxSize(bWidth, bHeight));
+	::setColor(m_redoButton);
+	fgs->Add(m_redoButton, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 0);
     //row 1, col 1
-    m_prev = new wxButton( mControlPanel, ID_PREVIOUS, "Previous", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    m_prev = new wxButton( mControlPanel, ID_PREVIOUS, "Previous", wxDefaultPosition, wxSize(bWidth,bHeight) );
     ::setColor( m_prev );
     fgs->Add( m_prev, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 1, col 2
-    m_next = new wxButton( mControlPanel, ID_NEXT, "Next", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    m_next = new wxButton( mControlPanel, ID_NEXT, "Next", wxDefaultPosition, wxSize(bWidth,bHeight) );
     ::setColor( m_next );
     fgs->Add( m_next, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 2, col 1
-    m_setIndex = new wxButton( mControlPanel, ID_SET_INDEX, "SetIndex", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    m_setIndex = new wxButton( mControlPanel, ID_SET_INDEX, "SetIndex", wxDefaultPosition, wxSize(bWidth,bHeight) );
     ::setColor( m_setIndex );
     fgs->Add( m_setIndex, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 2, col 2
-    m_grayMap = new wxButton( mControlPanel, ID_GRAYMAP, "GrayMap", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    m_grayMap = new wxButton( mControlPanel, ID_GRAYMAP, "GrayMap", wxDefaultPosition, wxSize(bWidth,bHeight) );
     ::setColor( m_grayMap );
     fgs->Add( m_grayMap, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 3
-	mModeLabel = new wxStaticText( mControlPanel, wxID_ANY, "Mode:" );
+	mModeLabel = new wxStaticText( mControlPanel, wxID_ANY, "Mode:");
 	fgs->Add( mModeLabel, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     Owen2dCanvas*  canvas = dynamic_cast<Owen2dCanvas*>(mCanvas);
 	wxArrayString sa;
 	for (int j=0; j<canvas->num_detection_modes; j++)
 		sa.Add(modeName[canvas->detection_modes[j]]);
-	mMode = new wxComboBox( mControlPanel, ID_MODE, modeName[canvas->detection_mode], wxDefaultPosition, wxSize(buttonWidth,buttonHeight), sa, wxCB_READONLY );
+	mMode = new wxComboBox( mControlPanel, ID_MODE, modeName[canvas->detection_mode], wxDefaultPosition, wxSize(bWidth,bHeight), sa, wxCB_READONLY );
 	::setColor( mMode );
     fgs->Add( mMode, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 4, col 1
-    m_reset = new wxButton( mControlPanel, ID_RESET, "Reset", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    m_reset = new wxButton( mControlPanel, ID_RESET, "Reset", wxDefaultPosition, wxSize(bWidth,bHeight) );
     ::setColor( m_reset );
     fgs->Add( m_reset, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 4, col 2
@@ -272,19 +345,19 @@ void Owen2dFrame::addButtonBox ( void ) {
 	sa.Clear();
 	for (int j=0; j<9; j++)
 		sa.Add(objectName[j]);
-	m_object = new wxComboBox( mControlPanel, ID_OBJECT, objectName[canvas->object_number], wxDefaultPosition, wxSize(buttonWidth,buttonHeight), sa, wxCB_READONLY );
+	m_object = new wxComboBox( mControlPanel, ID_OBJECT, objectName[canvas->object_number], wxDefaultPosition, wxSize(bWidth,bHeight), sa, wxCB_READONLY );
 	::setColor( m_object );
 	fgs->Add( m_object, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 6, col 1
-	m_deleteObject = new wxButton( mControlPanel, ID_DELETE_OBJECT, "Del. Obj.", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+	m_deleteObject = new wxButton( mControlPanel, ID_DELETE_OBJECT, "Del. Obj.", wxDefaultPosition, wxSize(bWidth,bHeight) );
 	::setColor( m_deleteObject );
 	fgs->Add( m_deleteObject, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 6, col 2
-	m_loadObject = new wxButton( mControlPanel, ID_LOAD_OBJECT, "Load Obj.", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+	m_loadObject = new wxButton( mControlPanel, ID_LOAD_OBJECT, "Load Obj.", wxDefaultPosition, wxSize(bWidth,bHeight) );
 	::setColor( m_loadObject );
 	fgs->Add( m_loadObject, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 7, col 1
-	m_setOutputBut = new wxButton( mControlPanel, ID_SET_OUTPUT, "Set Output", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+	m_setOutputBut = new wxButton( mControlPanel, ID_SET_OUTPUT, "Set Output", wxDefaultPosition, wxSize(bWidth,bHeight) );
 	::setColor( m_setOutputBut );
     fgs->Add( m_setOutputBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 7, col 2
@@ -297,6 +370,14 @@ void Owen2dFrame::addButtonBox ( void ) {
 	::setColor( m_overlay );
 	m_overlay->SetValue( canvas->overlay_flag );
 	fgs->Add( m_overlay, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	//add save preferences button (written by owen)
+	m_savePrefs = new wxButton(mControlPanel, ID_SAVE_PREFS, "Save Pref.", wxDefaultPosition, wxSize(bWidth, bHeight));
+	::setColor(m_savePrefs);
+	fgs->Add(m_savePrefs, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 0);
+	//add load preferences button (written by owen)
+	m_loadPrefs = new wxButton(mControlPanel, ID_LOAD_PREFS, "Load Pref.", wxDefaultPosition, wxSize(bWidth, bHeight));
+	::setColor(m_loadPrefs);
+	fgs->Add(m_loadPrefs, 0, wxALIGN_CENTER_HORIZONTAL | wxALIGN_CENTER_VERTICAL, 0);
 
     m_buttonSizer->Add( fgs, 0, wxGROW|wxALL, 10 );
     mBottomSizer->Add( m_buttonSizer, 0, wxGROW|wxALL, 10 );
@@ -364,6 +445,30 @@ Owen2dFrame::~Owen2dFrame ( void ) {
 		fgs->Detach(m_prev);
 		delete m_prev;
 		m_prev = NULL;
+	}
+	//delete save preferences button (written by owen)
+	if (m_savePrefs != NULL) {
+		fgs->Detach(m_savePrefs);
+		delete m_savePrefs;
+		m_savePrefs = NULL;
+	}
+	//delete load preferences button (written by owen)
+	if (m_loadPrefs != NULL) {
+		fgs->Detach(m_loadPrefs);
+		delete m_loadPrefs;
+		m_loadPrefs = NULL;
+	}
+	//delete undo button (written by owen)
+	if (m_undoButton != NULL) {
+		fgs->Detach(m_undoButton);
+		delete m_undoButton;
+		m_undoButton = NULL;
+	}
+	//delete redo button (written by owen)
+	if (m_redoButton != NULL) {
+		fgs->Detach(m_redoButton);
+		delete m_redoButton;
+		m_redoButton = NULL;
 	}
 	if (fgs!=NULL)
 	{
@@ -603,6 +708,9 @@ void Owen2dFrame::OnPrevious ( wxCommandEvent& unused ) {
 		slice = canvas->getNoSlices(0) - 1;
     canvas->setSliceNo( 0, slice );
     canvas->reload();
+	//owen addition
+	canvas->ResetStates();
+	//end owen addition
     if (mSetIndexControls!=NULL)    mSetIndexControls->setSliceNo( slice );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -614,8 +722,98 @@ void Owen2dFrame::OnNext ( wxCommandEvent& unused ) {
 		slice = 0;
     canvas->setSliceNo( 0, slice );
     canvas->reload();
+	//owen addition
+	canvas->ResetStates();
+	//end owen addition
     if (mSetIndexControls!=NULL)    mSetIndexControls->setSliceNo( slice );
 }
+
+/* \brief OnSavePrefs saves canvas scale, label val, brush size, 
+   gray center, width, and invert to cavass.ini*/
+void Owen2dFrame::OnSavePrefs(wxCommandEvent& unused) {
+	//get instance of the current canvas
+	Owen2dCanvas* canvas = dynamic_cast<Owen2dCanvas*>(mCanvas);
+	//set layout values
+	Preferences::setScaleVal(canvas->getScale());
+	Preferences::setLabelVal(canvas->getLabels());
+	//set paint values
+	Preferences::setBrushSize(canvas->paint_brush_size);
+	//set gray map values
+	Preferences::setGrayLevel(canvas->getCenter(0));
+	Preferences::setGrayWidth(canvas->getWidth(0));
+	Preferences::setInvertVal(canvas->getInvert(0));
+}
+
+/* \brief OnLoadPrefs reads scale, label value, brush size,
+    gray center, width, and invert and sets the value of the canvas object to the read values.*/
+void Owen2dFrame::OnLoadPrefs(wxCommandEvent& unused) {
+	//get instance of current canvas
+	Owen2dCanvas* canvas = dynamic_cast<Owen2dCanvas*>(mCanvas);
+	/*get brushSize as a variable because it needs to be used twice
+	* in this function; the other values only need to be accessed once
+	* (except in the case of the gray map values, but since we access them
+	* from preferences file once and then set them in the canvas. this means
+	* that when we "remake" the gray map controls, we can just pull the values
+	* from the canvas itself with no need to access preferences again.)
+	*/ 
+	int brushSize = Preferences::getBrushSize(); //brush size
+	//now set values in canvas
+	//layout values
+	canvas->setScale(Preferences::getScaleVal());
+	canvas->setLabels(Preferences::getLabelVal());
+	/* to update GrayMap UI, we must essentially "reset"
+	* the GrayMap controls with the new values; first, tho,
+	* the following values need to be set in the canvas:
+	* center, width, and invert. */
+	canvas->setCenter(0, Preferences::getGrayLevel());
+	canvas->setWidth(0, Preferences::getGrayWidth());
+	canvas->setInvert(0, Preferences::getInvertVal());
+	//if the control panel already exists, delete it
+	if (mGrayMapControls != NULL) {
+		delete mGrayMapControls;
+		mGrayMapControls = NULL;
+	}
+	deleteOwen2dControls();
+	//create a new control panel with the new values
+	mGrayMapControls = new GrayMapControls(mControlPanel, mBottomSizer,
+		"Gray Map", canvas->getCenter(0), canvas->getWidth(0),
+		canvas->getMax(0), canvas->getInvert(0),
+		ID_CENTER_SLIDER, ID_WIDTH_SLIDER, ID_INVERT,
+		ID_CT_LUNG, ID_CT_SOFT_TISSUE, ID_CT_BONE, ID_PET);
+
+	//now to update brush size UI
+	//change brush size in canvas
+	canvas->paint_brush_size = brushSize;
+	//delete original aux controls
+	delete mAuxControls;
+	//make new control panel with updated brush size
+	mAuxControls = new Owen2dAuxControls(mControlPanel,
+		mBottomSizer, (modeName[canvas->detection_mode] + " Controls").c_str(),
+		brushSize);
+}
+
+/* owen undo / redo implementation
+* this enum just knows what num wxWidgets uses for keycodes
+* specifically for ctrl+z & ctrl+y; enum'd to prevent hard coding */
+enum owenKeyCodes {
+	UNDO_ACTION = 90,
+	REDO_ACTION = 89
+};
+/*
+   \brief this function is simply for handling the 
+   undo button event. it just calls URHandler in Owen2dCanvas and indicates that it wants to undo.*/
+void Owen2dFrame::OnUndo(wxCommandEvent& unused) {
+	Owen2dCanvas* canvas = dynamic_cast<Owen2dCanvas*>(mCanvas);
+	canvas->urhandler(UNDO_ACTION);
+}
+/* \brief this function is simply for handling the
+* redo button event. it just calls URHandler in Owen2dCanvas
+* and indicates that it wants to redo.*/
+void Owen2dFrame::OnRedo(wxCommandEvent& unused) {
+	Owen2dCanvas* canvas = dynamic_cast<Owen2dCanvas*>(mCanvas);
+	canvas->urhandler(REDO_ACTION);
+}
+//end owen OnUndo() OnRedo() implementation
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Owen2dFrame::OnSetIndex ( wxCommandEvent& unused ) {
     if (mSetIndexControls!=NULL) {
@@ -699,12 +897,13 @@ void Owen2dFrame::OnGrayMap ( wxCommandEvent& unused ) {
         return;
     }
     deleteOwen2dControls();
+	double uiScalar = Preferences::getSliderScalar();
     Owen2dCanvas*  canvas = dynamic_cast<Owen2dCanvas*>(mCanvas);
     mGrayMapControls = new GrayMapControls( mControlPanel, mBottomSizer,
-        "GrayMap", canvas->getCenter(0), canvas->getWidth(0),
+        "Gray Map", canvas->getCenter(0), canvas->getWidth(0),
         canvas->getMax(0), canvas->getInvert(0),
         ID_CENTER_SLIDER, ID_WIDTH_SLIDER, ID_INVERT,
-		ID_CT_LUNG, ID_CT_SOFT_TISSUE, ID_CT_BONE, ID_PET );
+		ID_CT_LUNG, ID_CT_SOFT_TISSUE, ID_CT_BONE, ID_PET, 0);
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for center slider (used to change contrast). */
@@ -1521,6 +1720,12 @@ BEGIN_EVENT_TABLE       ( Owen2dFrame, wxFrame )
   EVT_BUTTON( ID_SET_OUTPUT,       Owen2dFrame::OnSetOutput  )
   EVT_BUTTON( ID_OUT_TYPE,         Owen2dFrame::OnOutputType )
   EVT_BUTTON( ID_SAVE,             Owen2dFrame::OnOwen2dSave)
+  //owen funcs
+  EVT_BUTTON( ID_SAVE_PREFS,       Owen2dFrame::OnSavePrefs)
+  EVT_BUTTON( ID_LOAD_PREFS,       Owen2dFrame::OnLoadPrefs)
+  EVT_BUTTON( ID_UNDO_BUTTON,      Owen2dFrame::OnUndo)
+  EVT_BUTTON( ID_REDO_BUTTON,      Owen2dFrame::OnRedo)
+  //end owen funcs
   EVT_COMBOBOX( ID_MODE,           Owen2dFrame::OnMode       )
   EVT_COMBOBOX( ID_OUT_OBJECT,     Owen2dFrame::OnOutputObject)
   EVT_COMBOBOX( ID_BRUSH_SIZE,     Owen2dFrame::OnBrushSize  )
