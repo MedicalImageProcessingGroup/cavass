@@ -99,6 +99,8 @@ wxPanel* PreferencesDialog::CreateAppearanceSettingsPage ( wxWindow* parent )
     wxBoxSizer*    item     = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer*    bs       = NULL;
     wxCheckBox*    cb       = NULL;
+    wxRadioButton* rb = NULL;
+    wxSlider* sl = NULL;
     wxString       tmp;
 
     //add some space
@@ -168,6 +170,32 @@ wxPanel* PreferencesDialog::CreateAppearanceSettingsPage ( wxWindow* parent )
     bs->Add( 10, 10, 0 );
 
     item->Add( bs, 0, wxGROW|wxALL, 0 );
+
+    //owen - frame button resizer radio buttons
+    bs = new wxBoxSizer(wxHORIZONTAL);
+    wxStaticText* rbText = new wxStaticText(panel, wxID_ANY, "Change UI Scaling:");
+    bs->Add(rbText, 2, wxALIGN_CENTER_VERTICAL);
+    /*
+    rb = new wxRadioButton(panel, ID_SMALL_BUTTONS, _("Small"), wxDefaultPosition, wxDefaultSize);
+    rb->SetValue(Preferences::getSmallPressed());
+    bs->Add(rb, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    rb = new wxRadioButton(panel, ID_MED_BUTTONS, _("Medium"), wxDefaultPosition, wxDefaultSize);
+    bs->Add(rb, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    rb = new wxRadioButton(panel, ID_BIG_BUTTONS, _("Large"), wxDefaultPosition, wxDefaultSize);
+    rb->SetValue(Preferences::getLargePressed());
+    bs->Add(rb, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    */
+    //get current scalar value; value will be a double
+    double currentSlider = Preferences::getSliderScalar();
+    //convert scalar val back to int so it may be displayed on slider
+    currentSlider = (int)(currentSlider * 100);
+    sl = new wxSlider(panel, ID_SCALAR_SLIDER, currentSlider, 100, 200, 
+        wxDefaultPosition, wxSize(sliderWidth, -1),
+        wxSL_HORIZONTAL | wxSL_LABELS | wxSL_TOP,
+        wxDefaultValidator, "Scale");
+    bs->Add(sl, 0, wxALL | wxALIGN_CENTER_VERTICAL, 5);
+    item->Add(bs, 2);
+	//end owen slidr implementation
 
     //reminder message
     bs = new wxBoxSizer( wxHORIZONTAL );
@@ -911,6 +939,10 @@ BEGIN_EVENT_TABLE( PreferencesDialog, wxPropertySheetDialog )
     EVT_RADIOBUTTON( ID_STEREO_MODE_OFF,        PreferencesDialog::OnStereoModeOff        )
     EVT_RADIOBUTTON( ID_STEREO_MODE_INTERLACED, PreferencesDialog::OnStereoModeInterlaced )
     EVT_RADIOBUTTON( ID_STEREO_MODE_ANAGLYPH,   PreferencesDialog::OnStereoModeAnaglyph   )
+    EVT_RADIOBUTTON(ID_SMALL_BUTTONS, PreferencesDialog::OnSmallButton)
+    EVT_RADIOBUTTON(ID_MED_BUTTONS, PreferencesDialog::OnMedButton)
+    EVT_RADIOBUTTON(ID_BIG_BUTTONS, PreferencesDialog::OnBigButton)
+    EVT_COMMAND_SCROLL(ID_SCALAR_SLIDER, PreferencesDialog::OnScalarSlider)
     EVT_CHECKBOX( ID_STEREO_LEFT_ODD,   PreferencesDialog::OnStereoLeftOdd   )
 END_EVENT_TABLE()
 //----------------------------------------------------------------------
