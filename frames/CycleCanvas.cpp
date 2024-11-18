@@ -1367,7 +1367,7 @@ void CycleCanvas::handleMeasureMode ( wxMouseEvent& e ) {
     FILE *fp=NULL;
     if (mSaveFile != wxEmptyString)
     {
-        fp = fopen((const char *)mSaveFile.c_str(), "a");
+        fp = fopen((const char *)mSaveFile.c_str(), "ab");
         if (fp == NULL)
             wxMessageBox("Could not open file.");
     }

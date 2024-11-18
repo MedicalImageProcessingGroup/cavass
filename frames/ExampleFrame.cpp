@@ -47,9 +47,9 @@ ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
     //init the types of input files that this app can accept
     mFileNameFilter     = (char *)"CAVASS files (*.BIM;*.IM0;*.MV0)|*.BIM;*.IM0;*.MV0|DICOM files (*.DCM;*.DICOM;*.dcm;*.dicom)|*.DCM;*.DICOM;*.dcm;*.dicom|image files (*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff)|*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff";
     mFileOrDataCount    = 0;
-    mGrayMapControls    = NULL;
+    mGrayMapControls    = nullptr;
     mModuleName         = "CAVASS:Example";
-    mSaveScreenControls = NULL;
+    mSaveScreenControls = nullptr;
 
     //if we are in the mode that supports having more than one window open
     // at a time, we need to add this window to the list.
@@ -112,7 +112,7 @@ ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
  *  this function does not any additional, custom menu items (but could
  *  if necessary).
  */
-void ExampleFrame::initializeMenu ( void ) {
+void ExampleFrame::initializeMenu ( ) {
     //init standard menu bar and menu items
     MainFrame::initializeMenu();
     //if we are in the mode that supports having more than one window open
@@ -134,51 +134,70 @@ void ExampleFrame::initializeMenu ( void ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief add the button box that appears on the lower right. */
-void ExampleFrame::addButtonBox ( void ) {
+void ExampleFrame::addButtonBox ( ) {
+#if 1
+    mBottomSizer->Add( 0, 0, 1, wxALL );  //spacer
     //box for buttons
-    mBottomSizer->Add( 0, 5, 10, wxGROW );  //spacer
-    m_buttonBox = new wxStaticBox( mControlPanel, -1, "" );
+    m_buttonBox = new wxStaticBox( mControlPanel, wxID_ANY, "Example" );
     ::setColor( m_buttonBox );
-    wxSizer*  buttonSizer = new wxStaticBoxSizer( m_buttonBox, wxHORIZONTAL );
-    wxFlexGridSizer*  fgs = new wxFlexGridSizer( 2, 1, 1 );  //2 cols,vgap,hgap
+    auto buttonSizer = new wxStaticBoxSizer( m_buttonBox, wxVERTICAL );
+    auto gs = new wxGridSizer( 2, 10, 10 );
     //row 1, col 1
-    wxButton*  prev = new wxButton( mControlPanel, ID_PREVIOUS, "Previous", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    auto prev = new wxButton( m_buttonBox, ID_PREVIOUS, "Previous" );
     ::setColor( prev );
-    fgs->Add( prev, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    gs->Add( prev, 1, wxEXPAND, 20 );
     //row 1, col 2
-    wxButton*  next = new wxButton( mControlPanel, ID_NEXT, "Next", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    auto next = new wxButton( m_buttonBox, ID_NEXT, "Next" );
     ::setColor( next );
-    fgs->Add( next, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    gs->Add( next, 1, wxEXPAND, 20 );
     //row 2, col 1
-    wxButton*  grayMap = new wxButton( mControlPanel, ID_GRAYMAP, "GrayMap", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
+    auto grayMap = new wxButton( m_buttonBox, ID_GRAYMAP, "GrayMap" );
     ::setColor( grayMap );
-    fgs->Add( grayMap, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    gs->Add( grayMap, 1, wxEXPAND, 20 );
 
-    buttonSizer->Add( fgs, 0, wxGROW|wxALL, 10 );
-    mBottomSizer->Add( buttonSizer, 0, wxGROW|wxALL, 10 );
+    //buttonSizer->Add( gs, 1, wxGROW|wxALL, 10 );
+    //mBottomSizer->Add( buttonSizer, 0, wxGROW|wxALL, 10 );
+    buttonSizer->Add( gs, 0, 0, 0 );
+    mBottomSizer->Add( buttonSizer, 0, 0, 0 );
+#endif
+#if 0
+    auto panel = new wxPanel( mControlPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER );
+    auto gridSizer = new wxGridSizer(2, 3, 1, 1);
+    // Add widgets to the grid sizer
+    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 1Button1"), 1, wxEXPAND);
+    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 2"), 1, wxEXPAND);
+    gridSizer->Add(new wxButton(panel, wxID_ANY, "Bu3"), 1, wxEXPAND );
+    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 4"), 1, wxEXPAND);
+    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 5"), 1, wxEXPAND);
+    // Set the sizer for the panel
+    panel->SetSizer(gridSizer);
+    // Fit the sizer to the panel
+    gridSizer->Fit(panel);
+    gridSizer->SetSizeHints(panel);
+#endif
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief destructor for ExampleFrame class. */
-ExampleFrame::~ExampleFrame ( void ) {
+ExampleFrame::~ExampleFrame ( ) {
     cout << "ExampleFrame::~ExampleFrame" << endl;
     wxLogMessage( "ExampleFrame::~ExampleFrame" );
 
-    if (mSplitter!=NULL)      { delete mSplitter;      mSplitter=NULL;     }
+    if (mSplitter!=nullptr)      { delete mSplitter;      mSplitter=nullptr;     }
     //the destruction of the above splitter also causes the destruction of the
     // canvas.  so another destruction of the canvas causes BOOM!
-    //if (mCanvas!=NULL)        { delete mCanvas;        mCanvas=NULL;       }
+    //if (mCanvas!=nullptr)        { delete mCanvas;        mCanvas=nullptr;       }
     //it appears that this is already deleted as well.
-    //if (mControlPanel!=NULL)  { delete mControlPanel;  mControlPanel=NULL; }
-    //if (mBottomSizer!=NULL)   { delete mBottomSizer;   mBottomSizer=NULL;  }
-    mCanvas       = NULL;
-    mControlPanel = NULL;
-    mBottomSizer  = NULL;
+    //if (mControlPanel!=nullptr)  { delete mControlPanel;  mControlPanel=nullptr; }
+    //if (mBottomSizer!=nullptr)   { delete mBottomSizer;   mBottomSizer=nullptr;  }
+    mCanvas       = nullptr;
+    mControlPanel = nullptr;
+    mBottomSizer  = nullptr;
     //if we are in the mode that supports having more than one window open
     // at a time, we need to remove this window from the list.
     Vector::iterator  i;
     for (i=::gFrameList.begin(); i!=::gFrameList.end(); i++) {
         if (*i==this) {
-            if (mCanvas!=NULL)  {  delete mCanvas;  mCanvas=NULL;  }
+            if (mCanvas!=nullptr)  {  delete mCanvas;  mCanvas=nullptr;  }
             ::gFrameList.erase( i );
             break;
         }
@@ -315,7 +334,7 @@ void ExampleFrame::OnInput ( wxCommandEvent& unused ) {
  *  \param fname input file name.
  */
 void ExampleFrame::loadFile ( const char* const fname ) {
-    if (fname==NULL || strlen(fname)==0)    return;
+    if (fname==nullptr || strlen(fname)==0)    return;
     if (!wxFile::Exists(fname)) {
         wxString  tmp = wxString::Format( "File %s could not be opened.", fname );
         wxMessageBox( tmp, "File does not exist",
@@ -340,13 +359,13 @@ void ExampleFrame::loadFile ( const char* const fname ) {
     mWindowTitle = tmp;
     SetTitle( mWindowTitle );
 
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
-    assert( canvas != NULL );
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    assert( canvas != nullptr );
     canvas->loadFile( fname );
 	if (!canvas->isLoaded(0))
 	{
 		delete m_buttonBox;
-		m_buttonBox = NULL;
+		m_buttonBox = nullptr;
 		mFileOrDataCount = 0;
 		return;
 	}
@@ -362,13 +381,13 @@ void ExampleFrame::loadFile ( const char* const fname ) {
  *  \todo this is incomplete.
  */
 void ExampleFrame::loadData ( char* name,
-    const int xSize, const int ySize, const int zSize,
-    const double xSpacing, const double ySpacing, const double zSpacing,
-    const int* const data, const ViewnixHeader* const vh,
-    const bool vh_initialized )
+    int xSize, int ySize, int zSize,
+    double xSpacing, double ySpacing, double zSpacing,
+    int* const data, ViewnixHeader* const vh,
+    bool vh_initialized )
 {
     assert( 0 );
-    
+#if 0
     if (name==NULL || strlen(name)==0)  name=(char *)"no name";
     wxString  tmp = wxString::Format( "%s: ", (const char *)mModuleName.c_str() );
     tmp += name;
@@ -383,13 +402,14 @@ void ExampleFrame::loadData ( char* name,
     
     Show();
     Raise();
+#endif
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for Previous button press.  display the previous slice.
  *  \param unused is not used.
  */
 void ExampleFrame::OnPrevious ( wxCommandEvent& unused ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
     int  slice = canvas->getSliceNo(0) - 1;
     if (slice<0)
 		slice = canvas->getNoSlices(0)-1;
@@ -401,7 +421,7 @@ void ExampleFrame::OnPrevious ( wxCommandEvent& unused ) {
  *  \param unused is not used.
  */
 void ExampleFrame::OnNext ( wxCommandEvent& unused ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
     int  slice = canvas->getSliceNo(0) + 1;
     if (slice >= canvas->getNoSlices(0))
 		slice = 0;
@@ -414,16 +434,16 @@ void ExampleFrame::OnNext ( wxCommandEvent& unused ) {
  *  \param unused is not used.
  */
 void ExampleFrame::OnGrayMap ( wxCommandEvent& unused ) {
-    if (mGrayMapControls!=NULL) {
+    if (mGrayMapControls!=nullptr) {
         delete mGrayMapControls;
-        mGrayMapControls = NULL;
+        mGrayMapControls = nullptr;
         return;
     }
-	if (mSaveScreenControls!=NULL) {
+	if (mSaveScreenControls!=nullptr) {
 		delete mSaveScreenControls;
-		mSaveScreenControls = NULL;
+		mSaveScreenControls = nullptr;
 	}
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
     mGrayMapControls = new GrayMapControls( mControlPanel, mBottomSizer,
         "GrayMap", canvas->getCenter(0), canvas->getWidth(0),
         canvas->getMax(0), canvas->getInvert(0),
@@ -433,7 +453,7 @@ void ExampleFrame::OnGrayMap ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for center slider (used to change contrast). */
 void ExampleFrame::OnCenterSlider ( wxScrollEvent& e ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
     if (canvas->getCenter(0)==e.GetPosition())    return;  //no change
     canvas->setCenter( 0, e.GetPosition() );
     canvas->initLUT( 0 );
@@ -442,7 +462,7 @@ void ExampleFrame::OnCenterSlider ( wxScrollEvent& e ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for width slider (used to change contrast). */
 void ExampleFrame::OnWidthSlider ( wxScrollEvent& e ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
     if (canvas->getWidth(0)==e.GetPosition())    return;  //no change
     canvas->setWidth( 0, e.GetPosition() );
     canvas->initLUT( 0 );
@@ -451,7 +471,7 @@ void ExampleFrame::OnWidthSlider ( wxScrollEvent& e ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for width slider for data set 1 */
 void ExampleFrame::OnCTLung ( wxCommandEvent& unused ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
+    auto canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
     if (canvas->getCenter(0)==Preferences::getCTLungCenter() &&
 			canvas->getWidth(0)==Preferences::getCTLungWidth())
 	    return;  //no change
@@ -466,22 +486,23 @@ void ExampleFrame::OnCTLung ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for width slider for data set 1 */
 void ExampleFrame::OnCTSoftTissue ( wxCommandEvent& unused ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
+    auto canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
     if (canvas->getCenter(0)==Preferences::getCTSoftTissueCenter() &&
-			canvas->getWidth(0)==Preferences::getCTSoftTissueWidth())
-	    return;  //no change
+        canvas->getWidth(0)==Preferences::getCTSoftTissueWidth()) {
+        return;  //no change
+    }
     canvas->setCenter( 0, Preferences::getCTSoftTissueCenter() );
 	canvas->setWidth( 0, Preferences::getCTSoftTissueWidth() );
 	canvas->setInvert( 0, false );
-	mGrayMapControls->update_sliders(Preferences::getCTSoftTissueCenter(),
-		Preferences::getCTSoftTissueWidth());
+	mGrayMapControls->update_sliders( Preferences::getCTSoftTissueCenter(),
+                                     Preferences::getCTSoftTissueWidth() );
     canvas->initLUT( 0 );
     canvas->reload();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for width slider for data set 1 */
 void ExampleFrame::OnCTBone ( wxCommandEvent& unused ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
+    auto canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
     if (canvas->getCenter(0)==Preferences::getCTBoneCenter() &&
 			canvas->getWidth(0)==Preferences::getCTBoneWidth())
 	    return;  //no change
@@ -496,7 +517,7 @@ void ExampleFrame::OnCTBone ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for width slider for data set 1 */
 void ExampleFrame::OnPET ( wxCommandEvent& unused ) {
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
+    auto canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
     if (canvas->getCenter(0)==Preferences::getPETCenter() &&
 			canvas->getWidth(0)==Preferences::getPETWidth())
 	    return;  //no change
@@ -541,8 +562,8 @@ void ExampleFrame::OnUpdateUIWidthSlider ( wxUpdateUIEvent& unused ) {
 void ExampleFrame::OnPrintPreview ( wxCommandEvent& unused ) {
     // Pass two print objects: for preview, and possible printing.
     wxPrintDialogData  printDialogData( *g_printData );
-    ExampleCanvas*  canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
-    wxPrintPreview*    preview = new wxPrintPreview(
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    auto preview = new wxPrintPreview(
         new MainPrint(wxString("CAVASS").c_str(), canvas), new MainPrint(wxString("CAVASS").c_str(), canvas),
         &printDialogData );
     if (!preview->Ok()) {
@@ -551,7 +572,7 @@ void ExampleFrame::OnPrintPreview ( wxCommandEvent& unused ) {
         return;
     }
     
-    wxPreviewFrame*  frame = new wxPreviewFrame( preview, this,
+    auto frame = new wxPreviewFrame( preview, this,
         _T("CAVASS Print Preview"),
         wxPoint(100, 100), wxSize(600, 650) );
     frame->Centre( wxBOTH );
@@ -565,7 +586,7 @@ void ExampleFrame::OnPrintPreview ( wxCommandEvent& unused ) {
 void ExampleFrame::OnPrint ( wxCommandEvent& unused ) {
     wxPrintDialogData  printDialogData( *g_printData );
     wxPrinter          printer( &printDialogData );
-    ExampleCanvas*     canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    auto               canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
     MainPrint          printout( mModuleName.c_str(), canvas );
     if (!printer.Print(this, &printout, TRUE)) {
         if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
@@ -584,9 +605,9 @@ void ExampleFrame::OnMouseWheel ( wxMouseEvent& e ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void ExampleFrame::OnSaveScreen ( wxCommandEvent& unused ) {
-    if (mGrayMapControls!=NULL) {
+    if (mGrayMapControls!=nullptr) {
         delete mGrayMapControls;
-        mGrayMapControls = NULL;
+        mGrayMapControls = nullptr;
     }
 	MainFrame::OnSaveScreen( unused );
 }
@@ -597,14 +618,14 @@ BEGIN_EVENT_TABLE       ( ExampleFrame, wxFrame )
   DefineStandardFrameCallbacks
   // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   //app specific callbacks:
-  EVT_BUTTON(         ID_GRAYMAP,       ExampleFrame::OnGrayMap      )
-  EVT_BUTTON( ID_CT_LUNG,          ExampleFrame::OnCTLung  )
-  EVT_BUTTON( ID_CT_SOFT_TISSUE,   ExampleFrame::OnCTSoftTissue  )
-  EVT_BUTTON( ID_CT_BONE,          ExampleFrame::OnCTBone  )
-  EVT_BUTTON( ID_PET,              ExampleFrame::OnPET     )
-  EVT_MOUSEWHEEL(                       ExampleFrame::OnMouseWheel   )
-  EVT_BUTTON(         ID_NEXT,          ExampleFrame::OnNext         )
-  EVT_BUTTON(         ID_PREVIOUS,      ExampleFrame::OnPrevious     )
+  EVT_BUTTON( ID_GRAYMAP,        ExampleFrame::OnGrayMap       )
+  EVT_BUTTON( ID_CT_LUNG,        ExampleFrame::OnCTLung        )
+  EVT_BUTTON( ID_CT_SOFT_TISSUE, ExampleFrame::OnCTSoftTissue  )
+  EVT_BUTTON( ID_CT_BONE,        ExampleFrame::OnCTBone        )
+  EVT_BUTTON( ID_PET,            ExampleFrame::OnPET           )
+  EVT_MOUSEWHEEL( ExampleFrame::OnMouseWheel )
+  EVT_BUTTON( ID_NEXT,           ExampleFrame::OnNext          )
+  EVT_BUTTON( ID_PREVIOUS,       ExampleFrame::OnPrevious      )
   EVT_COMMAND_SCROLL( ID_CENTER_SLIDER, ExampleFrame::OnCenterSlider )
   EVT_COMMAND_SCROLL( ID_WIDTH_SLIDER,  ExampleFrame::OnWidthSlider  )
 

@@ -31,8 +31,9 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Rise and shine and give God your glory (glory).
  */
-#ifndef __PreferencesDialog_h
-#define __PreferencesDialog_h
+#pragma once
+//#ifndef __PreferencesDialog_h
+//#define __PreferencesDialog_h
 
 #if wxUSE_SPINCTRL
     #include  "wx/spinctrl.h"
@@ -63,6 +64,7 @@ protected:
     bool           mShowSaveScreen;
     bool           mShowToolTips;
     bool           mSingleFrameMode;
+    bool           mDejaVuMode;
     bool           mUseInputHistory;
 
     wxStaticText*  mFgSt;
@@ -128,69 +130,15 @@ protected:
     bool           mStereoLeftOdd;
     wxCheckBox*    mStereoLeftOddCb;
 public:
-    PreferencesDialog ( wxWindow* parent );
-    ~PreferencesDialog ( void )  {  }
+    explicit PreferencesDialog ( wxWindow* parent );
+    //~PreferencesDialog ( void )  {  }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    /** \brief first page of dialog.
-     */
-    wxPanel* CreateGeneralSettingsPage ( wxWindow* parent ) {
-        wxPanel*     panel = new wxPanel( parent, wxID_ANY );
-        wxBoxSizer*  topSizer = new wxBoxSizer( wxVERTICAL );
-        wxBoxSizer*  item = new wxBoxSizer( wxVERTICAL );
-        wxBoxSizer*  bs = NULL;
-        wxCheckBox*  cb = NULL;
-
-        //single frame mode
-        bs = new wxBoxSizer( wxHORIZONTAL );
-        cb = new wxCheckBox( panel, ID_SINGLE_FRAME_MODE,
-            _("&single frame mode"), wxDefaultPosition, wxDefaultSize );
-        cb->SetValue( mSingleFrameMode );
-        bs->Add( cb, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-        item->Add( bs, 0, wxGROW|wxALL, 0 );
-
-        //use input history
-        bs = new wxBoxSizer( wxHORIZONTAL );
-        cb = new wxCheckBox( panel, ID_USE_INPUT_HISTORY,
-            _("&use input history"), wxDefaultPosition, wxDefaultSize );
-        cb->SetValue( mUseInputHistory );
-        bs->Add( cb, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-        item->Add( bs, 0, wxGROW|wxALL, 0 );
-
-        //show savescreen
-        bs = new wxBoxSizer( wxHORIZONTAL );
-        cb = new wxCheckBox( panel, ID_SHOW_SAVE_SCREEN,
-            _("show &save screen"), wxDefaultPosition, wxDefaultSize );
-        cb->SetValue( mShowSaveScreen );
-        bs->Add( cb, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-        item->Add( bs, 0, wxGROW|wxALL, 0 );
-
-        //show information log
-        bs = new wxBoxSizer( wxHORIZONTAL );
-        cb = new wxCheckBox( panel, ID_SHOW_LOG, _("show information &log"),
-            wxDefaultPosition, wxDefaultSize );
-        cb->SetValue( mShowLog );
-        bs->Add( cb, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-        item->Add( bs, 0, wxGROW|wxALL, 0 );
-
-        //show tooltips
-        bs = new wxBoxSizer( wxHORIZONTAL );
-        cb = new wxCheckBox( panel, ID_SHOW_TOOL_TIPS, _("show &tooltips"),
-            wxDefaultPosition, wxDefaultSize );
-        cb->SetValue( mShowToolTips );
-        bs->Add( cb, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
-        item->Add( bs, 0, wxGROW|wxALL, 0 );
-
-        topSizer->Add( item, 1, wxALIGN_CENTRE|wxALL, 5 );
-        panel->SetSizer( topSizer );
-        topSizer->Fit( panel );
-
-        return panel;
-    }
-    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    wxPanel* CreateGeneralSettingsPage     ( wxWindow* parent ) const;
     wxPanel* CreateDirectoriesSettingsPage ( wxWindow* parent );
     wxPanel* CreateAppearanceSettingsPage  ( wxWindow* parent );
     wxPanel* CreateCTWindowSettingsPage    ( wxWindow* parent );
-	wxPanel* CreateOverlaySettingsPage     ( wxWindow* parent );
+    wxPanel* CreateOverlaySettingsPage     ( wxWindow* parent );
+    wxPanel* CreateStereoSettingsPage      ( wxWindow* parent );
 
     void OnChooseFg    ( wxCommandEvent& unused );
     void OnChooseBg    ( wxCommandEvent& unused );
@@ -198,7 +146,7 @@ public:
 
 	void OnCTDefault   ( wxCommandEvent& unused );
 
-	void OnOverlaySettings  ( wxCommandEvent& unused );
+	//void OnOverlaySettings  ( wxCommandEvent& unused );
 
     wxPanel* CreateParallelSettingsPage ( wxWindow* parent );
 
@@ -206,12 +154,15 @@ public:
     void OnClearRows   ( wxCommandEvent& unused );
     void OnDeleteRows  ( wxCommandEvent& unused );
     void OnTest        ( wxCommandEvent& unused );
-
-    wxPanel* CreateStereoSettingsPage ( wxWindow* parent );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief callback for changes to single frame mode. */
     void OnSingleFrameMode ( wxCommandEvent& e ) {
         mSingleFrameMode = e.IsChecked();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief callback for changes to deja vu mode. */
+    void OnDejaVuMode ( wxCommandEvent& e ) {
+        mDejaVuMode = e.IsChecked();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief callback for changes to use input history. */
@@ -294,6 +245,7 @@ public:
         ID_SHOW_SAVE_SCREEN,
         ID_SHOW_TOOL_TIPS,
         ID_SINGLE_FRAME_MODE,
+        ID_DEJA_VU_MODE,
         ID_USE_INPUT_HISTORY,
 
         ID_STEREO_MODE_OFF, ID_STEREO_ANGLE,
@@ -328,4 +280,4 @@ public:
     DECLARE_EVENT_TABLE()
 };
 
-#endif
+//#endif

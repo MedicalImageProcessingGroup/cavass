@@ -35,8 +35,9 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
-#ifndef __ExampleFrame_h
-#define __ExampleFrame_h
+#pragma once
+//#ifndef __ExampleFrame_h
+//#define __ExampleFrame_h
 
 #include  "MainFrame.h"
 
@@ -49,7 +50,8 @@ class  ExampleCanvas;
 #if ! defined (WIN32) && ! defined (_WIN32)
     #include  <unistd.h>
 #endif
-#include  <stdlib.h>
+#include  <cstdlib>
+//#include  <stdlib.h>
 
 class  GrayMapControls;
 
@@ -180,13 +182,13 @@ class ExampleFrame : public MainFrame {
     };
     int  mFileOrDataCount;  ///< count data/datafiles associated w/ this frame (1 for this example).
   protected:
-    void initializeMenu ( void );
-    void addButtonBox ( void );
+    void initializeMenu ( );
+    void addButtonBox ( );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   public:
     static void createExampleFrame ( wxFrame* parentFrame, bool useHistory=true );
-    ExampleFrame ( bool maximize=false, int w=800, int h=600 );
-    ~ExampleFrame ( void );
+    explicit ExampleFrame ( bool maximize=false, int w=800, int h=600 );
+    ~ExampleFrame ( ) override;
     static bool match ( wxString filename );
     //"virtualize" a static method
     virtual bool filenameMatch ( wxString filename ) const {
@@ -195,10 +197,10 @@ class ExampleFrame : public MainFrame {
 
     void loadFile ( const char* const fname );
     void loadData ( char* name,
-        const int xSize, const int ySize, const int zSize,
-        const double xSpacing, const double ySpacing, const double zSpacing,
-        const int* const data,
-        const ViewnixHeader* const vh=NULL, const bool vh_initialized=false );
+        int xSize, int ySize, int zSize,
+        double xSpacing, double ySpacing, double zSpacing,
+        int* data,
+        ViewnixHeader* vh=nullptr, bool vh_initialized=false );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     virtual void OnGrayMap         ( wxCommandEvent& unused );
     virtual void OnInput           ( wxCommandEvent& unused );
@@ -225,5 +227,5 @@ class ExampleFrame : public MainFrame {
     DECLARE_EVENT_TABLE()
 };
 
-#endif
+//#endif
 //======================================================================

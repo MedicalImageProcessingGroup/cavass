@@ -1670,7 +1670,7 @@ void SurfViewFrame::OnSave(wxCommandEvent &unused)
 			break;
 		case SurfViewCanvas::MEASURE:
 			FILE *fp;
-			fp = fopen((const char *)saveDlg.GetPath().c_str(), "w");
+			fp = fopen((const char *)saveDlg.GetPath().c_str(), "wb");
 			for (int j=0; j<canvas->mRenderer->nmeasurement_points; j++)
 				fprintf(fp,	"(%f, %f, %f)\n",
 						canvas->mRenderer->measurement_point[j][0]-
@@ -1687,7 +1687,7 @@ void SurfViewFrame::OnSave(wxCommandEvent &unused)
 				wxMessageBox("No valid statistics computed.");
 				break;
 			}
-			fp = fopen((const char *)saveDlg.GetPath().c_str(), "w");
+			fp = fopen((const char *)saveDlg.GetPath().c_str(), "wb");
 			fprintf(fp,
 			"Total density %.0f; Mean %.1f; St.dev. %.1f; Min %.0f; Max %.0f\n"
 				,

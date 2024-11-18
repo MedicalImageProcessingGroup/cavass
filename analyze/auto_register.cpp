@@ -1230,7 +1230,7 @@ int SaveInterPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
 #ifndef SCRIPTABLE_VERSION
     wxLogMessage("Writing Plan. Wait....");
 #endif
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) {
       wxLogMessage("Could not Open Plan for writing ....");      
     }
@@ -1306,7 +1306,7 @@ int SaveInterPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
 #ifndef SCRIPTABLE_VERSION
     wxLogMessage("Writing report file. Wait....");
 #endif
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) {
       wxLogMessage("Could not Open TXT for writing ....");      
     }   
@@ -1463,7 +1463,7 @@ int SaveInterPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
 #ifndef SCRIPTABLE_VERSION
     wxLogMessage("Writing parameters. Wait....");   
 #endif
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) {
       wxLogMessage("Could not open file for writing parameters.");      
       return(-1);
@@ -1540,7 +1540,7 @@ int SaveInterPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
     if (time_inst < 2)
       break;
     wxLogMessage("Writing turn angles. Wait....");   
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) {
       wxLogMessage("Could not open file for writing parameters.");      
       return(-1);
@@ -2181,7 +2181,7 @@ int SaveIntraPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
 #ifndef SCRIPTABLE_VERSION
     wxLogMessage("Writing Plan. Wait....");   
 #endif
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) {
       wxLogMessage("Could not Open Plan for writing ....");      
       return(-1);
@@ -2241,7 +2241,7 @@ int SaveIntraPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
 #ifndef SCRIPTABLE_VERSION
     wxLogMessage("Writing report file. Wait....");
 #endif
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) {
       wxLogMessage("Could not Open TXT for writing ....");      
     }   
@@ -2403,7 +2403,7 @@ int SaveIntraPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
 #ifndef SCRIPTABLE_VERSION
     wxLogMessage("Writing parameters. Wait....");    
 #endif
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) 
 	{
       wxLogMessage("Could not open file for writing parameters.");      
@@ -2482,7 +2482,7 @@ int SaveIntraPlan(Surf_Info *InSurf, char *outfile, int timeInstances, int nRefF
       break;
     wxLogMessage("Writing turn angles. Wait....");
     
-    fp=fopen(outfile,"w");
+    fp=fopen(outfile,"wb");
     if (fp==NULL) {
       wxLogMessage("Could not open file for writing parameters.");      
       return(-1);
@@ -2987,8 +2987,8 @@ void output_stats(char* file_name)
 	//}
 
 //	VGetSaveSwitchValue(&overwrite_flag);
-//	fp = fopen(file_name, overwrite_flag? "w":"a");
-	fp = fopen(file_name, "a");
+//	fp = fopen(file_name, overwrite_flag? "wb":"ab");
+	fp = fopen(file_name, "ab");
 	if (fp == NULL)
 	{
 		wxLogMessage("Can not open output_stats file!");

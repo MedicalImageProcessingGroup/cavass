@@ -3795,7 +3795,7 @@ void cvRenderer::do_slice_output(const char out_file_name[], double first_loc,
 	}
 	else
 	{
-		scene_file = fopen(in_file_name, "r");
+		scene_file = fopen(in_file_name, "rb");
 		if (scene_file == NULL)
 		{
 			display_message("Failed to open input file.");

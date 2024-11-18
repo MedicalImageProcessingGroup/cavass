@@ -2245,7 +2245,7 @@ void Segment2dCanvas::paint ( wxDC* dc ) {
 			total_object_area[i] = object_area[i] = 0;
 
 		/* Open file for reading the appropriate mask */
-		if( (fp = fopen("object_mask.TMP", "r")) == NULL)
+		if( (fp = fopen("object_mask.TMP", "rb")) == NULL)
 		{
 			wxMessageBox("CAN'T OPEN 'MASK' FILE !");
 			return;
@@ -5350,11 +5350,11 @@ int Segment2dCanvas::Convert_Contours_to_Vedges()
 	if (first_call)
 	{
 		first_call = 0;
-		fp = fopen("DP_CONTOUR_RECORD", "r");
+		fp = fopen("DP_CONTOUR_RECORD", "rb");
 		if (fp)
 		{
 			fclose(fp);
-			fp = fopen("DP_CONTOUR_RECORD", "a");
+			fp = fopen("DP_CONTOUR_RECORD", "ab");
 		}
 	}
 	if (fp)

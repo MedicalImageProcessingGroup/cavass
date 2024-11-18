@@ -1508,7 +1508,7 @@ int ROIStatisticalCanvas::GetPrevRoistats()
 	}
 
 
-	/* if((fp=fopen(OutStats,"r"))!=NULL){
+	/* if((fp=fopen(OutStats,"rb"))!=NULL){
 	tmp_int=0;
 	while((tmp_int<2)&&(!feof(fp)))
 	if( fgetc(fp) == '\n') tmp_int++;
@@ -1768,7 +1768,7 @@ void ROIStatisticalCanvas::SaveStats(unsigned char *OutStats )
 	tmpstat = RoiStats;
 	tmp_int=1;   
 
-	if((ofp_stats=fopen((const char*)OutStats,"w"))==NULL)
+	if((ofp_stats=fopen((const char*)OutStats,"wb"))==NULL)
 	{
 		wxMessageBox("Can't open file to save statistics");		
 	}

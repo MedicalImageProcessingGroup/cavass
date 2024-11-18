@@ -315,12 +315,14 @@ class MainSplitter : public wxSplitterWindow {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief called when the splitter position has changed. */
     virtual void OnPositionChanged ( wxSplitterEvent& event ) {
-        if (mFrame!=NULL)    mFrame->Refresh();
+        cout << typeid(this->mFrame).name() << ".OnPositionChanged " << event.GetSashPosition() << std::endl;
+        if (mFrame != nullptr)    mFrame->Refresh();
         event.Skip();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief called as the splitter position is changed. */
     virtual void OnPositionChanging ( wxSplitterEvent& event ) {
+        cout << "OnPositionChanging \n";
         if (mFrame!=NULL)    mFrame->Refresh();
         event.Skip();
     }

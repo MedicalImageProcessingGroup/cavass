@@ -8,4 +8,5 @@
 *.so
 .idea/
 cmake-build-debug/
+doxydocs/
 

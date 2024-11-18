@@ -602,7 +602,9 @@ if (wxWidgets_FOUND)
         frames/RegistrationControls.h
         frames/SaveScreenControls.h
         frames/Segment2dCanvas.cpp
+        frames/Segment2dCanvas.h
         frames/Segment2dFrame.cpp
+        frames/Segment2dFrame.h
         frames/SetFuzzCompIndexControls.h
         frames/SetIndexControls.h
         frames/ShowScreenCanvas.cpp

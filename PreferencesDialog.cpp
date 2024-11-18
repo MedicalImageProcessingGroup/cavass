@@ -36,28 +36,35 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "wx/colordlg.h"
 #include  "wx/dirdlg.h"
 #include  "wx/radiobut.h"
+
+#if wxVERSION_NUMBER >= 3100
+    #define WXC_FROM_DIP(x) wxWindow::FromDIP(x, NULL)
+#else
+    #define WXC_FROM_DIP(x) x
+#endif
 //----------------------------------------------------------------------
 /** \brief class ctor.
 */
 PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
     mCustomAppearance   = Preferences::getCustomAppearance();
-    mHome               = NULL;
-    mInputDirectory     = NULL;
-    mOutputDirectory    = NULL;
+    mHome               = nullptr;
+    mInputDirectory     = nullptr;
+    mOutputDirectory    = nullptr;
     mParallelMode       = Preferences::getParallelMode();
-    mSaveScreenFileName = NULL;
+    mSaveScreenFileName = nullptr;
     mShowLog            = Preferences::getShowLog();
     mShowSaveScreen     = Preferences::getShowSaveScreen();
     mShowToolTips       = Preferences::getShowToolTips();
     mSingleFrameMode    = Preferences::getSingleFrameMode();
+    mDejaVuMode         = Preferences::getDejaVuMode();
     mUseInputHistory    = Preferences::getUseInputHistory();
     mStereoMode         = Preferences::getStereoMode();
     mStereoLeftOdd      = false;
-    mSystemListCtrl     = NULL;
-    mMPIDirectory       = NULL;
-    mTest               = NULL;
+    mSystemListCtrl     = nullptr;
+    mMPIDirectory       = nullptr;
+    mTest               = nullptr;
 
-    SetExtraStyle( wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY );
+    //SetExtraStyle( wxDIALOG_EX_CONTEXTHELP|wxWS_EX_VALIDATE_RECURSIVELY );
 
     Create( parent, wxID_ANY, "Preferences", wxDefaultPosition,
         wxDefaultSize,
@@ -66,7 +73,7 @@ PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
         | wxRESIZE_BORDER
 #endif
         );
-    CreateButtons( wxOK|wxCANCEL|wxHELP );
+    //CreateButtons( wxOK );
 
     wxBookCtrlBase*  notebook = GetBookCtrl();
 
@@ -78,7 +85,7 @@ PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
 #endif
     wxPanel*  stereoSettings      = CreateStereoSettingsPage(      notebook );
 	wxPanel*  CTWindowSettings    = CreateCTWindowSettingsPage(    notebook );
-	wxPanel*  OverlaySettings     = CreateOverlaySettingsPage(     notebook );
+    wxPanel*  OverlaySettings     = CreateOverlaySettingsPage(     notebook );
 
     notebook->AddPage( generalSettings,     _("General")     );
     notebook->AddPage( directoriesSettings, _("Directories") );
@@ -88,9 +95,51 @@ PreferencesDialog::PreferencesDialog ( wxWindow* parent ) {
 #endif
     notebook->AddPage( stereoSettings,      _("Stereo")      );
 	notebook->AddPage( CTWindowSettings,    _("CT Windows")  );
-	notebook->AddPage( OverlaySettings,     _("Overlay")     );
+    notebook->AddPage( OverlaySettings,     _("Overlay")     );
 
-    LayoutDialog();
+    //LayoutDialog();
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/** \brief first page of dialog.
+ */
+wxPanel* PreferencesDialog::CreateGeneralSettingsPage ( wxWindow* parent ) const {
+    const int border = 15;
+    auto panel = new wxPanel( parent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(parent, wxSize(-1,-1)), wxTAB_TRAVERSAL );
+    auto sizer = new wxBoxSizer( wxVERTICAL );
+    panel->SetSizer( sizer );
+
+    //single frame mode
+    auto cb = new wxCheckBox( panel, ID_SINGLE_FRAME_MODE, _("&single frame mode"), wxDefaultPosition, wxDefaultSize );
+    cb->SetValue( mSingleFrameMode );
+    sizer->Add( cb, 0, wxALL, WXC_FROM_DIP(border) );
+
+    //deja vu mode
+    cb = new wxCheckBox( panel, ID_DEJA_VU_MODE, _("&deja vu mode"), wxDefaultPosition, wxDefaultSize );
+    cb->SetValue( mDejaVuMode );
+    sizer->Add( cb, 0, wxALL, WXC_FROM_DIP(border) );
+
+    //use input history
+    cb = new wxCheckBox( panel, ID_USE_INPUT_HISTORY, _("&use input history"), wxDefaultPosition, wxDefaultSize );
+    cb->SetValue( mUseInputHistory );
+    sizer->Add( cb, 0, wxALL, WXC_FROM_DIP(border) );
+
+    //show savescreen
+    cb = new wxCheckBox( panel, ID_SHOW_SAVE_SCREEN, _("show &save screen"), wxDefaultPosition, wxDefaultSize );
+    cb->SetValue( mShowSaveScreen );
+    sizer->Add( cb, 0, wxALL, WXC_FROM_DIP(border) );
+
+    //show information log
+    cb = new wxCheckBox( panel, ID_SHOW_LOG, _("show information &log"), wxDefaultPosition, wxDefaultSize );
+    cb->SetValue( mShowLog );
+    sizer->Add( cb, 0, wxALL, WXC_FROM_DIP(border) );
+
+    //show tooltips
+    cb = new wxCheckBox( panel, ID_SHOW_TOOL_TIPS, _("show &tooltips"), wxDefaultPosition, wxDefaultSize );
+    cb->SetValue( mShowToolTips );
+    sizer->Add( cb, 0, wxALL, WXC_FROM_DIP(border) );
+
+    sizer->Fit( panel );
+    return panel;
 }
 //----------------------------------------------------------------------
 /** \brief create the appearance settings page. */
@@ -125,18 +174,24 @@ wxPanel* PreferencesDialog::CreateAppearanceSettingsPage ( wxWindow* parent )
 
     mFgSt = new wxStaticText( panel, wxID_ANY, "foreground color (RGB):" );
     bs->Add( mFgSt, 2, wxALIGN_CENTER_VERTICAL );
+
     tmp = wxString::Format( "%d", Preferences::getFgRed() );
-    mFgRed = new wxTextCtrl( panel, ID_FG_RED, tmp, wxDefaultPosition, wxSize(50,-1) );
+    mFgRed = new wxTextCtrl( panel, ID_FG_RED, tmp, wxDefaultPosition, wxSize(50,-1), wxTEXT_ALIGNMENT_RIGHT );
     bs->Add( mFgRed, 1 );
+
     tmp = wxString::Format( "%d", Preferences::getFgGreen() );
     mFgGreen = new wxTextCtrl( panel, ID_FG_GREEN, tmp, wxDefaultPosition, wxSize(50,-1) );
     bs->Add( mFgGreen, 1 );
+
     tmp = wxString::Format( "%d", Preferences::getFgBlue() );
     mFgBlue = new wxTextCtrl( panel, ID_FG_BLUE, tmp, wxDefaultPosition, wxSize(50,-1) );
     bs->Add( mFgBlue, 1 );
+
     bs->Add( 10, 10, 0 );
+
     mFgB = new wxButton( panel, ID_CHOOSE_FG, "Choose", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
     bs->Add( mFgB, 1 );
+
     bs->Add( 10, 10, 0 );
 
     item->Add( bs, 1 );
@@ -507,6 +562,7 @@ void PreferencesDialog::OnCTDefault ( wxCommandEvent& unused ) {
 /** \brief create the directories settings page. */
 wxPanel* PreferencesDialog::CreateDirectoriesSettingsPage ( wxWindow* parent )
 {
+#if 0
     wxPanel*       panel    = new wxPanel( parent, wxID_ANY );
     wxBoxSizer*    topSizer = new wxBoxSizer( wxVERTICAL );
     wxBoxSizer*    item     = new wxBoxSizer( wxVERTICAL );
@@ -523,7 +579,7 @@ wxPanel* PreferencesDialog::CreateDirectoriesSettingsPage ( wxWindow* parent )
     st = new wxStaticText( panel, wxID_ANY, "CAVASS home directory:", wxDefaultPosition, wxSize(160,-1) );
     bs->Add( st, 0, wxALIGN_CENTER_VERTICAL );
     mHome = new wxTextCtrl( panel, ID_HOME, Preferences::getHome(),
-        wxDefaultPosition, wxSize(300,-1) );
+        wxDefaultPosition, wxSize(400,-1) );
     bs->Add( mHome, 1 );
     item->Add( bs, 1 );
 
@@ -560,6 +616,32 @@ wxPanel* PreferencesDialog::CreateDirectoriesSettingsPage ( wxWindow* parent )
     //topSizer->AddSpacer(5);
     panel->SetSizer( topSizer );
     topSizer->Fit( panel );
+    return panel;
+#endif
+    auto panel = new wxPanel( parent, wxID_ANY );
+    auto sizer = new wxFlexGridSizer(0, 2, 15, 15);
+    sizer->SetFlexibleDirection( wxBOTH );
+    sizer->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    panel->SetSizer( sizer );
+
+    //CAVASS home directory
+    auto st = new wxStaticText( panel, wxID_ANY, "CAVASS home directory:", wxDefaultPosition, wxSize(160,-1) );
+    sizer->Add( st );
+    mHome = new wxTextCtrl( panel, ID_HOME, Preferences::getHome(),wxDefaultPosition, wxSize(400,-1) );
+    sizer->Add( mHome );
+
+    //input directory
+    st = new wxStaticText( panel, wxID_ANY, "input directory:", wxDefaultPosition, wxSize(160,-1) );
+    sizer->Add( st );
+    mInputDirectory = new wxTextCtrl( panel, ID_HOME, Preferences::getInputDirectory(), wxDefaultPosition, wxSize(300,-1) );
+    sizer->Add( mInputDirectory );
+
+    //output directory
+    st = new wxStaticText( panel, wxID_ANY, "output directory:", wxDefaultPosition, wxSize(160,-1) );
+    sizer->Add( st );
+    mOutputDirectory = new wxTextCtrl( panel, ID_HOME, Preferences::getOutputDirectory(), wxDefaultPosition, wxSize(300,-1) );
+    sizer->Add( mOutputDirectory );
+
     return panel;
 }
 //----------------------------------------------------------------------
@@ -977,6 +1059,7 @@ void PreferencesDialog::OnOK ( wxCommandEvent& unused ) {
     Preferences::setShowSaveScreen(       mShowSaveScreen );
     Preferences::setShowToolTips(         mShowToolTips );
     Preferences::setSingleFrameMode(      mSingleFrameMode );
+    Preferences::setDejaVuMode(           mDejaVuMode );
 #ifdef  PARALLEL
     //save the grid values
     Preferences::clearHostNamesAndProcessCounts();
@@ -1017,6 +1100,7 @@ void PreferencesDialog::OnOK ( wxCommandEvent& unused ) {
 IMPLEMENT_CLASS(   PreferencesDialog, wxPropertySheetDialog )
 BEGIN_EVENT_TABLE( PreferencesDialog, wxPropertySheetDialog )
     EVT_CHECKBOX( ID_SINGLE_FRAME_MODE, PreferencesDialog::OnSingleFrameMode )
+    EVT_CHECKBOX( ID_DEJA_VU_MODE,      PreferencesDialog::OnDejaVuMode      )
     EVT_CHECKBOX( ID_SHOW_LOG,          PreferencesDialog::OnShowLog         )
     EVT_CHECKBOX( ID_SHOW_SAVE_SCREEN,  PreferencesDialog::OnShowSaveScreen  )
     EVT_CHECKBOX( ID_SHOW_TOOL_TIPS,    PreferencesDialog::OnShowToolTips    )

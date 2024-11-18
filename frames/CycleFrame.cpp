@@ -512,7 +512,7 @@ void CycleFrame::OnSave ( wxCommandEvent& e ) {
                 wxSAVE);
     if (saveDlg.ShowModal() == wxID_OK)
     {
-        FILE *fp=fopen((const char *)saveDlg.GetPath().c_str(), "a");
+        FILE *fp=fopen((const char *)saveDlg.GetPath().c_str(), "ab");
         if (fp == NULL)
         {
             wxMessageBox("Could not open file.");

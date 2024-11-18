@@ -88,7 +88,7 @@ Segment2dFrame::Segment2dFrame ( bool maximize, int w, int h )
 	modeName[Segment2dCanvas::REVIEW] = "Review";
 	modeName[Segment2dCanvas::REPORT] = "Report";
 	modeName[Segment2dCanvas::PEEK] = "Peek";
-	FILE *objnamfp=fopen("object_names.spec", "r");
+	FILE *objnamfp=fopen("object_names.spec", "rb");
 	for (int j=0; j<8; j++)
 	{
 		char buf[100];
@@ -275,72 +275,72 @@ void Segment2dFrame::addButtonBox ( void ) {
     //row 1, col 1
     m_prev = new wxButton( mControlPanel, ID_PREVIOUS, "Previous", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
     ::setColor( m_prev );
-    fgs->Add( m_prev, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    fgs->Add( m_prev, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 1, col 2
     m_next = new wxButton( mControlPanel, ID_NEXT, "Next", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
     ::setColor( m_next );
-    fgs->Add( m_next, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    fgs->Add( m_next, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 2, col 1
     m_setIndex = new wxButton( mControlPanel, ID_SET_INDEX, "SetIndex", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
     ::setColor( m_setIndex );
-    fgs->Add( m_setIndex, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    fgs->Add( m_setIndex, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 2, col 2
     m_grayMap = new wxButton( mControlPanel, ID_GRAYMAP, "GrayMap", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
     ::setColor( m_grayMap );
-    fgs->Add( m_grayMap, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    fgs->Add( m_grayMap, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 3
 	mModeLabel = new wxStaticText( mControlPanel, wxID_ANY, "Mode:" );
-	fgs->Add( mModeLabel, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( mModeLabel, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     Segment2dCanvas*  canvas = dynamic_cast<Segment2dCanvas*>(mCanvas);
 	wxArrayString sa;
 	for (int j=0; j<canvas->num_detection_modes; j++)
 		sa.Add(modeName[canvas->detection_modes[j]]);
 	mMode = new wxComboBox( mControlPanel, ID_MODE, modeName[canvas->detection_mode], wxDefaultPosition, wxSize(buttonWidth,buttonHeight), sa, wxCB_READONLY );
 	::setColor( mMode );
-    fgs->Add( mMode, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    fgs->Add( mMode, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     //row 4, col 1
     m_reset = new wxButton( mControlPanel, ID_RESET, "Reset", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
     ::setColor( m_reset );
-    fgs->Add( m_reset, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    fgs->Add( m_reset, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 4, col 2
 	m_defaultFill = new wxCheckBox( mControlPanel, ID_DEFAULT_FILL, "Default Fill" );
 	::setColor( m_defaultFill );
 	m_defaultFill->SetValue( canvas->default_mask_value!=0 );
-	fgs->Add( m_defaultFill, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( m_defaultFill, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 5
 	m_objectLabel = new wxStaticText( mControlPanel, wxID_ANY, "Object:" );
-	fgs->Add( m_objectLabel, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( m_objectLabel, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	sa.Clear();
 	for (int j=0; j<9; j++)
 		sa.Add(objectName[j]);
 	m_object = new wxComboBox( mControlPanel, ID_OBJECT, objectName[canvas->object_number], wxDefaultPosition, wxSize(buttonWidth,buttonHeight), sa, wxCB_READONLY );
 	::setColor( m_object );
-	fgs->Add( m_object, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( m_object, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 6, col 1
 	m_deleteObject = new wxButton( mControlPanel, ID_DELETE_OBJECT, "Del. Obj.", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
 	::setColor( m_deleteObject );
-	fgs->Add( m_deleteObject, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( m_deleteObject, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 6, col 2
 	m_loadObject = new wxButton( mControlPanel, ID_LOAD_OBJECT, "Load Obj.", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
 	::setColor( m_loadObject );
-	fgs->Add( m_loadObject, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( m_loadObject, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 7, col 1
 	m_setOutputBut = new wxButton( mControlPanel, ID_SET_OUTPUT, "Set Output", wxDefaultPosition, wxSize(buttonWidth,buttonHeight) );
 	::setColor( m_setOutputBut );
-    fgs->Add( m_setOutputBut, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+    fgs->Add( m_setOutputBut, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 7, col 2
 	m_layout = new wxCheckBox( mControlPanel, ID_LAYOUT, "Layout" );
 	::setColor( m_layout );
 	m_layout->SetValue( canvas->layout_flag );
-	fgs->Add( m_layout, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( m_layout, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	//row 8, col 1
 	m_overlay = new wxCheckBox( mControlPanel, ID_OVERLAY, "Overlay" );
 	::setColor( m_overlay );
 	m_overlay->SetValue( canvas->overlay_flag );
-	fgs->Add( m_overlay, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
+	fgs->Add( m_overlay, 1, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 
-    m_buttonSizer->Add( fgs, 0, wxGROW|wxALL, 10 );
-    mBottomSizer->Add( m_buttonSizer, 0, wxGROW|wxALL, 10 );
+    m_buttonSizer->Add( fgs, 1, wxGROW|wxALL, 10 );
+    mBottomSizer->Add( m_buttonSizer, 1, wxGROW|wxALL, 10 );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief destructor for Segment2dFrame class. */
@@ -1000,7 +1000,7 @@ SetSegment2dOutputControls::SetSegment2dOutputControls( wxPanel* cp,
 		wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
 	wxString objNam = "All";
 	wxArrayString as(1, &objNam);
-	FILE *objnamfp=fopen("object_names.spec", "r");
+	FILE *objnamfp=fopen("object_names.spec", "rb");
 	for (int j=1; j<=8; j++)
 	{
 		char buf[100];

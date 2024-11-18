@@ -49,7 +49,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #if ! defined (WIN32) && ! defined (_WIN32)
     #include  <unistd.h>
 #endif
-#include  <stdlib.h>
+#include  <cstdlib>  // #include  <stdlib.h>
 
 class  GrayMapControls;
 class  SetIndexControls;

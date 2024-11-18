@@ -462,7 +462,7 @@ void master()
 		memset(right_overlaps[i],0,slice_size*sizeof(short));
 	}
 
-//	fp_in = fopen(object_points_file[selected_object], "r");
+//	fp_in = fopen(object_points_file[selected_object], "rb");
 //	while (fscanf(fp_in, "%d %d %d ", &x, &y, &z) == 3)
 	for( i=0; i<nSeeds; i++ )
 	{

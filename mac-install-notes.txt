@@ -18,7 +18,7 @@ Obtain wxWidgets source code. Then:
   run cmake gui
 
 Obtain cavass source code.
-  git clone george@grevera.ddns.net:/home/george/repos/cavass.git
+  git clone https://github.com/MedicalImageProcessingGroup/cavass.git
   mkdir cavass-build
   run cmake gui
     source code:       /Users/ggrevera/monday/cavass
@@ -41,7 +41,7 @@ cavass & git (source code repository)
 Note: All git commands (except clone) must be in CAVASS source dir.
 Useful git commands:
   1. obtain a complete copy of CAVASS (from a remote repository)
-       git clone george@grevera.ddns.net:/home/george/repos/cavass.git/
+       git clone https://github.com/MedicalImageProcessingGroup/cavass.git
   2. list my changes
        git status
   3. add my changes to the staging area

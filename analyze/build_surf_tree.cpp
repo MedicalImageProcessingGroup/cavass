@@ -284,7 +284,7 @@ int InitPlan(Surf_Info *s)
   short TREE_FLAG,AXIS_FLAG,BBOX_FLAG;
 
   if (!s->plan_on) return(-1);
-  if ((fp=fopen(s->plan_file,"r"))==NULL) 
+  if ((fp=fopen(s->plan_file,"rb"))==NULL) 
   {
     //VDisplayDialogMessage("Could Not Open PLN file");
 	  wxLogMessage("Could Not Open PLN file");

@@ -488,6 +488,19 @@ class CavassMain : public wxApp {
      */
     virtual bool OnInit ( void ) {
         puts( "in CavassMain::OnInit()" );
+
+        #if defined(_DEBUG)
+            puts( "_DEBUG" );
+        #endif
+        #if defined(NDEBUG)
+            puts( "NDEBUG" );
+        #endif
+        #if defined(__OPTIMIZE__)
+            puts( "__OPTIMIZE__" );
+        #endif
+        printf( "wxWidgets version: %d.%d.%d.%d \n", wxMAJOR_VERSION,
+                wxMINOR_VERSION, wxRELEASE_NUMBER, wxSUBRELEASE_NUMBER );
+
 #if defined (WIN32) || defined (_WIN32)
         putenv( "WXSUPPRESS_SIZER_FLAGS_CHECK=1" );
 #else

@@ -22,7 +22,7 @@ Optionally build ITK if desired.
 Build CAVASS
 ------------
 Download CAVASS or clone the CAVASS repo
-(e.g., git clone george@grevera.ddns.net:/home/george/repos/cavass.git/).
+(e.g., git clone https://github.com/MedicalImageProcessingGroup/cavass.git).
 Run cmake. Indicate CAVASS source folder.
 We suggest that a separate folder (e.g., cavass-build)
 be used for "Where to build the binaries."

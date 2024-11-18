@@ -1130,7 +1130,10 @@ void MainFrame::OnWindow ( wxCommandEvent& e ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnPreferences ( wxCommandEvent& unused ) {
-    PreferencesDialog  pd(this);
+    PreferencesDialog  pd( this );
+    pd.SetExtraStyle( wxDIALOG_EX_CONTEXTHELP | wxWS_EX_VALIDATE_RECURSIVELY );
+    pd.CreateButtons( wxOK | wxCANCEL );  //| wxHELP );
+    pd.LayoutDialog();
     pd.ShowModal();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

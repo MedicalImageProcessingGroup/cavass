@@ -31,15 +31,16 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
-#ifndef  __Preferences_h
-#define  __Preferences_h
+#pragma once
+//#ifndef  __Preferences_h
+//#define  __Preferences_h
 
 /** \brief Definition and implementation of Preferences class.
  *
  *  This (singleton) class allows the caller to check and modify the
  *  status/state of user preferences.  This class allows preferences
  *  to persist via loading and storing preferences in a wxConfig object.
- *  Changes are automatically stored (to the file ~/.CAVASS on Linux).
+ *  Changes are automatically stored (to the file ~/.cavass.ini on Linux).
  */
 class Preferences {
   public:
@@ -81,6 +82,7 @@ class Preferences {
         _showSaveScreen  = _preferences->Read( "showSaveScreen",  _showSaveScreen );
         _showToolTips    = _preferences->Read( "showToolTips",    _showToolTips );
         _singleFrameMode = _preferences->Read( "singleFrameMode", _singleFrameMode );
+        _dejaVuMode      = _preferences->Read( "dejaVuMode",      _dejaVuMode  );
 
         _stereoMode      = _preferences->Read( "stereoMode",      _stereoMode    );
         _stereoAngle     = _preferences->Read( "stereoAngle",     _stereoAngle   );
@@ -408,6 +410,13 @@ class Preferences {
     static bool getSingleFrameMode ( void ) {
         Preferences::Instance();
         if (_singleFrameMode)    return true;
+        return false;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for use input history preference. */
+    static bool getDejaVuMode ( void ) {
+        Preferences::Instance();
+        if (_dejaVuMode)    return true;
         return false;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -843,6 +852,15 @@ class Preferences {
         Preferences::DeleteInstance();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief mutator for use input history preference. */
+    static void setDejaVuMode ( bool newValue ) {
+        Preferences::Instance();
+        if (newValue)    _dejaVuMode = true;
+        else             _dejaVuMode = false;
+        _preferences->Write( "dejaVuMode", _dejaVuMode );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief mutator for stereo mode preference. */
     static void setStereoMode ( int newValue ) {
         Preferences::Instance();
@@ -951,6 +969,7 @@ class Preferences {
     static long      _showSaveScreen;   ///< 0=off; 1=show save screen enabled
     static long      _showToolTips;     ///< 0=off; 1=tooltips enabled
     static long      _singleFrameMode;  ///< 0=multi frame mode; 1=single frame mode
+    static long      _dejaVuMode;       ///< 0=off; 1=on
 public:
     enum {           StereoModeOff, StereoModeAnaglyph, StereoModeInterlaced };  ///< stereo modes
 private:
@@ -984,4 +1003,4 @@ private:
 //----------------------------------------------------------------------
 void modifyEnvironment ( char* cavassExe = NULL );
 
-#endif
+//#endif

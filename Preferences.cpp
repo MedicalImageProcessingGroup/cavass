@@ -54,6 +54,7 @@ long           Preferences::_showLog         = 0;
 long           Preferences::_showSaveScreen  = 0;
 long           Preferences::_showToolTips    = 0;
 long           Preferences::_singleFrameMode = 1;
+long           Preferences::_dejaVuMode      = 1;
 
 long           Preferences::_stereoMode      = StereoModeOff;
 double         Preferences::_stereoAngle     = 4.0;
