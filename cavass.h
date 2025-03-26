@@ -19,15 +19,21 @@ You should have received a copy of the GNU General Public License
 along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 */
-
-#ifndef  __cavass_h
-#define  __cavass_h
+#pragma once
+//#ifndef  __cavass_h
+//#define  __cavass_h
 
 #if defined (WIN32) || defined (_WIN32)
     #pragma  warning(disable:4786)  //necessary because stl generates longer
                                     // names than bill's compiler can handle!
     #pragma  warning(disable:4996)  //necessary because bill's compiler deprecated stdio.h
 #endif
+/**
+ * avoid using the windoze registry at all costs. (lest it become corrupted and
+ * windows won't boot!) tell wxwidgets to use an ordinary file (typically,
+ * ~/.cavass.ini) instead.
+ */
+#define wxUSE_CONFIG_NATIVE 0
 
 #include  "wx/wx.h"
 #include  "wx/clipbrd.h"
@@ -82,7 +88,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "EasyHeaderFrame.h"
 #include  "FromDicomFrame.h"
 #include  "FuzzCompFrame.h"
-#include  "GrayMapControls.h"
+//#include  "GrayMapControls.h"
 #include  "InformationDialog.h"
 #include  "InputHistoryDialog.h"
 #include  "IRFCFrame.h"
@@ -96,8 +102,8 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "Preferences.h"
 #include  "ProcessManager.h"
 #include  "SaveScreenControls.h"
-#include  "Segment2dFrame.h"
-#include  "SetIndexControls.h"
+//#include  "Segment2dFrame.h"
+//#include  "SetIndexControls.h"
 #include  "MagnifyControls.h"
 #include  "OpacityControls.h"
 #include  "RegisterFrame.h"
@@ -114,4 +120,4 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "../analyze/KinematicsIntraFrame.h"
 #include  "../analyze/AnalyzeStaticFrame.h"
 
-#endif
+//#endif

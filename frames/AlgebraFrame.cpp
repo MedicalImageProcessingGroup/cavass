@@ -36,6 +36,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "cavass.h"
 #include  "CineControls.h"
 #include  "DivThreControls.h"
+#include  "GrayMapControls.h"
 #include  "SetFilterIndexControls.h"
 #include  "OffsetControls.h"
 

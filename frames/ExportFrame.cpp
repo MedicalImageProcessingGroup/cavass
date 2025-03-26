@@ -32,6 +32,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 //======================================================================
 #include  "cavass.h"
+#include  "SetIndexControls.h"
 #include  "port_data/from_dicom.h"
 #include  <sys/types.h>
 #if ! defined (WIN32) && ! defined (_WIN32)
@@ -42,6 +43,7 @@ extern "C" {
 }
 #endif
 #include  <time.h>
+#include  "GrayMapControls.h"
 
 extern Vector  gFrameList;
 

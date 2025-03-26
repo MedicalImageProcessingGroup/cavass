@@ -32,32 +32,48 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 //======================================================================
 #include  "cavass.h"
+//#include  <unistd.h>
 
-Preferences*   Preferences::_instance    = 0;
-wxConfigBase*  Preferences::_preferences = 0;
+Preferences*   Preferences::_instance    = nullptr;
+wxConfigBase*  Preferences::_preferences = nullptr;
 
-int            Preferences::_bgBlue  = 89;
-int            Preferences::_bgGreen = 69;
-int            Preferences::_bgRed   = 69;
+int            Preferences::_bgBlue  = 90;
+int            Preferences::_bgGreen = 80;
+int            Preferences::_bgRed   = 80;
 long           Preferences::_customAppearance = 1;
-int            Preferences::_fgBlue  = 167;
-int            Preferences::_fgGreen = 255;
-int            Preferences::_fgRed   = 255;
+#ifdef USING_GTK
+    //change the foreground because gtk doesn't allow us to change the
+    // background for buttons
+    //gray
+    int        Preferences::_fgBlue  = 50;
+    int        Preferences::_fgGreen = 50;
+    int        Preferences::_fgRed   = 50;
+#else
+    //yellow
+    int        Preferences::_fgBlue  = 167;
+    int        Preferences::_fgGreen = 255;
+    int        Preferences::_fgRed   = 255;
+#endif
 wxString       Preferences::_file[ Preferences::FileCount ];
 wxString       Preferences::_hostNames( "" );
 wxString       Preferences::_hostProcessCounts( "" );
-wxString       Preferences::_inputDirectory(  "." );
-wxString       Preferences::_outputDirectory( "." );
+wxString       Preferences::_inputDirectory(  wxGetUserHome() );
+wxString       Preferences::_lastFrame( "" );
+wxString       Preferences::_outputDirectory( wxGetUserHome() );
 long           Preferences::_parallelMode    = 0;
 wxString       Preferences::_saveScreenFileName( "temp.tiff" );
 long           Preferences::_showLog         = 0;
+long           Preferences::_showLog_x       = 100;
+long           Preferences::_showLog_y       = 100;
+long           Preferences::_showLog_w       = 600;
+long           Preferences::_showLog_h       = 400;
 long           Preferences::_showSaveScreen  = 0;
 long           Preferences::_showToolTips    = 0;
 long           Preferences::_singleFrameMode = 1;
 long           Preferences::_dejaVuMode      = 1;
 
 long           Preferences::_stereoMode      = StereoModeOff;
-double         Preferences::_stereoAngle     = 4.0;
+wxString       Preferences::_stereoAngle     = "4.0";
 int            Preferences::_stereoLeftRed   = 255,  Preferences::_stereoLeftGreen  =   0,  Preferences::_stereoLeftBlue  =   0;
 int            Preferences::_stereoRightRed  = 0,    Preferences::_stereoRightGreen = 255,  Preferences::_stereoRightBlue = 255;
 int            Preferences::_stereoLeftOdd   = 1;
@@ -73,7 +89,7 @@ int            Preferences::_CTBoneWidth     = 4000;
 int            Preferences::_PETCenter    = 1200;
 int            Preferences::_PETWidth     = 3500;
 
-wxString       Preferences::_OverlayScale = "1.5";
+wxString       Preferences::_OverlayScale  = "1.5";
 int            Preferences::_IM0onIM0Red   = 100;
 int            Preferences::_IM0onIM0Green = 50;
 int            Preferences::_IM0onIM0Blue  = 0;
@@ -86,12 +102,13 @@ int            Preferences::_BIMonBIMBlue  = 0;
 
 
 #if defined (WIN32) || defined (_WIN32)
-    wxString   Preferences::_home( "c:/cavass-build/debug" );
+    //wxString   Preferences::_home( "c:/cavass-build/debug" );
     wxString   Preferences::_MPIDirectory( "c:/Program Files/MPICH2/bin" );
 #else
-    wxString   Preferences::_home( "." );
+    //wxString   Preferences::_home( "." );
     wxString   Preferences::_MPIDirectory( "" );
 #endif
+    wxString   Preferences::_home( wxFileName::GetCwd() );
 //----------------------------------------------------------------------
 /** \brief This function sets the VIEWNIX_ENV and PATH enviromnent vars
  *  according to the CAVASS home preference value.  This function also
@@ -103,16 +120,48 @@ int            Preferences::_BIMonBIMBlue  = 0;
  *  \todo This should (but doesn't) work with relative path names.
  */
 void modifyEnvironment ( char* cavassExe ) {
-    static char*  argv0 = NULL;
+    static char*  argv0 = nullptr;
 
-    if (cavassExe!=NULL)
-	{
+    if (cavassExe != nullptr) {
 	    if (argv0)
 			free(argv0);
 		argv0 = (char *)malloc(strlen(cavassExe)+1);
 		strcpy(argv0, cavassExe);
     }
-    printf( "VIEWNIX_ENV currently set to %s \n", getenv("VIEWNIX_ENV") );
+    //if VIEWNIX_ENV is not set, set it to something reasonable (viz., the current wd)
+#if 0
+#if defined (WIN32) || defined (_WIN32)
+    if (getenv("VIEWNIX_ENV") == nullptr) {
+        char buff[1024];
+        getcwd( buff, sizeof buff );
+        wxString s( "\n\nVIEWNIX_ENV is not set!\n\nSetting it to " );
+        s += buff;
+        s += ".\n";
+        wxMessageBox( s );
+        setenv( "VIEWNIX_ENV", buff, 1 );
+    } else {
+        printf("VIEWNIX_ENV currently set to %s \n", getenv("VIEWNIX_ENV"));
+    }
+#else
+    /** \todo need to do similar to above for windoze */
+#endif
+#else
+    //below should work on both windoze and linux/mac
+    if (getenv("VIEWNIX_ENV") == nullptr) {
+        char buff[1024];
+        getcwd( buff, sizeof buff );
+        wxString s( "\n\nVIEWNIX_ENV is not set!\n\nSetting it to " );
+        s += buff;
+        s += ".\n";
+        //wxMessageBox( s );
+        cerr << s << endl;
+        //setenv( "VIEWNIX_ENV", buff, 1 );
+        wxSetEnv( "VIEWNIX_ENV", buff );
+    } else {
+        printf("VIEWNIX_ENV currently set to %s \n", getenv("VIEWNIX_ENV"));
+    }
+#endif
+
     printf( "PATH        currently set to %s \n", getenv("PATH") );
 #if defined (WIN32) || defined (_WIN32)
     puts( "setting VIEWNIX_ENV" );
@@ -162,6 +211,175 @@ void modifyEnvironment ( char* cavassExe ) {
 #endif
     printf( "VIEWNIX_ENV now set to %s \n", getenv("VIEWNIX_ENV") );
     printf( "PATH        now set to %s \n", getenv("PATH") );
+}
+//----------------------------------------------------------------------
+/**
+ * this function allows one to retrieve a saved/persistent value without
+ * having to actually create the widget.
+ * example of retrieving level slider value from gray map controls:
+ * <pre>
+ *     int value;
+ *     bool ok = Preferences::getPersistence( GrayMapControls::levelGroup, "value", value, -1 );
+ * </pre>
+ * example contents of ~/.cavass.ini for graymap controls:
+ * <pre>
+ * [Persistent_Options]
+ * [Persistent_Options/wxSlider]
+ * [Persistent_Options/wxSlider/graymap.level]
+ * value=550
+ * min=0
+ * max=4095
+ * [Persistent_Options/wxSlider/graymap.width]
+ * value=1730
+ * min=0
+ * max=4095
+ * </pre>
+ * @param group is a string identifying the specific control
+ * @param key is a string identifying the particular control value (there may be more than one) to retrieve
+ * @param currentValue value will be set to the persistent/saved value
+ * @param defaultValue is the value that currentValue will be set to whenever any problem occurs
+ * @return true on success (currentValue will be set to the retrieved value); false otherwise (and currentValue will be set to the default value)
+ */
+bool Preferences::getPersistence ( const string& group, const string& key,
+                                   int& currentValue, int defaultValue )
+{
+    Preferences::Instance();
+    if (_preferences == nullptr) {
+        currentValue = defaultValue;
+        return false;
+    }
+    if (!_preferences->HasGroup(group)) {
+        currentValue = defaultValue;
+        return false;
+    }
+
+    auto oldPath = _preferences->GetPath();  //save (restore later)
+    _preferences->SetPath( group );
+    auto n = _preferences->GetNumberOfEntries();
+    if (n < 1) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    if (!_preferences->HasEntry( key )) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    auto s = _preferences->Read( key );
+    if (!s.IsNumber()) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    int tmp;
+    if (!s.ToInt( &tmp )) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+
+    currentValue = tmp;
+    _preferences->SetPath( oldPath );  //restore
+    return true;
+}
+#if 0
+bool Preferences::getPersistence ( const string& group, const char* key,
+                                   int& currentValue, int defaultValue )
+{
+    Preferences::Instance();
+    if (_preferences == nullptr) {
+        currentValue = defaultValue;
+        return false;
+    }
+    if (!_preferences->HasGroup(group)) {
+        currentValue = defaultValue;
+        return false;
+    }
+
+    auto oldPath = _preferences->GetPath();  //save (restore later)
+    _preferences->SetPath( group );
+    auto n = _preferences->GetNumberOfEntries();
+    if (n < 1) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    if (!_preferences->HasEntry( key )) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    auto s = _preferences->Read( key );
+    if (!s.IsNumber()) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    int tmp;
+    if (!s.ToInt( &tmp )) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+
+    currentValue = tmp;
+    _preferences->SetPath( oldPath );  //restore
+    return true;
+}
+
+bool Preferences::getPersistence ( const string& group, const char* key,
+                                   bool& currentValue, bool defaultValue )
+{
+    Preferences::Instance();
+    if (_preferences == nullptr) {
+        currentValue = defaultValue;
+        return false;
+    }
+    if (!_preferences->HasGroup(group)) {
+        currentValue = defaultValue;
+        return false;
+    }
+
+    auto oldPath = _preferences->GetPath();  //save (restore later)
+    _preferences->SetPath( group );
+    auto n = _preferences->GetNumberOfEntries();
+    if (n < 1) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    if (!_preferences->HasEntry( key )) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    auto s = _preferences->Read( key );
+    if (!s.IsNumber()) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+    int tmp;
+    if (!s.ToInt( &tmp )) {
+        currentValue = defaultValue;
+        _preferences->SetPath( oldPath );  //restore
+        return false;
+    }
+
+    currentValue = tmp;
+    _preferences->SetPath( oldPath );  //restore
+    return true;
+}
+#endif
+
+bool Preferences::getPersistence (  const string& group, const string& key,
+                                    string& currentValue, string& defaultValue )
+{
+    /** \todo */
+    assert( false );
+    cout << "todo \n";
+    return false;
 }
 //----------------------------------------------------------------------
 

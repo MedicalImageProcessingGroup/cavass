@@ -32,14 +32,14 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
-#ifndef __MainFrame_h
-#define __MainFrame_h
+#pragma once
 
 #include  "wx/dnd.h"
 #include  "wx/docview.h"
+#include  "wx/persist.h"
 #include  "wx/splitter.h"
 #include  "wx/thread.h"
-#include  <stdlib.h>
+#include  <cstdlib>
 #if ! defined (WIN32) && ! defined (_WIN32)
     #include  <unistd.h>
 #endif
@@ -53,6 +53,8 @@ class MainFrame : public wxFrame {
     SaveScreenControls*  mSaveScreenControls;  ///< controls to save screens
     wxSizer*             mBottomSizer;         ///< sizer at the bottom of the window for buttons and controls
   public:
+    wxPersistentObject*  mPersistentMe;
+    virtual string whatAmI ( ) { return "MainFrame"; }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     char*        mFileNameFilter; ///< input file name filter string
     wxMenuItem*  mHideControls;   ///< ptr to "hide controls" menu item (so it can be changed dynamically)
@@ -62,7 +64,7 @@ class MainFrame : public wxFrame {
     wxString     mWindowTitle;    ///< title of window
     wxString     mModuleName;     ///< name of module
     wxSplitterWindow*  mSplitter;     ///< mainly used to handle split events
-    wxStaticBox *m_buttonBox;
+    wxStaticBox* m_buttonBox;    ///< omnipresent control box at bottom-right
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief Define standard window menu and menu item ids.  We start at
      *  100 to avoid predefined ids.  We end with ID_LAST to allow apps/modules
@@ -75,7 +77,7 @@ class MainFrame : public wxFrame {
                ID_EXPORT, ID_EXPORT_DICOM,                       ID_EXPORT_MATHEMATICA, ID_EXPORT_MATLAB, ID_EXPORT_PGM, ID_EXPORT_R, ID_EXPORT_STL, ID_EXPORT_VTK,
                ID_SAVE_SCREEN, ID_CLOSE,
                ID_PAGE_SETUP, ID_PRINT_PREVIEW, ID_PRINT, ID_EXIT,
-      /*edit*/ ID_COPY, ID_PASTE, ID_ANIMATION, ID_PREFERENCES,
+      /*edit*/ ID_COPY, ID_PASTE, ID_UNDO, ID_REDO, ID_ANIMATION, ID_PREFERENCES,
       /*tools*/ ID_TUTORIALS, ID_TASKS, ID_RECIPES, ID_ITK_FILTERS,
                 ID_SHOW_SCREEN,
       /*preprocess*/
@@ -124,18 +126,20 @@ class MainFrame : public wxFrame {
     #define   dControlsHeight  ((buttonHeight+1)*mButtonRows+50)    ///< height of control panel (from bottom)
 	int       mButtonRows;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    void initializeMenu ( void );
+    virtual void initializeMenu ( );
+    virtual void restoreFrameSettings ( );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   public:
-    MainFrame  ( void );
-    MainFrame  ( int dummy );
-    ~MainFrame ( void );
-    static bool match ( wxString filename );
+    MainFrame  ( );
+    explicit MainFrame  ( int dummy );
+    //MainFrame  ( bool dummy );  //used by persisted frames
+    ~MainFrame ( ) override;
+    static bool match ( wxString& filename );
     //"virtualize" a static method
-    virtual bool filenameMatch ( wxString filename ) const {
+    [[nodiscard]] virtual bool filenameMatch ( wxString& filename ) const {
         return match( filename );
     };
-	virtual void flush_temp_data( void );
+	virtual void flush_temp_data ( );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     //all of these callbacks are virtual so that they can be replaced when
     // subclassed.
@@ -181,13 +185,15 @@ class MainFrame : public wxFrame {
     virtual void OnPrintPreview    ( wxCommandEvent& unused );
     virtual void OnQuit            ( wxCommandEvent& unused );
     virtual void OnRecipes         ( wxCommandEvent& unused );
+    virtual void OnRedo            ( wxCommandEvent& unused );
     virtual void OnRegister        ( wxCommandEvent& unused );
     virtual void OnSaveScreen      ( wxCommandEvent& unused );
     virtual void OnSegment2d       ( wxCommandEvent& unused );
     virtual void OnShowScreen      ( wxCommandEvent& unused );
     virtual void OnTasks           ( wxCommandEvent& unused );
     virtual void OnTutorials       ( wxCommandEvent& unused );
-    
+    virtual void OnUndo            ( wxCommandEvent& unused );
+
     virtual void OnPPScopsVOIROI   ( wxCommandEvent& unused );
     virtual void OnPPScopsVOIIOI   ( wxCommandEvent& unused );
     virtual void OnPPScopsVOIPickSlices ( wxCommandEvent& unused );
@@ -271,10 +277,12 @@ class MainFrame : public wxFrame {
   EVT_MENU( ID_PRINT,                MainFrame::OnPrint        )    \
   EVT_MENU( ID_PRINT_PREVIEW,        MainFrame::OnPrintPreview )    \
   EVT_MENU( ID_RECIPES,              MainFrame::OnRecipes      )    \
+  EVT_MENU( ID_REDO,                 MainFrame::OnRedo         )    \
   EVT_MENU( ID_SAVE_SCREEN,          MainFrame::OnSaveScreen   )    \
   EVT_MENU( ID_SHOW_SCREEN,          MainFrame::OnShowScreen   )    \
   EVT_MENU( ID_TASKS,                MainFrame::OnTasks        )    \
   EVT_MENU( ID_TUTORIALS,            MainFrame::OnTutorials    )    \
+  EVT_MENU( ID_UNDO,                 MainFrame::OnUndo         )    \
   EVT_MENU( ID_VIS_CYCLE,            MainFrame::OnCycle        )    \
   EVT_MENU( ID_VIS_MONTAGE,          MainFrame::OnMontage      )    \
   EVT_MENU( ID_VIS_OVERLAY,          MainFrame::OnVisOverlay   )    \
@@ -306,7 +314,7 @@ class MainSplitter : public wxSplitterWindow {
     /** \brief MainSplitter ctor.
      *  \param parent frame to split
      */
-    MainSplitter ( MainFrame* parent=NULL )
+    explicit MainSplitter ( MainFrame* parent=nullptr )
         : wxSplitterWindow( parent, wxID_ANY, wxDefaultPosition, wxDefaultSize,
                             wxSP_3D | wxSP_LIVE_UPDATE | wxCLIP_CHILDREN )
     {
@@ -315,34 +323,32 @@ class MainSplitter : public wxSplitterWindow {
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief called when the splitter position has changed. */
     virtual void OnPositionChanged ( wxSplitterEvent& event ) {
-        cout << typeid(this->mFrame).name() << ".OnPositionChanged " << event.GetSashPosition() << std::endl;
+        //cout << typeid(this->mFrame).name() << "::OnPositionChanged " << event.GetSashPosition() << std::endl;
         if (mFrame != nullptr)    mFrame->Refresh();
         event.Skip();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief called as the splitter position is changed. */
     virtual void OnPositionChanging ( wxSplitterEvent& event ) {
-        cout << "OnPositionChanging \n";
-        if (mFrame!=NULL)    mFrame->Refresh();
+        //cout << "MainFrame::OnPositionChanging \n";
+        if (mFrame != nullptr)    mFrame->Refresh();
         event.Skip();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief double click causes the controls to be hidden. */
     virtual void OnDClick ( wxSplitterEvent& event ) {
         mFrame->mHideControls->SetItemLabel( "Show Controls\tAlt-C" );
-        if (mFrame!=NULL)    mFrame->Refresh();
+        mFrame->Refresh();
         event.Skip();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief called when no longer split. */
     virtual void OnUnsplitEvent ( wxSplitterEvent& event ) {
-        if (mFrame!=NULL)    mFrame->Refresh();
+        if (mFrame != nullptr)    mFrame->Refresh();
         event.Skip();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     DECLARE_DYNAMIC_CLASS( MainSplitter )
     DECLARE_EVENT_TABLE()
 };
-
-#endif
 //======================================================================

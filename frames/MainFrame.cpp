@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2017, 2020-2024 Medical Image Processing Group
+  Copyright 1993-2017, 2020-2025 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -34,11 +34,13 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "cavass.h"
 #include  "CycleFrame.h"
 #include  "ExampleFrame.h"
+
 #include  "FilterFrame.h"
 #include  "ImportFrame.h"
 #include  "InterpolateFrame.h"
 #include  "MontageCanvas.h"
 #include  "PreferencesDialog.h"
+#include  "frames/segment2d/Segment2dFrame.h"
 #include  "VOIIOIFrame.h"
 #include  "VOIPickSlicesFrame.h"
 #include  "VOIROIFrame.h"
@@ -48,30 +50,58 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "cavass_icon.xpm"    //icon
 #include  "wx/statline.h"
 #include  "wx/wxhtml.h"
+#include  "PersistentMainFrame.h"
 
 Vector  gFrameList;    ///< list of frames (windows)
 int     gTimerInterval = 250;
 //----------------------------------------------------------------------
+/** \brief MainFrame ctor for persisted frames. */
+#if 0
+MainFrame::MainFrame ( bool dummy )
+    : wxFrame( nullptr, wxID_ANY, _T("CAVASS") ),
+      mModuleName( _T("CAVASS") )
+{
+    SetIcon( wxICON(cavass_icon) );  //set the icon
+    mFileNameFilter     = (char*)"All files (*.*)|*.*";
+    mBottomSizer        = nullptr;
+    mControlPanel       = nullptr;
+    mSaveScreenControls = nullptr;
+    mSplitter           = nullptr;
+    m_buttonBox         = nullptr;
+    mButtonRows         = 9;
+    wxToolTip::Enable( Preferences::getShowToolTips() );
+}
+#endif
+//----------------------------------------------------------------------
 /** \brief MainFrame ctor. */
 MainFrame::MainFrame ( int dummy )
-    : wxFrame( NULL, -1, _T("CAVASS"), wxPoint(gWhere,gWhere),
+    : wxFrame( nullptr, -1, _T("CAVASS"), wxPoint(gWhere,gWhere),
                wxSize(WIDTH,HEIGHT) ),
       mModuleName(_T("CAVASS"))
 {
     SetIcon( wxICON(cavass_icon) );  //set the icon
-    mFileNameFilter     = (char *)"All files (*.*)|*.*";
-    mBottomSizer        = NULL;
-    mControlPanel       = NULL;
-    mSaveScreenControls = NULL;
-    mSplitter           = NULL;
-	m_buttonBox         = NULL;
-	mButtonRows         = 9;
+    mBottomSizer        = nullptr;
+    mButtonRows         = 9;
+    mCanvas             = nullptr;
+    mClassifyMenu       = nullptr;
+    mControlPanel       = nullptr;
+    mFileMenu           = nullptr;
+    mFileNameFilter     = (char*) "All files (*.*)|*.*";
+    mHideControls       = nullptr;
+    mMainPanel          = nullptr;
+    mPersistentMe       = nullptr;
+    mSaveScreenControls = nullptr;
+    mSegmentMenu        = nullptr;
+    mSplitter           = nullptr;
+    mVOIMenu            = nullptr;
+    mWindowMenu         = nullptr;
+	m_buttonBox         = nullptr;
     wxToolTip::Enable( Preferences::getShowToolTips() );
 }
 //----------------------------------------------------------------------
 /** \brief MainFrame ctor. */
 MainFrame::MainFrame ( )
-    : wxFrame( NULL, -1, _T("CAVASS"), wxPoint(gWhere,gWhere),
+    : wxFrame( nullptr, -1, _T("CAVASS"), wxPoint(gWhere,gWhere),
       wxSize(WIDTH,HEIGHT) ),
       mModuleName(_T("CAVASS"))
 {
@@ -82,13 +112,20 @@ MainFrame::MainFrame ( )
     }
 
     SetIcon( wxICON(cavass_icon) );  //set the icon
-    mFileNameFilter     = (char *)"All files (*.*)|*.*";
-    mBottomSizer        = NULL;
-    mControlPanel       = NULL;
-    mSaveScreenControls = NULL;
-    mSplitter           = NULL;
-	m_buttonBox         = NULL;
-	mButtonRows         = 9;
+    mBottomSizer        = nullptr;
+    mButtonRows         = 9;
+    mClassifyMenu       = nullptr;
+    mControlPanel       = nullptr;
+    mFileMenu           = nullptr;
+    mFileNameFilter     = (char*) "All files (*.*)|*.*";
+    mHideControls       = nullptr;
+    mPersistentMe       = nullptr;
+    mSaveScreenControls = nullptr;
+    mSegmentMenu        = nullptr;
+    mSplitter           = nullptr;
+    mVOIMenu            = nullptr;
+    mWindowMenu         = nullptr;
+	m_buttonBox         = nullptr;
 
     initializeMenu();
     ::copyWindowTitles( this );
@@ -111,7 +148,7 @@ MainFrame::MainFrame ( )
     wxSizer*  mainSizer = new wxBoxSizer(wxVERTICAL);
 
     //middle, image panel
-    mCanvas = new MainCanvas( mMainPanel, this, -1, wxDefaultPosition,
+    mCanvas = new MainCanvas( mMainPanel, this, wxID_ANY, wxDefaultPosition,
         wxDefaultSize );
     if (Preferences::getCustomAppearance()) {
         mCanvas->SetBackgroundColour( wxColour(DkBlue) );
@@ -131,6 +168,7 @@ MainFrame::MainFrame ( )
     mainSizer->SetSizeHints( this );
     
     Maximize( true );
+    restoreFrameSettings();  // <-- _MUST_ be called before Show(); and Raise(); (otherwise SetPosition and other calls will be ignored)
     Show();
     Raise();
 #ifdef WIN32
@@ -145,14 +183,14 @@ MainFrame::MainFrame ( )
 /** \brief Define standard menu bar. */
 void MainFrame::initializeMenu ( void ) {
     //init menu bar and menu items
-    wxMenuBar*  menu_bar = new wxMenuBar();
+    auto menu_bar = new wxMenuBar();
 
     mFileMenu = new wxMenu();
     mFileMenu->Append( ID_NEW,           "&New..."   );
     mFileMenu->Append( ID_OPEN,          "&Open..."  );
 
     mFileMenu->Append( ID_INPUT,         "&Input..." );
-    wxMenu*  import_menu = new wxMenu();
+    auto import_menu = new wxMenu();
     mFileMenu->Append( ID_IMPORT,        "&Import", import_menu );
         import_menu->Append( ID_IMPORT_DICOM,       "DICOM"       );
         import_menu->Append( ID_IMPORT_EASYHEADER,  "EasyHeader"  );
@@ -160,7 +198,7 @@ void MainFrame::initializeMenu ( void ) {
         import_menu->Append( ID_IMPORT_MATHEMATICA, "Mathematica" );
         import_menu->Append( ID_IMPORT_R,           "R"           );
         import_menu->Append( ID_IMPORT_VTK,         "VTK"         );
-    wxMenu*  export_menu = new wxMenu();
+    auto export_menu = new wxMenu();
     mFileMenu->Append( ID_EXPORT,        "&Export", export_menu );
         export_menu->Append( ID_EXPORT_DICOM,       "DICOM"       );
         export_menu->Append( ID_EXPORT_MATHEMATICA, "Mathematica" );
@@ -180,14 +218,17 @@ void MainFrame::initializeMenu ( void ) {
 #endif
     menu_bar->Append( mFileMenu, "&File" );
 
-    wxMenu*  edit_menu = new wxMenu();
+    auto edit_menu = new wxMenu();
     edit_menu->Append( ID_COPY,        "&Copy" );
     edit_menu->Append( ID_PASTE,       "&Paste" );
+    edit_menu->Append( ID_UNDO,        "&Undo" );
+    edit_menu->Append( ID_REDO,        "&Redo" );
     edit_menu->AppendSeparator();
     edit_menu->Append( ID_PREFERENCES, "&Preferences..." );
     menu_bar->Append( edit_menu, "&Edit" );
-    
-    wxMenu*  tools_menu = new wxMenu();
+    edit_menu->Enable( ID_PASTE, false );
+
+    auto tools_menu = new wxMenu();
     tools_menu->Append( ID_TUTORIALS,   "&Tutorials" );
     tools_menu->Append( ID_RECIPES,     "&Recipes" );
     tools_menu->Append( ID_TASKS,       "&Tasks" );
@@ -201,9 +242,9 @@ void MainFrame::initializeMenu ( void ) {
 #endif
     tools_menu->Enable( ID_TASKS,       false );
     tools_menu->Enable( ID_RECIPES,     false );
-    
-    wxMenu*  preprocess_menu = new wxMenu();
-    wxMenu*  pp_scops_menu = new wxMenu();
+
+    auto preprocess_menu = new wxMenu();
+    auto pp_scops_menu = new wxMenu();
 
     mVOIMenu = new wxMenu();
     mVOIMenu->Append( ID_PP_SCOPS_VOI_ROI, "&ROI" );
@@ -230,7 +271,7 @@ void MainFrame::initializeMenu ( void ) {
     pp_scops_menu->Append( ID_PP_SCOPS_ALGEBRA,  "&Algebra"  );
     
     pp_scops_menu->Append( ID_PP_SCOPS_REGISTER, "&Register" );
-    wxMenu*  pp_stops_menu = new wxMenu();
+    auto pp_stops_menu = new wxMenu();
     pp_stops_menu->Append( ID_PP_STOPS_SURFACE_NORMAL, "&Surface Normal" );
     pp_stops_menu->Append( ID_PP_STOPS_MERGE_STRUCTURES, "&Merge Structures" );
     pp_stops_menu->Append( ID_PP_STOPS_TO_STRUCTURE, "&To Structure" );
@@ -238,13 +279,13 @@ void MainFrame::initializeMenu ( void ) {
     preprocess_menu->Append( ID_PP_SCOPS, "Scene Operations", pp_scops_menu );
     preprocess_menu->Append( ID_PP_STOPS, "Structure Operations", pp_stops_menu );
     menu_bar->Append( preprocess_menu, "&Preprocess" );
-    
-    wxMenu*  visualize_menu = new wxMenu();
+
+    auto visualize_menu = new wxMenu();
     //slice: montage, cycle, reslice
-    wxMenu*  vis_slice_menu = new wxMenu();
+    auto vis_slice_menu = new wxMenu();
     vis_slice_menu->Append( ID_VIS_MONTAGE, "&Montage" );
 
-    wxMenuItem* menuItem = new wxMenuItem( vis_slice_menu, ID_VIS_CYCLE, "&Cycle" );
+    auto menuItem = new wxMenuItem( vis_slice_menu, ID_VIS_CYCLE, "&Cycle" );
     vis_slice_menu->Append( menuItem );
 
     //menuItem = new wxMenuItem( vis_slice_menu, ID_VIS_RESLICE, "&Reslice" );
@@ -258,24 +299,24 @@ void MainFrame::initializeMenu ( void ) {
     //volume: view, measure, create movie
     visualize_menu->Append( ID_VIS_VOL_VIEW, "&Volume" );
     menu_bar->Append( visualize_menu, "&Visualize" );
-    
-    wxMenu*  manipulate_menu = new wxMenu();
+
+    auto manipulate_menu = new wxMenu();
     //select slice, measure, reflect, cut, separate, move, create movie
     manipulate_menu->Append( ID_MANIPULATE, "&Manipulate" );
     menu_bar->Append( manipulate_menu, "&Manipulate" );
 
-    wxMenu*  analyze_menu = new wxMenu();
+    auto analyze_menu = new wxMenu();
     //scene: density profile, roi statistics
-    wxMenu*  scene_menu = new wxMenu();
+    auto scene_menu = new wxMenu();
     scene_menu->Append( ID_ANL_DENSITY, "&Density Profile" );
     scene_menu->Append( ID_ANL_ROI,     "&ROI" );
     analyze_menu->Append( ID_ANL_SCENE, "&Scene", scene_menu );
     //structure: register, kinematics
-    wxMenu*  structure_menu = new wxMenu();
+    auto structure_menu = new wxMenu();
     structure_menu->Append( ID_ANL_REGISTER,   "&Register" );
     structure_menu->Append( ID_ANL_STATIC,   "&Static" );
 
-    wxMenu* KinematicsMenu = new wxMenu();
+    auto KinematicsMenu = new wxMenu();
     KinematicsMenu->Append( ID_ANL_KINEMATICS_INTER, "&Inter" );
     KinematicsMenu->Append( ID_ANL_KINEMATICS_INTRA, "&Intra" );
     structure_menu->Append( ID_ANL_KINEMATICS, "&Kinematics", KinematicsMenu );
@@ -297,7 +338,7 @@ void MainFrame::initializeMenu ( void ) {
 #endif
     menu_bar->Append( mWindowMenu, "&Window" );
 
-    wxMenu*  help_menu = new wxMenu();
+    auto help_menu = new wxMenu();
 #ifdef __MACH__
     mHideControls = new wxMenuItem( mWindowMenu, ID_WINDOW_HIDE_CONTROLS,
                                     "Hide Controls\tAlt-C" );
@@ -317,7 +358,7 @@ void MainFrame::initializeMenu ( void ) {
     SetMenuBar( menu_bar );
     
     CreateStatusBar( 5 );
-    int  widths[] = { -1, 400, 100, 100, 100 };
+    int  widths[] = { -1, 250, 150, 150, 150 };
     SetStatusWidths( 5, widths );
     SetStatusText( "Ready",  0 );
     SetStatusText( "Left",   2 );
@@ -325,16 +366,30 @@ void MainFrame::initializeMenu ( void ) {
     SetStatusText( "Right",  4 );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void MainFrame::restoreFrameSettings ( ) {
+    cout << "MainFrame::restoreFrameSettings() \n";
+    mPersistentMe = wxPersistenceManager::Get().Register( this, new PersistentMainFrame(this) );
+    bool ok = wxPersistenceManager::Get().Restore( this );
+    assert( ok );
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief MainFrame dtor. */
-MainFrame::~MainFrame ( void ) {
+MainFrame::~MainFrame ( ) {
     cout << "MainFrame::~MainFrame" << endl;
     wxLogMessage( "MainFrame::~MainFrame" );
-    if (mCanvas!=NULL) { delete mCanvas;  mCanvas=NULL; }
+    if (mPersistentMe != nullptr) {
+        //update persisted values
+        mPersistentMe->Save();
+        delete mPersistentMe;
+        mPersistentMe = nullptr;
+    }
+    //if (mSplitter!=nullptr) { delete mSplitter;  mSplitter=nullptr; }
+    //if (mCanvas!=NULL) { delete mCanvas;  mCanvas=NULL; }
 #if 1
     Vector::iterator  i;
     for (i=::gFrameList.begin(); i!=::gFrameList.end(); i++) {
         if (*i==this) {
-            if (mCanvas!=NULL)  {  delete mCanvas;  mCanvas=NULL;  }
+            if (mCanvas!=nullptr)  {  delete mCanvas;  mCanvas=nullptr;  }
             ::gFrameList.erase( i );
             break;
         }
@@ -356,7 +411,7 @@ MainFrame::~MainFrame ( void ) {
  *  \param filename the file name which may match
  *  \returns true if the filename matches; false otherwise
  */
-bool MainFrame::match ( wxString filename ) {
+bool MainFrame::match ( wxString& filename ) {
     wxString  fn = filename.Upper();
     if (wxMatchWild( "*.BIM",   fn, false ))    return true;
     if (wxMatchWild( "*.BMP",   fn, false ))    return true;
@@ -379,8 +434,7 @@ bool MainFrame::match ( wxString filename ) {
     return false;
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MainFrame::flush_temp_data( void )
-{
+void MainFrame::flush_temp_data ( ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for key presses.  nothing is currently done. */
@@ -443,23 +497,31 @@ void MainFrame::OnCopy ( wxCommandEvent& unused ) {
     wxTheClipboard->Close();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void MainFrame::OnRedo ( wxCommandEvent& unused ) {
+    cout << "MainFrame::OnRedo" << endl;
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void MainFrame::OnUndo ( wxCommandEvent& unused ) {
+    cout << "MainFrame::OnUndo" << endl;
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnAbout ( wxCommandEvent& unused ) {
     wxMessageBox(
-"CAVASS version 1.1.4 \n\
+"CAVASS version 2.0 \n\
 \n\
   Xinjian Chen, Ph.D.,\n\
   George J. Grevera, Ph.D.,\n\
   Tad Iwanaga, M.S.,\n\
-  Tingching Kao, M.S., \n\
+  Tingching Kao, M.S.,\n\
   Shipra Mishra, B.S.,\n\
   Dewey Odhner, M.A.,\n\
   Andre Souza, Ph.D.,\n\
   Yubing Tong, Ph.D.,\n\
   Jayaram K. Udupa, Ph.D.,\n\
   Xiaofen Zheng, Ph.D.,\n\
-  Ying (Ronald) Zhuge, Ph.D.                    \n\
+  Ying (Ronald) Zhuge, Ph.D.\n\
 \n\
-Copyright 1993-2024 University of Pennsylvania",
+Copyright 1993-2025 University of Pennsylvania",
         _T("About CAVASS"),
         wxICON_INFORMATION | wxOK );
 }
@@ -500,14 +562,14 @@ void MainFrame::OnOpen ( wxCommandEvent& e ) {
     wxString  tmp = filename;
     tmp.LowerCase();
     if (tmp.EndsWith( ".bim" ) || tmp.EndsWith( ".im0" )) {
-        MontageFrame*  frame = new MontageFrame();
+        auto frame = new MontageFrame();
         frame->loadFile( filename.c_str() );
-        MontageCanvas*  canvas = dynamic_cast<MontageCanvas*>( frame->mCanvas );
+        auto canvas = dynamic_cast<MontageCanvas*>( frame->mCanvas );
         assert( canvas != NULL );
         canvas->setScale( 1.0 );
         if (Preferences::getSingleFrameMode())    Close();
     } else if (tmp.EndsWith( ".bs0" ) || tmp.EndsWith( ".bs2" ) || tmp.EndsWith( ".sh0" )) {
-        SurfViewFrame*  frame = new SurfViewFrame();
+        auto frame = new SurfViewFrame();
         wxArrayString  f;
         f.Add( filename );
         frame->loadFiles( f );
@@ -525,8 +587,8 @@ void MainFrame::OnMontage ( wxCommandEvent& e ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnDocumentation ( wxCommandEvent& unused ) {
  wxDialog       dlg( this, wxID_ANY, wxString(_("CAVASS Documentation")) );
-    wxBoxSizer*    topsizer = new wxBoxSizer( wxVERTICAL );
-    wxHtmlWindow*  html = new wxHtmlWindow( &dlg, wxID_ANY, wxDefaultPosition,
+    auto topsizer = new wxBoxSizer( wxVERTICAL );
+    auto html = new wxHtmlWindow( &dlg, wxID_ANY, wxDefaultPosition,
         wxSize(600, 400), wxHW_SCROLLBAR_AUTO );
     html->SetBorders( 0 );
     wxString  s = wxString::Format( "%s/docs/index.html", (const char *)Preferences::getHome().c_str() );
@@ -539,7 +601,7 @@ void MainFrame::OnDocumentation ( wxCommandEvent& unused ) {
 #if wxUSE_STATLINE
     topsizer->Add( new wxStaticLine(&dlg, wxID_ANY), 0, wxEXPAND|wxLEFT|wxRIGHT, 10 );
 #endif // wxUSE_STATLINE
-    wxButton*  bu1 = new wxButton( &dlg, wxID_OK, _("OK") );
+    auto bu1 = new wxButton( &dlg, wxID_OK, _("OK") );
     bu1->SetDefault();
     topsizer->Add( bu1, 0, wxALL|wxALIGN_RIGHT, 15 );
 #endif
@@ -551,9 +613,9 @@ void MainFrame::OnDocumentation ( wxCommandEvent& unused ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnTutorials ( wxCommandEvent& unused ) {
-    wxDialog       dlg( this, wxID_ANY, wxString(_("CAVASS Tutorials")) );
-    wxBoxSizer*    topsizer = new wxBoxSizer( wxVERTICAL );
-    wxHtmlWindow*  html = new wxHtmlWindow( &dlg, wxID_ANY, wxDefaultPosition,
+    wxDialog dlg( this, wxID_ANY, wxString(_("CAVASS Tutorials")) );
+    auto topsizer = new wxBoxSizer( wxVERTICAL );
+    auto html = new wxHtmlWindow( &dlg, wxID_ANY, wxDefaultPosition,
         wxSize(600, 400), wxHW_SCROLLBAR_AUTO );
     html->SetBorders( 0 );
     wxString  s = wxString::Format( "%s/tutorials/Tutorial_intro.html", (const char *)Preferences::getHome().c_str() );
@@ -566,7 +628,7 @@ void MainFrame::OnTutorials ( wxCommandEvent& unused ) {
 #if wxUSE_STATLINE
     topsizer->Add( new wxStaticLine(&dlg, wxID_ANY), 0, wxEXPAND|wxLEFT|wxRIGHT, 10 );
 #endif // wxUSE_STATLINE
-    wxButton*  bu1 = new wxButton( &dlg, wxID_OK, _("OK") );
+    auto bu1 = new wxButton( &dlg, wxID_OK, _("OK") );
     bu1->SetDefault();
     topsizer->Add( bu1, 0, wxALL|wxALIGN_RIGHT, 15 );
 #endif
@@ -578,11 +640,11 @@ void MainFrame::OnTutorials ( wxCommandEvent& unused ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnTasks ( wxCommandEvent& unused ) {
-    // \todo
+    /** \todo not implemeted */
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnRecipes ( wxCommandEvent& unused ) {
-    // \todo
+    /** \todo not implemeted */
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnEasyHeader ( wxCommandEvent& unused ) {
@@ -590,6 +652,11 @@ void MainFrame::OnEasyHeader ( wxCommandEvent& unused ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnExample ( wxCommandEvent& unused ) {
+    if (mPersistentMe != nullptr) {
+        mPersistentMe->Save();  //this should be automagic!
+        delete mPersistentMe;
+        mPersistentMe = nullptr;
+    }
     ExampleFrame::createExampleFrame( this );
 }
 
@@ -686,9 +753,8 @@ void MainFrame::OnPPScopsVOIStandardize   ( wxCommandEvent& unused )
     wxArrayString  names;
     f.GetPaths( names );
 
-    if ( names.Count()>0)
-    { 
-        VOIStandardlizeFrame*  frame = new VOIStandardlizeFrame(); 
+    if (names.Count() > 0) {
+        auto frame = new VOIStandardlizeFrame();
         frame->loadFile(names); 
         if (Preferences::getSingleFrameMode())    Close(); 
     }
@@ -703,7 +769,7 @@ void MainFrame::OnPPStopsToScene ( wxCommandEvent& unused )
         wxFILE_MUST_EXIST ); 
      
     if (filename.Length()>0) { 
-        ToSceneFrame*  frame = new ToSceneFrame(); 
+        auto frame = new ToSceneFrame();
         frame->loadFile(filename); 
         if (Preferences::getSingleFrameMode())    Close(); 
     }
@@ -718,7 +784,7 @@ void MainFrame::OnDensityAnalysis ( wxCommandEvent& unused )
         wxFILE_MUST_EXIST ); 
      
     if (filename.Length()>0) { 
-        DensityFrame*  frame = new DensityFrame(); 
+        auto frame = new DensityFrame();
         frame->loadFile(filename.c_str()); 
         if (Preferences::getSingleFrameMode())    Close(); 
     }
@@ -733,7 +799,7 @@ void MainFrame::OnROIAnalysis ( wxCommandEvent& unused )
         wxFILE_MUST_EXIST ); 
      
     if (filename.Length()>0) { 
-        ROIStatisticalFrame*  frame = new ROIStatisticalFrame(); 
+        auto frame = new ROIStatisticalFrame();
         frame->loadFile(filename.c_str()); 
         if (Preferences::getSingleFrameMode())    Close(); 
     }
@@ -749,7 +815,7 @@ void MainFrame::OnAnalyzeStatic ( wxCommandEvent& unused )
         wxFILE_MUST_EXIST ); 
      
     if (filename.Length()>0) { 
-        AnalyzeStaticFrame*  frame = new AnalyzeStaticFrame(); 
+        auto frame = new AnalyzeStaticFrame();
         frame->loadFile(filename.c_str()); 
         if (Preferences::getSingleFrameMode())    Close(); 
     }
@@ -765,7 +831,7 @@ void MainFrame::OnKinematicsIntra ( wxCommandEvent& unused )
         wxFILE_MUST_EXIST ); 
      
     if (filename.Length()>0) { 
-        KinematicsIntraFrame*  frame = new KinematicsIntraFrame(); 
+        auto frame = new KinematicsIntraFrame();
         frame->loadFile(filename.c_str()); 
         if (Preferences::getSingleFrameMode())    Close(); 
     }
@@ -791,7 +857,7 @@ void MainFrame::OnKinematicsInter ( wxCommandEvent& unused )
         return;
     } 
     
-    KinematicsInterFrame*  frame = new KinematicsInterFrame();
+    auto frame = new KinematicsInterFrame();
     frame->loadFile( names );
         
     if (Preferences::getSingleFrameMode())    Close();
@@ -807,6 +873,11 @@ void MainFrame::OnPPScopsThreshold ( wxCommandEvent& unused ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnSegment2d ( wxCommandEvent& unused ) {
+    if (mPersistentMe != nullptr) {
+        mPersistentMe->Save();  //this should be automagic!
+        delete mPersistentMe;
+        mPersistentMe = nullptr;
+    }
     Segment2dFrame::createSegment2dFrame( this );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -852,13 +923,13 @@ void MainFrame::OnAlgebra ( wxCommandEvent& unused )
         }
     }
     //at this point, f1 and f2 contain the names of the files
-    AlgebraFrame*  frame = new AlgebraFrame();
+    auto frame = new AlgebraFrame();
     int err = frame->loadFile( f1.c_str() );
     if( err > 0 )
     {
         wxMessageBox( "Algebra can not load the first image.", "Load Image Fail.", wxOK );
         
-        if( frame != NULL )
+        if (frame != nullptr)
             delete frame;
 
         return;
@@ -867,12 +938,12 @@ void MainFrame::OnAlgebra ( wxCommandEvent& unused )
     err = frame->loadFile( f2.c_str() );
     if( err > 0 )
     {
-        if( err == 100 )
+        if ( err == 100 )
             wxMessageBox( "The first image size is different with the second image.", "Algebra Operation Can not Proceed.", wxOK );
         else
             wxMessageBox( "Algebra can not load the second image.", "Load Image Fail.", wxOK );
 
-        if( frame != NULL )
+        if (frame != nullptr)
             delete frame;
 
         return;
@@ -882,7 +953,7 @@ void MainFrame::OnAlgebra ( wxCommandEvent& unused )
     {
         wxMessageBox( "Algebra requires that you select two Equal Size Images.", "Require Equal Size Images.", wxOK );
         
-        if( frame != NULL )
+        if (frame != nullptr)
             delete frame;
 
         return;
@@ -920,7 +991,7 @@ void MainFrame::OnRegister ( wxCommandEvent& unused ) {
         if (!f2 || f2.Length()<=0)    return;
     }
     //at this point, f1 and f2 contain the names of the files
-    RegisterFrame*  frame = new RegisterFrame();
+    auto frame = new RegisterFrame();
         frame->loadFile( f1.c_str() );
         frame->loadFile( f2.c_str() );
         if (Preferences::getSingleFrameMode())    Close();
@@ -952,10 +1023,10 @@ void MainFrame::OnVisOverlay ( wxCommandEvent& e ) {
         if (!f2 || f2.Length()<=0)    return;
     }
     //at this point, f1 and f2 contain the names of the files
-    OverlayFrame*  frame = new OverlayFrame();
-        frame->loadFile( f1.c_str() );
-        frame->loadFile( f2.c_str() );
-        if (Preferences::getSingleFrameMode())    Close();
+    auto frame = new OverlayFrame();
+    frame->loadFile( f1.c_str() );
+    frame->loadFile( f2.c_str() );
+    if (Preferences::getSingleFrameMode())    Close();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnVisSurfView ( wxCommandEvent& e ) {
@@ -970,13 +1041,28 @@ void MainFrame::OnManipulate ( wxCommandEvent& e ) {
     SurfViewFrame::createSurfViewFrame( this, true, true, true );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void MainFrame::OnQuit ( wxCommandEvent& e ) {
-    Close( TRUE );
-    exit( 0 );
+/** called in response to menu selection 'exit' */
+void MainFrame::OnQuit ( wxCommandEvent& unused ) {
+    //Close( TRUE );
+    if (Preferences::getSingleFrameMode())    OnClose( unused );
+    else {
+        /** \todo need to iterate over all frames and close 'em */
+#if 0
+        //Vector::iterator  i;
+        for (auto i=::gFrameList.begin(); i!=::gFrameList.end(); i++) {
+            if (*i == this) {
+                ::gFrameList.erase( i );
+                break;
+            }
+        }
+#endif
+    }
+//    exit( 0 );  //don't call. persistence won't be saved.
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnMaximize ( wxMaximizeEvent& unused ) {
-    if (mSplitter==NULL)    return;
+    //cout << "MainFrame::OnMaximize()" << endl;
+    if (mSplitter == nullptr)    return;
     mSplitter->SetSashPosition( -dControlsHeight );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -988,13 +1074,13 @@ void MainFrame::OnMove ( wxMoveEvent& e ) {
  *  of the window.
  */
 void MainFrame::OnSaveScreen ( wxCommandEvent& unused ) {
-    if (mSaveScreenControls!=NULL) {
+    if (mSaveScreenControls != nullptr) {
         delete mSaveScreenControls;
-        mSaveScreenControls = NULL;
+        mSaveScreenControls = nullptr;
         return;
     }
 
-    if (mControlPanel!=NULL && mBottomSizer!=NULL) {
+    if (mControlPanel!=nullptr && mBottomSizer!=nullptr) {
         mSaveScreenControls = new SaveScreenControls( mControlPanel,
             mBottomSizer, ID_APPEND_SCREEN, ID_BROWSE_SCREEN,
             ID_OVERWRITE_SCREEN );
@@ -1006,7 +1092,7 @@ void MainFrame::OnShowScreen ( wxCommandEvent& unused ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnAppendScreen ( wxCommandEvent& unused ) {
-    assert( mSaveScreenControls!=NULL );
+    assert( mSaveScreenControls!=nullptr );
     mCanvas->appendContents( (char*)(const char *)mSaveScreenControls->getFileName().c_str() );
     SetStatusText( "ready",  0 );
 }
@@ -1021,27 +1107,39 @@ void MainFrame::OnBrowseScreen ( wxCommandEvent& unused ) {
     if (filename.Length()>0) {
         wxString  s = wxString::Format( "file selected %s", (const char *)filename.c_str() );
         SetStatusText( s,  0 );
-        if (mSaveScreenControls!=NULL)
+        if (mSaveScreenControls!=nullptr)
             mSaveScreenControls->setFileName( filename );
     }
     Raise();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnOverwriteScreen ( wxCommandEvent& unused ) {
-    assert( mSaveScreenControls!=NULL );
+    assert( mSaveScreenControls!=nullptr );
     mCanvas->saveContents( (char*)(const char *)mSaveScreenControls->getFileName().c_str() );
     SetStatusText( "ready",  0 );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/** called via event mgr */
 void MainFrame::OnCloseEvent ( wxCloseEvent& unused ) {
-    cout << "MainFrame::OnCloseEvent" << endl;
+    cout << "MainFrame::OnCloseEvent for " << whatAmI() << endl;
+    /* set last frame info in preferences */
+    Preferences::setLastFrame( whatAmI() );
+    /** save window location, window size, maximized or not, etc. */
+    if (mPersistentMe != nullptr) {
+        //update persisted values
+        mPersistentMe->Save();
+        delete mPersistentMe;
+        mPersistentMe = nullptr;
+    }
+
     ::removeFromAllWindowMenus( mWindowTitle );
     Destroy();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/** called in response to menu selection */
 void MainFrame::OnClose ( wxCommandEvent& unused ) {
-    cout << "OnClose" << endl;
-    wxLogMessage( "OnClose" );
+    cout << "MainFrame::OnClose" << endl;
+    wxLogMessage( "MainFrame::OnClose" );
     Close( true );
 #if 1
     Vector::iterator  i;
@@ -1062,8 +1160,8 @@ void MainFrame::OnClose ( wxCommandEvent& unused ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnPageSetup ( wxCommandEvent& unused ) {
-    assert( g_pageSetupData != NULL );
-    assert( g_printData     != NULL );
+    assert( g_pageSetupData != nullptr );
+    assert( g_printData     != nullptr );
     *g_pageSetupData = *g_printData;
     wxPageSetupDialog  pageSetupDialog( this, g_pageSetupData );
     pageSetupDialog.ShowModal();
@@ -1073,9 +1171,9 @@ void MainFrame::OnPageSetup ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void MainFrame::OnPrintPreview ( wxCommandEvent& unused ) {
     // Pass two printout objects: for preview, and possible printing.
-    assert( g_printData != NULL );
-    wxPrintDialogData  printDialogData( *g_printData );
-    wxPrintPreview*    preview = new wxPrintPreview(
+    assert( g_printData != nullptr );
+    wxPrintDialogData printDialogData( *g_printData );
+    auto preview = new wxPrintPreview(
         new MainPrint(wxString("CAVASS").c_str(), mCanvas),
         new MainPrint(wxString("CAVASS").c_str(), mCanvas),
         &printDialogData );
@@ -1085,7 +1183,7 @@ void MainFrame::OnPrintPreview ( wxCommandEvent& unused ) {
         return;
     }
     
-    wxPreviewFrame*  frame = new wxPreviewFrame( preview, this,
+    auto frame = new wxPreviewFrame( preview, this,
         _T("CAVASS Print Preview"),
         wxPoint(100, 100), wxSize(425, 550) );  //was 600x650
     frame->Centre( wxBOTH );
@@ -1107,7 +1205,7 @@ void MainFrame::OnPrint ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for toggling control panel on and off. */
 void MainFrame::OnHideControls ( wxCommandEvent& unused ) {
-    if (mSplitter==NULL)    return;
+    if (mSplitter==nullptr)    return;
     if (mSplitter->IsSplit()) {
         mSplitter->Unsplit();
         mHideControls->SetItemLabel( "Show Controls\tAlt-C" );

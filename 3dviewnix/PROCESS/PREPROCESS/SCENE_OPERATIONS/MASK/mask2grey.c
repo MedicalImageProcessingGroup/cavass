@@ -23,17 +23,17 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 /*******************
 *  In this file:   *
 *  TAB = 4 spaces  *
-* (Set you editor) *
+* (Set your editor) *
 *******************/
 
 
-/*
+/** <pre>
 	This program performs MASKING on an nD Scene (3DViewnix format).
 	It creates one file for each of the objects represented in the MASK file.
 	The output is a Grey Scene.
 
 
-	Each slice is is loaded and MASKED individually based on a mask file.
+	Each slice is loaded and MASKED individually based on a mask file.
 
 	The format for the mask file is as follows (the file below contains 'n' masked images):
 
@@ -62,6 +62,7 @@ Date  : 01/29/93
 
 % cc mask2grey.c -o mask2grey -I$VIEWNIX_ENV/INCLUDE  $VIEWNIX_ENV/LIBRARY/lib3dviewnix.a -lX11 -lm
 
+</pre>
 */
 
 

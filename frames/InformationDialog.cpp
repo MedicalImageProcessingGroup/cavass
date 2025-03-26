@@ -563,9 +563,11 @@ void InformationDialog::OnSelect ( wxCommandEvent& unused ) {
         sprintf( buff, "Bits/Cell   : %d\n", vh->dsp.num_of_bits );
         mDisplay->AppendText( buff );
     }
-    if (temp == NULL)
+    if (temp == nullptr)
         free_viewnix_header(vh);
 }
+//----------------------------------------------------------------------
+InformationDialog::~InformationDialog ( ) { }
 //----------------------------------------------------------------------
 IMPLEMENT_DYNAMIC_CLASS ( InformationDialog, wxDialog )
 BEGIN_EVENT_TABLE       ( InformationDialog, wxDialog )

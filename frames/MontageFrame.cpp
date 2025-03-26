@@ -37,6 +37,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "MontagePrint.h"
 #include  "MontageCanvas.h"
 #include  "CineControls.h"
+#include  "GrayMapControls.h"
 #include  "SetIndexControls.h"
 #include  "TextControls.h"
 
@@ -238,6 +239,10 @@ void MontageFrame::addButtonBox ( void ) {
 MontageFrame::~MontageFrame ( void ) {
     cout << "MontageFrame::~MontageFrame" << endl;
     wxLogMessage( "MontageFrame::~MontageFrame" );
+
+    //needed for canvas dtors and persistence
+    //gjg    if (mSplitter!=nullptr) { delete mSplitter; mSplitter = nullptr; }
+
     Vector::iterator  i;
     for (i=::gFrameList.begin(); i!=::gFrameList.end(); i++) {
         if (*i==this) {

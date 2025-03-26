@@ -1,3 +1,39 @@
+/**
+ * \file mask2bin.c
+ * \brief This program performs MASKING on an nD Scene (3DViewnix format).
+ *
+ * <pre>
+	It creates one file for each of the objects represented in the MASK file.
+	The output is a Binary Scene.
+
+	Each slice is loaded and MASKED individually based on a mask file.
+
+	The format for the mask file is as follows (the file below contains 'n' masked images):
+
+	- name of file (scene) in which mask was created (100 characters)
+	- byte0	(mask byte indicating what objects are represented by the mask image, unsigned char)
+	- areas0 (eight unsigned shorts with the value for the area of each mask in pixels)
+	- image0(array of unsigned chars containing the mask byte for each pixel, width x height)
+	- byte1
+	- areas1 
+	- image1
+	- byte2
+	- areas2 
+	- image2
+	  &middot;
+	  &middot;
+	  &middot;
+	- byte(n-1)
+	- areas(n-1)
+	- image(n-1)
+
+Author: Roberto J. Goncalves
+Date  : 01/29/93
+
+% cc mask2bin.c -o mask2bin  -I$VIEWNIX_ENV/INCLUDE $VIEWNIX_ENV/LIBRARY/lib3dviewnix.a -lX11 -lm
+ * </pre>
+ */
+
 /*
   Copyright 1993-2014 Medical Image Processing Group
               Department of Radiology
@@ -23,52 +59,12 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 /*******************
 *  In this file:   *
 *  TAB = 4 spaces  *
-* (Set you editor) *
+* (Set your editor) *
 *******************/
-
-
-/*
-	This program performs MASKING on an nD Scene (3DViewnix format).
-	It creates one file for each of the objects represented in the MASK file.
-	The output is a Binary Scene.
-
-
-	Each slice is is loaded and MASKED individually based on a mask file.
-
-	The format for the mask file is as follows (the file below contains 'n' masked images):
-
-	- name of file (scene) in which mask was created (100 characters)
-	- byte0	(mask byte indicating what objects are represented by the mask image, unsigned char)
-	- areas0 (eight unsigned shorts with the value for the area of each mask in pixels)
-	- image0(array of unsigned chars containing the mask byte for each pixel, width x height)
-	- byte1
-	- areas1 
-	- image1
-	- byte2
-	- areas2 
-	- image2
-		.
-		.
-		.
-		.
-	- byte(n-1)
-	- areas(n-1)
-	- image(n-1)
-
-
-
-Author: Roberto J. Goncalves
-Date  : 01/29/93
-
-% cc mask2bin.c -o mask2bin  -I$VIEWNIX_ENV/INCLUDE $VIEWNIX_ENV/LIBRARY/lib3dviewnix.a -lX11 -lm
-
-*/
-
 
  
 #include <cv3dv.h>
 #include "slices.c"
-
 
 void mask8tobin(unsigned char *mask, int n, int w, int h, unsigned char *out),
  mask8togrey(unsigned char *in, unsigned char *mask, int n, int w, int h,
@@ -76,14 +72,10 @@ void mask8tobin(unsigned char *mask, int n, int w, int h, unsigned char *out),
  mask16togrey(unsigned short *in, unsigned char *mask, int n, int w, int h,
    unsigned short *out);
 
-
 unsigned char onbit[8] = { 1, 2, 4, 8, 16, 32, 64, 128};    /* bits on a byte */
 unsigned char binpix[8] = {128, 64, 32, 16, 8, 4, 2, 1};	/* binary pixels */
-
-
- 
 /*-------------------------------------------------------------------------*/
-/* Read the file header and its length */
+/** Read the file header and its length */
 int get_file_info(file, vh, len)
 ViewnixHeader *vh;
 char *file; /* filename */

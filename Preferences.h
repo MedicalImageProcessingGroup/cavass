@@ -54,9 +54,11 @@ class Preferences {
      *
      *  If the instance does not already exist, it will be created.
      */
-    static Preferences* Instance ( void ) {
-        if (_instance!=0)    return _instance;
+    static Preferences* Instance ( ) {
+        //if it already exists, then use it
+        if (_instance != nullptr)    return _instance;
 
+        //doesn't already exist. create it/set it up.
         _instance    = new Preferences;
         _preferences = wxConfigBase::Get();
         ::gInputFileHistory.Load( *_preferences );
@@ -66,38 +68,46 @@ class Preferences {
         _customAppearance = _preferences->Read( "customAppearance", _customAppearance );
 
         wxGetEnv( "VIEWNIX_ENV", &_home );
+
+        //very important to set _home correctly
         _home = _preferences->Read( "home", _home );
+
         _hostNames = _preferences->Read( "hostNames", _hostNames );
         _hostProcessCounts = _preferences->Read( "hostProcessCounts", _hostProcessCounts );
         _inputDirectory = _preferences->Read( "inputDirectory", _inputDirectory );
         if (wxFileName::DirExists(_inputDirectory))
             ::wxSetWorkingDirectory( _inputDirectory );
+        _lastFrame = _preferences->Read( "lastFrame", _lastFrame );
         _MPIDirectory = _preferences->Read( "MPIDirectory", _MPIDirectory );
         _outputDirectory = _preferences->Read( "outputDirectory", _outputDirectory );
         _parallelMode = _preferences->Read( "parallelMode", _parallelMode );
         _preferences->Write( "saveScreenFileName", "temp.tiff" );
         _saveScreenFileName = _preferences->Read( "saveScreenFileName",
                                                   _saveScreenFileName );
-        _showLog         = _preferences->Read( "showLog",         _showLog );
-        _showSaveScreen  = _preferences->Read( "showSaveScreen",  _showSaveScreen );
-        _showToolTips    = _preferences->Read( "showToolTips",    _showToolTips );
-        _singleFrameMode = _preferences->Read( "singleFrameMode", _singleFrameMode );
-        _dejaVuMode      = _preferences->Read( "dejaVuMode",      _dejaVuMode  );
+        _showLog          = _preferences->Read( "showLog",         _showLog );
+        _showLog_x        = _preferences->Read( "showLog_x",       _showLog_x );
+        _showLog_y        = _preferences->Read( "showLog_y",       _showLog_y );
+        _showLog_w        = _preferences->Read( "showLog_w",       _showLog_w );
+        _showLog_h        = _preferences->Read( "showLog_h",       _showLog_h );
+        _showSaveScreen   = _preferences->Read( "showSaveScreen",  _showSaveScreen );
+        _showToolTips     = _preferences->Read( "showToolTips",    _showToolTips );
+        _singleFrameMode  = _preferences->Read( "singleFrameMode", _singleFrameMode );
+        _dejaVuMode       = _preferences->Read( "dejaVuMode",      _dejaVuMode  );
 
-        _stereoMode      = _preferences->Read( "stereoMode",      _stereoMode    );
-        _stereoAngle     = _preferences->Read( "stereoAngle",     _stereoAngle   );
+        _stereoMode       = _preferences->Read( "stereoMode",      _stereoMode    );
+        _stereoAngle      = _preferences->Read( "stereoAngle",     _stereoAngle   );
 
-        _stereoLeftRed   = _preferences->Read( "stereoLeftRed",   _stereoLeftRed    );
-        _stereoLeftGreen = _preferences->Read( "stereoLeftGreen", _stereoLeftGreen  );
-        _stereoLeftBlue  = _preferences->Read( "stereoLeftBlue",  _stereoLeftBlue   );
+        _stereoLeftRed    = _preferences->Read( "stereoLeftRed",   _stereoLeftRed    );
+        _stereoLeftGreen  = _preferences->Read( "stereoLeftGreen", _stereoLeftGreen  );
+        _stereoLeftBlue   = _preferences->Read( "stereoLeftBlue",  _stereoLeftBlue   );
 
-        _stereoRightRed  = _preferences->Read( "stereoRightRed",  _stereoRightRed    );
-        _stereoRightGreen= _preferences->Read( "stereoRightGreen",_stereoRightGreen  );
-        _stereoRightBlue = _preferences->Read( "stereoRightBlue", _stereoRightBlue   );
+        _stereoRightRed   = _preferences->Read( "stereoRightRed",  _stereoRightRed    );
+        _stereoRightGreen = _preferences->Read( "stereoRightGreen",_stereoRightGreen  );
+        _stereoRightBlue  = _preferences->Read( "stereoRightBlue", _stereoRightBlue   );
 
-        _stereoLeftOdd   = _preferences->Read( "stereoLeftOdd",   _stereoLeftOdd  );
+        _stereoLeftOdd    = _preferences->Read( "stereoLeftOdd",   _stereoLeftOdd  );
 
-        _useInputHistory = _preferences->Read( "useInputHistory", _useInputHistory  );
+        _useInputHistory  = _preferences->Read( "useInputHistory", _useInputHistory  );
         _customAppearance = _preferences->Read("customAppearance",_customAppearance );
 
         _fgRed   = _preferences->Read( "fgRed",   _fgRed   );
@@ -114,10 +124,10 @@ class Preferences {
         _CTSoftTissueWidth  = _preferences->Read( "CTSoftTissueWidth",  _CTSoftTissueWidth  );
         _CTBoneCenter       = _preferences->Read( "CTBoneCenter",       _CTBoneCenter       );
         _CTBoneWidth        = _preferences->Read( "CTBoneWidth",        _CTBoneWidth        );
-        _PETCenter       = _preferences->Read( "PETCenter",       _PETCenter       );
-        _PETWidth        = _preferences->Read( "PETWidth",        _PETWidth        );
+        _PETCenter          = _preferences->Read( "PETCenter",       _PETCenter       );
+        _PETWidth           = _preferences->Read( "PETWidth",        _PETWidth        );
 
-		_OverlayScale       = _preferences->Read( "OverlayScale",        _OverlayScale      );
+		_OverlayScale  = _preferences->Read( "OverlayScale",        _OverlayScale      );
 		_IM0onIM0Red   = _preferences->Read( "IM0onIM0Red",   _IM0onIM0Red   );
 		_IM0onIM0Green = _preferences->Read( "IM0onIM0Green", _IM0onIM0Green );
 		_IM0onIM0Blue  = _preferences->Read( "IM0onIM0Blue",  _IM0onIM0Blue  );
@@ -241,7 +251,7 @@ class Preferences {
     static double getOverlayScale ( void ) {
         Preferences::Instance();
 		double val;
-		_OverlayScale.ToDouble(&val);
+		_OverlayScale.ToDouble( &val );
         return val;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -360,6 +370,12 @@ class Preferences {
         return _inputDirectory;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief accessor for last frame accessed (viz., closed). */
+    static wxString getLastFrame ( ) {
+        Preferences::Instance();
+        return _lastFrame;
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief accessor for MPI directory preference. */
     static wxString getMPIDirectory ( void ) {
         Preferences::Instance();
@@ -386,10 +402,34 @@ class Preferences {
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief accessor for show information log preference. */
-    static bool getShowLog ( void ) {
+    static bool getShowLog ( ) {
         Preferences::Instance();
         if (_showLog)    return true;
         return false;
+    }
+
+    /** \brief accessor for show information log preference. */
+    static long getShowLog_x ( ) {
+        Preferences::Instance();
+        return _showLog_x;
+    }
+
+    /** \brief accessor for show information log preference. */
+    static long getShowLog_y ( ) {
+        Preferences::Instance();
+        return _showLog_y;
+    }
+
+    /** \brief accessor for show information log preference. */
+    static long getShowLog_w ( ) {
+        Preferences::Instance();
+        return _showLog_w;
+    }
+
+    /** \brief accessor for show information log preference. */
+    static long getShowLog_h ( ) {
+        Preferences::Instance();
+        return _showLog_h;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief accessor for show save screen preference. */
@@ -429,7 +469,9 @@ class Preferences {
     /** \brief accessor for stereo angle preference. */
     static double getStereoAngle ( void ) {
         Preferences::Instance();
-        return _stereoAngle;
+        double val;
+        _stereoAngle.ToDouble( &val );
+        return val;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief accessor for left red color preference for stereo anaglyph mode. */
@@ -774,6 +816,14 @@ class Preferences {
         Preferences::DeleteInstance();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    /** \brief mutator for last frame accessed (viz., closed). */
+    static void setLastFrame ( wxString newValue ) {
+        Preferences::Instance();
+        _lastFrame = newValue;
+        _preferences->Write( "lastFrame", _lastFrame );
+        Preferences::DeleteInstance();
+    }
+    // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \brief mutator for mpi directory preference. */
     static void setMPIDirectory ( wxString newValue ) {
         Preferences::Instance();
@@ -816,6 +866,28 @@ class Preferences {
         if (newValue)    _showLog = true;
         else             _showLog = false;
         _preferences->Write( "showLog", _showLog );
+        Preferences::DeleteInstance();
+    }
+
+    static void setShowLog_x ( long newValue ) {
+        Preferences::Instance();
+        _preferences->Write( "showLog_x", newValue );
+        Preferences::DeleteInstance();
+    }
+    static void setShowLog_y ( long newValue ) {
+        Preferences::Instance();
+        _preferences->Write( "showLog_y", newValue );
+        Preferences::DeleteInstance();
+    }
+
+    static void setShowLog_w ( long newValue ) {
+        Preferences::Instance();
+        _preferences->Write( "showLog_w", newValue );
+        Preferences::DeleteInstance();
+    }
+    static void setShowLog_h ( long newValue ) {
+        Preferences::Instance();
+        _preferences->Write( "showLog_h", newValue );
         Preferences::DeleteInstance();
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -873,7 +945,7 @@ class Preferences {
     /** \brief mutator for stereo angle preference. */
     static void setStereoAngle ( double newValue ) {
         Preferences::Instance();
-        _stereoAngle = newValue;
+        _stereoAngle = wxString::Format( "%.2f", newValue );
         _preferences->Write( "stereoAngle", _stereoAngle );
         Preferences::DeleteInstance();
     }
@@ -949,6 +1021,10 @@ class Preferences {
     /** \todo add additional preference mutators here. */
 
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+    static bool getPersistence (  const string& group, const string& key, int& currentValue, int defaultValue );
+//    static bool getPersistence (  const string& group, const char* key, int& currentValue, int defaultValue );
+//    static bool getPersistence (  const string& group, const char* key, bool& currentValue, bool defaultValue );
+    static bool getPersistence (  const string& group, const string& key, string& currentValue, string& defaultValue );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   private:
     /** \brief ctor - do not use! this is a singleton. */
@@ -961,11 +1037,16 @@ class Preferences {
     static long      _customAppearance; ///< 0=default; 1=custom appearance on
     static wxString  _home;             ///< CAVASS home directory
     static wxString  _inputDirectory;   ///< input directory
+    static wxString  _lastFrame;        ///< last frame accessed (viz., closed)
     static wxString  _MPIDirectory;     ///< mpi directory
     static wxString  _outputDirectory;  ///< output directory
     static long      _parallelMode;     ///< 0=default; 1=parallel mode on
     static wxString  _saveScreenFileName;  ///< file name of file to which screens are saved
     static long      _showLog;          ///< 0=off; 1=show information log enabled
+    static long      _showLog_x;        ///< log window position, x
+    static long      _showLog_y;        ///< log window position, y
+    static long      _showLog_w;        ///< log window width
+    static long      _showLog_h;        ///< log window height
     static long      _showSaveScreen;   ///< 0=off; 1=show save screen enabled
     static long      _showToolTips;     ///< 0=off; 1=tooltips enabled
     static long      _singleFrameMode;  ///< 0=multi frame mode; 1=single frame mode
@@ -974,7 +1055,7 @@ public:
     enum {           StereoModeOff, StereoModeAnaglyph, StereoModeInterlaced };  ///< stereo modes
 private:
     static long      _stereoMode;       ///< stereo off, anaglyph, or interlaced
-    static double    _stereoAngle;      ///< stereo angle value (in y direction) in degrees
+    static wxString  _stereoAngle;      ///< stereo angle value (in y direction) in degrees
     static int       _stereoLeftRed,  _stereoLeftGreen,  _stereoLeftBlue;   ///< stereo anaglyph left rgb color
     static int       _stereoRightRed, _stereoRightGreen, _stereoRightBlue;  ///< stereo anaglyph right rgb color
     static int       _stereoLeftOdd;    ///< stereo interlaced rows 1=left-odd-right-even; 0=left-even-right-odd

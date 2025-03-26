@@ -27,6 +27,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "CineControls.h"
 #include  "CovarianceControls.h"
 #include  "FunctionControls.h"
+#include  "GrayMapControls.h"
 #include  "HistoSettingControls.h"
 #include  "SetFuzzCompIndexControls.h"
 

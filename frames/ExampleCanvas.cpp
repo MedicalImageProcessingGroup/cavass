@@ -310,18 +310,36 @@ void ExampleCanvas::OnLeftDown ( wxMouseEvent& e ) {
 
     //simulate the middle button for a two button mouse
     if (e.ShiftDown()) {
+        cout << "OnLeftDown: shift down" << endl;    wxLogMessage("OnLeftDown: shift down");
         //pass the event up to the parent frame
-        ExampleFrame*   p = (ExampleFrame*)m_parent_frame;
+        auto p = (ExampleFrame*)m_parent_frame;
         wxCommandEvent  unused;
         p->OnPrevious( unused );  //middle button
         return;
     }
     if (e.ControlDown()) {
+        cout << "OnLeftDown: ctrl down" << endl;    wxLogMessage("OnLeftDown: ctrl down");
         //pass the event up to the parent frame
-        ExampleFrame*   p = (ExampleFrame*)m_parent_frame;
+        auto p = (ExampleFrame*)m_parent_frame;
         wxCommandEvent  unused;
         p->OnNext( unused );  //right button
         return;
+    }
+    //can't get these to fire on linuxmint (ubuntu) + gtk
+    if (e.AltDown()) {
+        cout << "OnLeftDown: alt down" << endl;    wxLogMessage("OnLeftDown: alt down");
+    }
+    if (e.Aux1Down()) {
+        cout << "OnLeftDown: aux1 down" << endl;    wxLogMessage("OnLeftDown: aux1 down");
+    }
+    if (e.Aux2Down()) {
+        cout << "OnLeftDown: aux2 down" << endl;    wxLogMessage("OnLeftDown: aux2 down");
+    }
+    if (e.CmdDown()) {
+        cout << "OnLeftDown: cmd down" << endl;    wxLogMessage("OnLeftDown: cmd down");
+    }
+    if (e.MetaDown()) {
+        cout << "OnLeftDown: meta down" << endl;    wxLogMessage("OnLeftDown: meta down");
     }
 
     const wxPoint  pos = e.GetPosition();
@@ -330,8 +348,8 @@ void ExampleCanvas::OnLeftDown ( wxMouseEvent& e ) {
     PrepareDC(dc);
     const long  wx = dc.DeviceToLogicalX( pos.x ) - mTx;
     const long  wy = dc.DeviceToLogicalY( pos.y ) - mTy;
-    mLastX = wx;
-    mLastY = wy;
+    mLastX = (int)wx;
+    mLastY = (int)wy;
     SetCursor( wxCursor(wxCURSOR_HAND) );
 }
 //----------------------------------------------------------------------
@@ -344,7 +362,7 @@ void ExampleCanvas::OnLeftUp ( wxMouseEvent& e ) {
 }
 //----------------------------------------------------------------------
 /** \brief callback for paint events. */
-void ExampleCanvas::OnPaint ( wxPaintEvent& e ) {
+void ExampleCanvas::OnPaint ( wxPaintEvent& unused ) {
     wxMemoryDC  m;
     int         w, h;
     GetSize( &w, &h );
@@ -374,9 +392,12 @@ void ExampleCanvas::OnPaint ( wxPaintEvent& e ) {
 //----------------------------------------------------------------------
 /** \brief called in response to paint, print, or copy to the clipboard. */
 void ExampleCanvas::paint ( wxDC* dc ) {
+    auto f = dc->GetFont();
+    f = f.Scale( 0.9 );
+    dc->SetFont( f );
+
     dc->SetTextBackground( *wxBLACK );
     dc->SetTextForeground( wxColour(Yellow) );
-    
     if (mBitmaps!=NULL) {
         int  i=0;
         for (int r=0; r<mRows; r++) {

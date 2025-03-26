@@ -32,9 +32,12 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
-#include  <wx/stdpaths.h>
 #include  "cavass.h"
+#include  <wx/stdpaths.h>
 #include  "MontageCanvas.h"
+
+#include  "frames/ExampleFrame.h"
+#include  "frames/segment2d/Segment2dFrame.h"
 
 Vector            demonsInputList;
 wxPrintData*      g_printData = NULL;      ///< global print data - to remember settings during the session
@@ -85,6 +88,27 @@ void setColor ( wxWindow* w ) {
         //w->SetForegroundColour( wxColour(Yellow) );
         w->SetForegroundColour( wxColour(r,g,b) );
     }
+}
+//----------------------------------------------------------------------
+void setBoxColor ( wxWindow* w ) {
+#ifdef __MACH__
+    //Don't set the colors on MainFrames or subclasses on the mac.
+    // If we do, the status bar text will be unreadable.
+    if (dynamic_cast<MainFrame*>(w) != nullptr)    return;
+#endif
+    if (Preferences::getCustomAppearance()) {
+        w->SetBackgroundColour( wxColour(LtBlue) );
+        w->SetForegroundColour( wxColour(Yellow) );
+    }
+}
+//----------------------------------------------------------------------
+void setSliderBoxColor ( wxWindow* w ) {
+#ifdef USING_GTK
+    w->SetBackgroundColour(wxColour(200, 200, 200));
+    w->SetForegroundColour(wxColour(0, 0, 0));
+#else
+    ::setBoxColor( w );
+#endif
 }
 //----------------------------------------------------------------------
 void setBackgroundColor ( wxWindow* w ) {
@@ -433,7 +457,7 @@ static unsigned char* lookup ( CavassData& cd, double sx, double sy ) {
             int  c = cd.getData( x1, y2, cd.m_sliceNo );
             int  d = cd.getData( x2, y2, cd.m_sliceNo );
 
-            // \todo interpolate the gray value at the desired position
+            /** \todo interpolate the gray value at the desired position */
             int  v = interpolate( a, b, c, d, x1, x2, y1, y2, xPos, yPos );
             v -= cd.m_min;
             if (v<0)    v = 0;
@@ -477,7 +501,19 @@ unsigned char* toRGBInterpolated ( CavassData& cd, double sx, double sy ) {
 static void calledAtExit ( void ) {
 	//this is very important because it causes the write to the configuration file
     cout << "calledAtExit" << endl;
-    delete wxConfigBase::Set( (wxConfigBase*)NULL );
+
+    //save location
+    wxPoint p;
+    p = gLogWindow->GetFrame()->GetPosition();
+    Preferences::setShowLog_x( p.x );
+    Preferences::setShowLog_y( p.y );
+    //save size
+    wxSize  s;
+    s = gLogWindow->GetFrame()->GetSize();
+    Preferences::setShowLog_w( s.GetWidth() );
+    Preferences::setShowLog_h( s.GetHeight() );
+
+    delete wxConfigBase::Set( (wxConfigBase*)nullptr );
 }
 //======================================================================
 /** \brief CavassMain definition and implementation.
@@ -489,17 +525,30 @@ class CavassMain : public wxApp {
     virtual bool OnInit ( void ) {
         puts( "in CavassMain::OnInit()" );
 
-        #if defined(_DEBUG)
+        #ifdef _DEBUG
             puts( "_DEBUG" );
         #endif
-        #if defined(NDEBUG)
+        #ifdef NDEBUG
             puts( "NDEBUG" );
         #endif
-        #if defined(__OPTIMIZE__)
+        #ifdef __OPTIMIZE__
             puts( "__OPTIMIZE__" );
+        #endif
+        #ifdef wxUSE_TOOLTIPS
+            puts( "wxUSE_TOOLTIPS defined" );
         #endif
         printf( "wxWidgets version: %d.%d.%d.%d \n", wxMAJOR_VERSION,
                 wxMINOR_VERSION, wxRELEASE_NUMBER, wxSUBRELEASE_NUMBER );
+        #ifdef USING_GTK
+            puts( "USING_GTK defined" );
+        #endif
+        #ifdef BUILD_WITH_TORCH
+            puts( "BUILD_WITH_TORCH" );
+        #endif
+        #ifdef BUILD_WITH_ITK
+            puts( "BUILD_WITH_ITK" );
+        #endif
+        puts( "" );
 
 #if defined (WIN32) || defined (_WIN32)
         putenv( "WXSUPPRESS_SIZER_FLAGS_CHECK=1" );
@@ -523,38 +572,61 @@ class CavassMain : public wxApp {
         loadConfig();
 		::modifyEnvironment( (char *)(const char *)argv[0].c_str() );
 
-
         wxInitAllImageHandlers();
-        gLogWindow = new wxLogWindow( NULL, "log", Preferences::getShowLog(), false );
+        gLogWindow = new wxLogWindow( nullptr, "log", false, false );
+        //get size
+        wxSize  s( (int)Preferences::getShowLog_w(), (int)Preferences::getShowLog_h() );
+        gLogWindow->GetFrame()->SetSize( s );
+        //get location
+        wxPoint p( (int)Preferences::getShowLog_x(), (int)Preferences::getShowLog_y() );
+        gLogWindow->GetFrame()->SetPosition( p );
+        gLogWindow->Show( Preferences::getShowLog() );
+
         //set icon for log window as well
         gLogWindow->GetFrame()->SetIcon( wxICON(cavass_icon) );
 
         wxLogMessage( "VIEWNIX_ENV=%s", getenv("VIEWNIX_ENV") );
         wxLogMessage( "PATH=%s",        getenv("PATH") );
         wxLogMessage( "ARGV[0]=%s",     argv[0] );
-		wxLogMessage( "ARGC=%d",        argc );
+        wxLogMessage( "ARGC=%d",        argc );
         wxLogMessage( "CAVASS home=%s", (const char *)Preferences::getHome().c_str() );
+        wxLogMessage( "config file=%s", (const char*)iniFile.c_str() );
 
         g_printData = new wxPrintData;
         g_pageSetupData = new wxPageSetupDialogData;
         gDefaultFont = wxFont( 10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL );
 
-        if (argc<2) {
-            MainFrame*  f = new MainFrame();
-            wxBitmap  bitmap( cavass_splash_xpm );
+        if (argc < 2) {
+            //run w/out any cmd line args
+            if (Preferences::getDejaVuMode()) {
+                if (Preferences::getLastFrame() == "Segment2dFrame") {
+                    cout << "opening last frame (Segment2dFrame)" << endl;
+                    Segment2dFrame::createSegment2dFrame( nullptr );
+                    return true;
+                }
+                if (Preferences::getLastFrame() == "ExampleFrame") {
+                    cout << "opening last frame (ExampleFrame)" << endl;
+                    ExampleFrame::createExampleFrame( nullptr );
+                    return true;
+                }
+                /** \todo add other frames here */
+            }
+            //otherwise, just create a main frame
+            cout << "creating MainFrame" << endl;
+            auto f = new MainFrame();
+            wxBitmap bitmap(cavass_splash_xpm);
             //if (bitmap.LoadFile( "cavass-splash.jpg", wxBITMAP_TYPE_JPEG )) {
-                new wxSplashScreen( bitmap,
-                        wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
-                        6000, f, wxID_ANY, wxDefaultPosition,
-                        wxDefaultSize );
-                wxYield();
+            new wxSplashScreen( bitmap,
+                                wxSPLASH_CENTRE_ON_SCREEN | wxSPLASH_TIMEOUT,
+                                6000, f, wxID_ANY, wxDefaultPosition,wxDefaultSize);
+            wxYield();
             //}
 //        } else if (argc==4 && strcmp(argv[1],"-mask")==0) {
 //            doMask( argc, argv );
-        }
-        else if (argc==2 && strlen((char *)(const char *)argv[1].c_str())>4 &&
-				strcmp((char *)(const char *)argv[1].c_str()+
-				strlen((char *)(const char *)argv[1].c_str())-4, ".IM0")==0) {
+        } else if (argc==2 && strlen((char *)(const char *)argv[1].c_str())>4 &&
+                   strcmp((char *)(const char *)argv[1].c_str()+
+                   strlen((char *)(const char *)argv[1].c_str())-4, ".IM0")==0)
+        {
 			wxFileName fn(argv[1]);
 			wxFileName gw(fn.GetPath(), "greymap.TMP");
 			wxSetWorkingDirectory(fn.GetPath());
@@ -583,7 +655,7 @@ class CavassMain : public wxApp {
         }
 
         //loadRamp();  //for testing the display
-        return TRUE;
+        return true;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     /** \todo this never gets called because exit(0) is directly called

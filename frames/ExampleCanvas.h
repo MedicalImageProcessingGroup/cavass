@@ -31,8 +31,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
-#ifndef __ExampleCanvas_h
-#define __ExampleCanvas_h
+#pragma once
 
 #include  <deque>
 #include  <math.h>
@@ -45,7 +44,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  *  the drawing area of the window).
  *
  *  This class is responsible for drawing images (typically) in the upper
- *  part of the window or frame.  The main method are the constuctors,
+ *  part of the window or frame.  The main method are the constructors,
  *  loadFile, and OnPaint.  The set* methods (mutators) change the 
  *  appearance of the drawn images.  The get* methods (inspectors) return
  *  the values of the current settings.
@@ -82,7 +81,7 @@ protected:
     void loadData ( char* name,
         const int xSize, const int ySize, const int zSize,
         const double xSpacing, const double ySpacing, const double zSpacing,
-        const int* const data, const ViewnixHeader* const vh=NULL,
+        const int* const data, const ViewnixHeader* const vh=nullptr,
         const bool vh_initialized=false );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     void loadFile ( const char* const fn );
@@ -96,11 +95,11 @@ protected:
     void OnMiddleUp   ( wxMouseEvent& e );
     void OnMouseMove  ( wxMouseEvent& e );
     void OnMouseWheel ( wxMouseEvent& e );
-    void OnPaint      ( wxPaintEvent& e );
+    void OnPaint      ( wxPaintEvent& unused ) override;
     void OnRightDown  ( wxMouseEvent& e );
     void OnRightUp    ( wxMouseEvent& e );
 
-    void paint        ( wxDC* dc );
+    void paint        ( wxDC* dc ) override;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     bool   isLoaded    ( const int which ) const;
 
@@ -131,4 +130,3 @@ protected:
     DECLARE_EVENT_TABLE()
 };
 
-#endif

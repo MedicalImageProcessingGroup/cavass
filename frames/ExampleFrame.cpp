@@ -17,7 +17,6 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
-
 */
 
 //======================================================================
@@ -31,21 +30,29 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Rise and shine and give God your glory (glory).
  */
 //======================================================================
-#include  "cavass.h"
-#include  "ExampleFrame.h"
-#include  "ExampleCanvas.h"
+/**
+ * #include "cavass.h" MUST appear before any #includes of wx .h's (because
+ * it defines a symbol, wxUSE_CONFIG_NATIVE, that is used by the wx headers )
+ */
+#include "cavass.h"
+#include "CButton.h"
+#include "ExampleFrame.h"
+#include "ExampleCanvas.h"
+#include "GrayMapControls.h"
+#include "PersistentExampleFrame.h"
 
-extern Vector  gFrameList;
+extern Vector gFrameList;
 //----------------------------------------------------------------------
 /** \brief Constructor for ExampleFrame class.
  *
  *  Most of the work in this method is in creating the control panel at
  *  the bottom of the window.
  */
-ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
+ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )  //false )
 {
+    cout << "ExampleFrame::ExampleFrame( maximize, w, h )" << endl;
     //init the types of input files that this app can accept
-    mFileNameFilter     = (char *)"CAVASS files (*.BIM;*.IM0;*.MV0)|*.BIM;*.IM0;*.MV0|DICOM files (*.DCM;*.DICOM;*.dcm;*.dicom)|*.DCM;*.DICOM;*.dcm;*.dicom|image files (*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff)|*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff";
+    mFileNameFilter     = (char*) "CAVASS files (*.BIM;*.IM0;*.MV0)|*.BIM;*.IM0;*.MV0|DICOM files (*.DCM;*.DICOM;*.dcm;*.dicom)|*.DCM;*.DICOM;*.dcm;*.dicom|image files (*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff)|*.bmp;*.gif;*.jpg;*.jpeg;*png;*.pcx;*.tif;*.tiff";
     mFileOrDataCount    = 0;
     mGrayMapControls    = nullptr;
     mModuleName         = "CAVASS:Example";
@@ -58,16 +65,14 @@ ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
         gWhere += cWhereIncr;
         if (gWhere>WIDTH || gWhere>HEIGHT)    gWhere = cWhereIncr;
     }
-    
+
     initializeMenu();
     ::setColor( this );
     mSplitter = new MainSplitter( this );
-    mSplitter->SetSashGravity( 1.0 );
-    mSplitter->SetSashPosition( -dControlsHeight );
     ::setColor( mSplitter );
 
     //top of window contains image(s) displayed via ExampleCanvas
-    mCanvas = new ExampleCanvas( mSplitter, this, -1, wxDefaultPosition, wxDefaultSize );
+    mCanvas = new ExampleCanvas( mSplitter, this, wxID_ANY, wxDefaultPosition, wxDefaultSize );
     if (Preferences::getCustomAppearance()) {
         mCanvas->SetBackgroundColour( wxColour(DkBlue) );
         mCanvas->SetForegroundColour( wxColour(Yellow) );
@@ -79,7 +84,7 @@ ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
     //bottom of window contains controls
     mControlPanel = new wxPanel( mSplitter, -1, wxDefaultPosition, wxDefaultSize );
     ::setColor( mControlPanel );
-    
+
     mSplitter->SplitHorizontally( mCanvas, mControlPanel, -dControlsHeight );
     mBottomSizer = new wxBoxSizer( wxHORIZONTAL );
 
@@ -89,23 +94,26 @@ ExampleFrame::ExampleFrame ( bool maximize, int w, int h ) : MainFrame( 0 )
 
     if (maximize)    Maximize( true );
     else             SetSize( w, h );
-    mSplitter->SetSashPosition( -dControlsHeight );
-    Show();
-    Raise();
+    restoreFrameSettings();  // <-- _MUST_ be called before Show(); and Raise(); (otherwise SetPosition and other calls will be ignored)
+    m_buttonBox->SetMinSize( wxSize(mCanvas->GetSize().x/6, 0) );  //because size of window may have changed
+
 #if wxUSE_DRAG_AND_DROP
     SetDropTarget( new MainFileDropTarget );
 #endif
-
     SetStatusText( "Move",     2 );
     SetStatusText( "Previous", 3 );
     SetStatusText( "Next",     4 );
 
     wxToolTip::Enable( Preferences::getShowToolTips() );
-    mSplitter->SetSashPosition( -dControlsHeight );
+    //mSplitter->SetSashPosition( -dControlsHeight );
     if (Preferences::getShowSaveScreen()) {
         wxCommandEvent  unused;
         OnSaveScreen( unused );
     }
+
+    Show();
+    Raise();
+    cout << "ExampleFrame::ExampleFrame done. \n";
 }
 //----------------------------------------------------------------------
 /** \brief initialize menu bar and items (in addition to the standard ones).
@@ -135,46 +143,36 @@ void ExampleFrame::initializeMenu ( ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief add the button box that appears on the lower right. */
 void ExampleFrame::addButtonBox ( ) {
-#if 1
-    mBottomSizer->Add( 0, 0, 1, wxALL );  //spacer
-    //box for buttons
-    m_buttonBox = new wxStaticBox( mControlPanel, wxID_ANY, "Example" );
-    ::setColor( m_buttonBox );
-    auto buttonSizer = new wxStaticBoxSizer( m_buttonBox, wxVERTICAL );
-    auto gs = new wxGridSizer( 2, 10, 10 );
-    //row 1, col 1
-    auto prev = new wxButton( m_buttonBox, ID_PREVIOUS, "Previous" );
-    ::setColor( prev );
-    gs->Add( prev, 1, wxEXPAND, 20 );
-    //row 1, col 2
-    auto next = new wxButton( m_buttonBox, ID_NEXT, "Next" );
-    ::setColor( next );
-    gs->Add( next, 1, wxEXPAND, 20 );
-    //row 2, col 1
-    auto grayMap = new wxButton( m_buttonBox, ID_GRAYMAP, "GrayMap" );
-    ::setColor( grayMap );
-    gs->Add( grayMap, 1, wxEXPAND, 20 );
+    //add spacer
+    //mBottomSizer->Add( 500, 0, 1, wxALL|wxEXPAND );
+    mBottomSizer->Add( 0, 0, 1 );
 
-    //buttonSizer->Add( gs, 1, wxGROW|wxALL, 10 );
-    //mBottomSizer->Add( buttonSizer, 0, wxGROW|wxALL, 10 );
-    buttonSizer->Add( gs, 0, 0, 0 );
-    mBottomSizer->Add( buttonSizer, 0, 0, 0 );
-#endif
-#if 0
-    auto panel = new wxPanel( mControlPanel, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxBORDER );
-    auto gridSizer = new wxGridSizer(2, 3, 1, 1);
-    // Add widgets to the grid sizer
-    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 1Button1"), 1, wxEXPAND);
-    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 2"), 1, wxEXPAND);
-    gridSizer->Add(new wxButton(panel, wxID_ANY, "Bu3"), 1, wxEXPAND );
-    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 4"), 1, wxEXPAND);
-    gridSizer->Add(new wxButton(panel, wxID_ANY, "Button 5"), 1, wxEXPAND);
-    // Set the sizer for the panel
-    panel->SetSizer(gridSizer);
-    // Fit the sizer to the panel
-    gridSizer->Fit(panel);
-    gridSizer->SetSizeHints(panel);
-#endif
+    //box for buttons
+    int sz = mCanvas->GetSize().x;  //value of sz is not useful now (but useful later)
+    m_buttonBox = new wxStaticBox( mControlPanel, wxID_ANY, "Example" );
+    //    wxDefaultPosition, wxSize(1500,0) );
+    //m_buttonBox->SetMinSize( wxSize(1500, 0) );
+    ::setBoxColor( m_buttonBox );
+    auto buttonSizer = new wxStaticBoxSizer( m_buttonBox, wxVERTICAL );
+    //buttonSizer->SetMinSize( mControlPanel->GetSize().x/2, 0 );
+
+    auto gs = new wxGridSizer( 2, 0, 0 );  //gap between rows and cols of buttons
+    //gs->SetMinSize( mControlPanel->GetSize().x/2, 0 );
+    //row 0, col 0
+    auto prev = new CButton( m_buttonBox, ID_PREVIOUS, "Previous" );
+    //::setColor( prev );
+    gs->Add( prev, 1, wxEXPAND|wxALL, 5 );
+    //row 0, col 1
+    auto next = new CButton( m_buttonBox, ID_NEXT, "Next" );
+    //::setColor( next );
+    gs->Add( next, 1, wxEXPAND|wxALL, 5 );
+    //row 1, col 0
+    auto grayMap = new CButton( m_buttonBox, ID_GRAYMAP, "GrayMap" );
+    //::setColor( grayMap );
+    gs->Add( grayMap, 1, wxEXPAND|wxALL, 5 );
+
+    buttonSizer->Add( gs, 0, wxEXPAND|wxALL, 10 );
+    mBottomSizer->Add( buttonSizer, 0, wxEXPAND|wxALL, 0 );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief destructor for ExampleFrame class. */
@@ -182,22 +180,23 @@ ExampleFrame::~ExampleFrame ( ) {
     cout << "ExampleFrame::~ExampleFrame" << endl;
     wxLogMessage( "ExampleFrame::~ExampleFrame" );
 
-    if (mSplitter!=nullptr)      { delete mSplitter;      mSplitter=nullptr;     }
+    //if (mSplitter!=nullptr)      { delete mSplitter;      mSplitter=nullptr;     }
     //the destruction of the above splitter also causes the destruction of the
     // canvas.  so another destruction of the canvas causes BOOM!
     //if (mCanvas!=nullptr)        { delete mCanvas;        mCanvas=nullptr;       }
     //it appears that this is already deleted as well.
     //if (mControlPanel!=nullptr)  { delete mControlPanel;  mControlPanel=nullptr; }
     //if (mBottomSizer!=nullptr)   { delete mBottomSizer;   mBottomSizer=nullptr;  }
-    mCanvas       = nullptr;
+    //mCanvas       = nullptr;
     mControlPanel = nullptr;
     mBottomSizer  = nullptr;
     //if we are in the mode that supports having more than one window open
     // at a time, we need to remove this window from the list.
+#if 0
     Vector::iterator  i;
     for (i=::gFrameList.begin(); i!=::gFrameList.end(); i++) {
         if (*i==this) {
-            if (mCanvas!=nullptr)  {  delete mCanvas;  mCanvas=nullptr;  }
+            //if (mCanvas!=nullptr)  {  delete mCanvas;  mCanvas=nullptr;  }
             ::gFrameList.erase( i );
             break;
         }
@@ -207,6 +206,7 @@ ExampleFrame::~ExampleFrame ( ) {
     if (::gFrameList.begin() == ::gFrameList.end()) {
         exit(0);
     }
+#endif
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -273,7 +273,7 @@ void ExampleFrame::createExampleFrame ( wxFrame* parentFrame, bool useHistory )
         parentFrame->GetSize( &w, &h );
         frame = new ExampleFrame( parentFrame->IsMaximized(), w, h );
     } else {
-        frame = new ExampleFrame();
+        frame = new ExampleFrame(true);
     }
     frame->loadFile( filename.c_str() );
     //if we are in single frame mode, close the parent frame
@@ -289,7 +289,7 @@ void ExampleFrame::createExampleFrame ( wxFrame* parentFrame, bool useHistory )
  *  \param filename is the file name which may match
  *  \returns true if the filename matches; false otherwise
  */
-bool ExampleFrame::match ( wxString filename ) {
+bool ExampleFrame::match ( wxString& filename ) {
     wxString  fn = filename.Upper();
     if (wxMatchWild( "*.BIM",   fn, false ))    return true;
     if (wxMatchWild( "*.BMP",   fn, false ))    return true;
@@ -330,6 +330,117 @@ void ExampleFrame::OnInput ( wxCommandEvent& unused ) {
         OnExample( unused );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/** restore/recall/reload window frame settings (e.g., size, maximized, etc.)
+ */
+void ExampleFrame::restoreFrameSettings ( ) {
+    cout << "ExampleFrame::restoreFrameSettings() \n";
+//    SetName( whatAmI() );  //important for persistence
+    //mPersistentMe = wxPersistenceManager::Get().Register( this );  <-- never use this version
+    mPersistentMe = wxPersistenceManager::Get().Register( this, new PersistentExampleFrame(this) );
+    bool ok = wxPersistenceManager::Get().Restore( this );
+    assert( ok );
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/** restore/recall/reload graymap settings, graymap controls visible or
+ *  or not, slice number displayed, position of displayed slice, etc.
+ *  this is separate from restoreFrameSettings() until after data are
+ *  loaded and displayed.
+ *  \todo code to handle graymap should probably be refactored into one place
+ *  (GrayMapControls?)
+ */
+void ExampleFrame::restoreControlSettings ( ) {
+//    if (!Preferences::getDejaVuMode()) return;
+//    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+//    assert( canvas != nullptr );
+//    if (canvas == nullptr)    return;
+    auto tmp = dynamic_cast<PersistentExampleFrame*>( mPersistentMe );
+    assert( tmp != nullptr);
+    if (tmp == nullptr)    return;
+    tmp->restoreControlSettings();
+#if 0
+    cout << "ExampleFrame::restoreControlSettings()" << endl;
+    if (!Preferences::getDejaVuMode())    return;
+    auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+    assert( canvas != nullptr );
+    if (canvas == nullptr)    return;
+
+    //graymap controls
+    //get invert
+    int invert;
+    bool invertOK = Preferences::getPersistence(
+            PersistentExampleFrame::group, PersistentExampleFrame::gm_invert, invert,
+            canvas->getInvert(0) );
+    if (invertOK) {
+        cout << "invert=" << (invert!=0) << endl;
+        canvas->setInvert( 0, invert!=0 );
+    }
+    //get level
+    int level;
+    bool levelOK = Preferences::getPersistence(
+            PersistentExampleFrame::group, PersistentExampleFrame::gm_level, level,
+            canvas->getCenter(0) );
+    if (levelOK) {
+        cout << "level=" << level << endl;
+        canvas->setCenter(0, level);
+    }
+    //get width
+    int width;
+    bool widthOK = Preferences::getPersistence(
+            PersistentExampleFrame::group, PersistentExampleFrame::gm_width, width,
+            canvas->getWidth(0));
+    if (widthOK) {
+        cout << "width=" << width << endl;
+        canvas->setWidth(0, width);
+    }
+    //update contrast (if necessary)
+    if (levelOK || widthOK || invertOK) {
+        canvas->initLUT(0);
+        canvas->reload();
+    }
+
+    //get index of slice number to display
+    int slice;
+    bool sliceOK = Preferences::getPersistence(
+            PersistentExampleFrame::group, PersistentExampleFrame::c_slice,
+            slice, canvas->getSliceNo(0) );
+    if (sliceOK) {
+        canvas->setSliceNo( 0, slice );
+    }
+
+    //get image display position tx, ty
+    int tx;
+    bool txOK = Preferences::getPersistence(
+            PersistentExampleFrame::group, PersistentExampleFrame::c_t_x,
+            tx, canvas->mTx );
+    int ty;
+    bool tyOK = Preferences::getPersistence(
+            PersistentExampleFrame::group, PersistentExampleFrame::c_t_y,
+            ty, canvas->mTy );
+    if (txOK && tyOK) {
+        canvas->mTx = tx;
+        canvas->mTy = ty;
+        //wxObject unused;
+        //canvas->OnPaint( (wxPaintEvent&) unused );  //n.g. on win
+        canvas->Refresh();
+    }
+
+    //graymap controls visible (or not)?
+    int graymap;
+    bool graymapOK = Preferences::getPersistence(
+            PersistentExampleFrame::group,
+            PersistentExampleFrame::gm_visible, graymap, -1 );
+    if (graymapOK) {
+        if (graymap && mGrayMapControls==nullptr) {
+            wxCommandEvent unused;
+            OnGrayMap( unused );
+        } else if (!graymap && mGrayMapControls!=nullptr) {
+            wxCommandEvent unused;
+            OnGrayMap( unused );
+        }
+    }
+#endif
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief load data from a file.
  *  \param fname input file name.
  */
@@ -359,21 +470,23 @@ void ExampleFrame::loadFile ( const char* const fname ) {
     mWindowTitle = tmp;
     SetTitle( mWindowTitle );
 
+
     auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
     assert( canvas != nullptr );
+    cout << "loadFile before: size is now (w,h)=" << GetSize().GetWidth() << "," << GetSize().GetHeight() << endl;
     canvas->loadFile( fname );
-	if (!canvas->isLoaded(0))
-	{
+    cout << "loadFile after: size is now (w,h)=" << GetSize().GetWidth() << "," << GetSize().GetHeight() << endl;
+	if (!canvas->isLoaded(0)) {
 		delete m_buttonBox;
 		m_buttonBox = nullptr;
 		mFileOrDataCount = 0;
 		return;
 	}
-
     const wxString  s = wxString::Format( "file %s", fname );
     SetStatusText( s, 0 );
     Show();
     Raise();
+    restoreControlSettings();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief load (and subsequently display) data directly from memory
@@ -447,8 +560,13 @@ void ExampleFrame::OnGrayMap ( wxCommandEvent& unused ) {
     mGrayMapControls = new GrayMapControls( mControlPanel, mBottomSizer,
         "GrayMap", canvas->getCenter(0), canvas->getWidth(0),
         canvas->getMax(0), canvas->getInvert(0),
-        ID_CENTER_SLIDER, ID_WIDTH_SLIDER, wxID_ANY /*ID_INVERT*/,
-		ID_CT_LUNG, ID_CT_SOFT_TISSUE, ID_CT_BONE, ID_PET );
+        ID_CENTER_SLIDER, ID_WIDTH_SLIDER, ID_INVERT,
+		ID_CT_LUNG, ID_CT_SOFT_TISSUE, ID_CT_BONE, ID_PET,
+        0 );  /*,
+        PersistentExampleFrame::group,  PersistentExampleFrame::level,    //for persistence
+        PersistentExampleFrame::group,  PersistentExampleFrame::width,
+        PersistentExampleFrame::group,  PersistentExampleFrame::invert
+        ); */
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for center slider (used to change contrast). */
@@ -580,6 +698,15 @@ void ExampleFrame::OnPrintPreview ( wxCommandEvent& unused ) {
     frame->Show();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/** \brief callback for invert checkbox for data set  */
+void ExampleFrame::OnInvert ( wxCommandEvent& e ) {
+    bool  value = e.IsChecked();
+    auto  canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
+    canvas->setInvert( 0, value );
+    canvas->initLUT( 0 );
+    canvas->reload();
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for printing.
  *  \param unused is not used.
  */
@@ -612,6 +739,11 @@ void ExampleFrame::OnSaveScreen ( wxCommandEvent& unused ) {
 	MainFrame::OnSaveScreen( unused );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+/** must be overridden by frames that persist the sash position */
+void ExampleFrame::OnMaximize ( wxMaximizeEvent& unused ) {
+    //cout << "ExampleFrame::OnMaximize()" << endl;
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // event table and callbacks.
 IMPLEMENT_DYNAMIC_CLASS ( ExampleFrame, wxFrame )
 BEGIN_EVENT_TABLE       ( ExampleFrame, wxFrame )
@@ -628,6 +760,7 @@ BEGIN_EVENT_TABLE       ( ExampleFrame, wxFrame )
   EVT_BUTTON( ID_PREVIOUS,       ExampleFrame::OnPrevious      )
   EVT_COMMAND_SCROLL( ID_CENTER_SLIDER, ExampleFrame::OnCenterSlider )
   EVT_COMMAND_SCROLL( ID_WIDTH_SLIDER,  ExampleFrame::OnWidthSlider  )
+  EVT_CHECKBOX(       ID_INVERT,        ExampleFrame::OnInvert       )
 
 #ifdef __WXX11__
   //especially (only) need on X11 (w/out GTK) to get slider events.

@@ -36,8 +36,6 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 //======================================================================
 #pragma once
-//#ifndef __ExampleFrame_h
-//#define __ExampleFrame_h
 
 #include  "MainFrame.h"
 
@@ -45,6 +43,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  <stack>
 #include  "wx/dnd.h"
 #include  "wx/docview.h"
+#include  <wx/persist.h>
 #include  "wx/splitter.h"
 class  ExampleCanvas;
 #if ! defined (WIN32) && ! defined (_WIN32)
@@ -170,54 +169,62 @@ class  GrayMapControls;
  </p>
  */
 class ExampleFrame : public MainFrame {
-  protected:
+    friend class PersistentExampleFrame;
+  private:
+    //wxPersistentObject* mPersistentMe;
     GrayMapControls*  mGrayMapControls;     ///< gray map controls
   public:
+    string whatAmI ( ) override { return "ExampleFrame"; }
     /** \brief additional ids for buttons, sliders, etc. */
     enum {
         ID_PREVIOUS=ID_LAST,  ///< continue from where MainFrame.h left off
         ID_NEXT,
         ID_GRAYMAP, ID_CENTER_SLIDER, ID_WIDTH_SLIDER, ID_INVERT,
-        ID_CT_LUNG,        ID_CT_SOFT_TISSUE, ID_CT_BONE, ID_PET
+        ID_CT_LUNG, ID_CT_SOFT_TISSUE, ID_CT_BONE, ID_PET
     };
     int  mFileOrDataCount;  ///< count data/datafiles associated w/ this frame (1 for this example).
-  protected:
-    void initializeMenu ( );
+  private:
+    explicit ExampleFrame ( bool maximize=false, int w=800, int h=600 );
+    void initializeMenu ( ) override;
     void addButtonBox ( );
+    void restoreFrameSettings ( ) override;
+    void restoreControlSettings ( );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   public:
     static void createExampleFrame ( wxFrame* parentFrame, bool useHistory=true );
-    explicit ExampleFrame ( bool maximize=false, int w=800, int h=600 );
     ~ExampleFrame ( ) override;
-    static bool match ( wxString filename );
+    static bool match ( wxString& filename );
     //"virtualize" a static method
-    virtual bool filenameMatch ( wxString filename ) const {
+    bool filenameMatch ( wxString& filename ) const override {
         return match( filename );
     };
 
-    void loadFile ( const char* const fname );
+    void loadFile ( const char* fname );
     void loadData ( char* name,
         int xSize, int ySize, int zSize,
         double xSpacing, double ySpacing, double zSpacing,
         int* data,
         ViewnixHeader* vh=nullptr, bool vh_initialized=false );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    virtual void OnGrayMap         ( wxCommandEvent& unused );
-    virtual void OnInput           ( wxCommandEvent& unused );
-    virtual void OnMouseWheel      ( wxMouseEvent& e );
-    virtual void OnNext            ( wxCommandEvent& unused );
-    virtual void OnOpen            ( wxCommandEvent& unused );
-    virtual void OnPrevious        ( wxCommandEvent& unused );
-    virtual void OnPrint           ( wxCommandEvent& unused );
-    virtual void OnPrintPreview    ( wxCommandEvent& unused );
-    virtual void OnSaveScreen      ( wxCommandEvent& unused );
-
-    virtual void OnCenterSlider ( wxScrollEvent& e );
-    virtual void OnWidthSlider  ( wxScrollEvent& e );
+    void OnInput        ( wxCommandEvent& unused ) override;
+    void OnOpen         ( wxCommandEvent& unused ) override;
+    void OnPrint        ( wxCommandEvent& unused ) override;
+    void OnPrintPreview ( wxCommandEvent& unused ) override;
+    void OnSaveScreen   ( wxCommandEvent& unused ) override;
+    void OnGrayMap      ( wxCommandEvent& unused );
+    void OnMouseWheel   ( wxMouseEvent& e );
+    void OnNext         ( wxCommandEvent& unused );
+    void OnPrevious     ( wxCommandEvent& unused );
+    void OnInvert       ( wxCommandEvent& e );
+    void OnCenterSlider ( wxScrollEvent& e );
+    void OnWidthSlider  ( wxScrollEvent& e );
 	void OnCTLung       ( wxCommandEvent& unused );
 	void OnCTSoftTissue ( wxCommandEvent& unused );
 	void OnCTBone       ( wxCommandEvent& unused );
     void OnPET          ( wxCommandEvent& unused );
+
+    void OnMaximize     ( wxMaximizeEvent& unused ) override;
+
 #ifdef __WXX11__
     virtual void OnUpdateUICenterSlider ( wxUpdateUIEvent& unused );
     virtual void OnUpdateUIWidthSlider  ( wxUpdateUIEvent& unused );
@@ -226,6 +233,4 @@ class ExampleFrame : public MainFrame {
     DECLARE_DYNAMIC_CLASS( ExampleFrame )
     DECLARE_EVENT_TABLE()
 };
-
-//#endif
 //======================================================================

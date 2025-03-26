@@ -507,7 +507,7 @@ static void process ( ChunkData* gray, double t, char* outName )
             }
         }
 
-        // \todo handle case when whereLargest == -1
+        /** \todo handle case when whereLargest == -1 */
 
         //at this point, slice has 1's for the single largest object and 0's everywhere else.
         // relabel it again to yield one labelled foreground object, and labelled background objects.

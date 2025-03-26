@@ -34,39 +34,39 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 class MainFrame;
 
 class InformationDialog : public wxDialog {
-    wxTextCtrl*  mDisplay;
-    wxTextCtrl*  mGeneral;
-    wxListBox*   mListBox;
-    wxNotebook*  mNotebook;
-    const MainFrame*   mParent;
-    wxTextCtrl*  mScene;
-    wxSizer*     mSizer;
-    wxTextCtrl*  mStructure;
+    wxTextCtrl*       mDisplay;
+    wxTextCtrl*       mGeneral;
+    wxListBox*        mListBox;
+    wxNotebook*       mNotebook;
+    const MainFrame*  mParent;
+    wxTextCtrl*       mScene;
+    wxSizer*          mSizer;
+    wxTextCtrl*       mStructure;
     enum { ID_INFO_LIST=200 };
 public:
-    InformationDialog ( void )
-      : wxDialog ( NULL, -1, "Information", wxDefaultPosition, wxDefaultSize ),
-        mParent(NULL)
+    InformationDialog ( )
+      : wxDialog ( nullptr, -1, "Information", wxDefaultPosition, wxDefaultSize ),
+        mParent( nullptr )
     {
-        mDisplay   = NULL;
-        mGeneral   = NULL;
-        mListBox   = NULL;
-        mNotebook  = NULL;
-        mParent    = NULL;
-        mScene     = NULL;
-        mSizer     = NULL;
-        mStructure = NULL;
+        mDisplay   = nullptr;
+        mGeneral   = nullptr;
+        mListBox   = nullptr;
+        mNotebook  = nullptr;
+        mParent    = nullptr;
+        mScene     = nullptr;
+        mSizer     = nullptr;
+        mStructure = nullptr;
     }
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    InformationDialog ( MainFrame* parent );
+    explicit InformationDialog ( MainFrame* parent );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    InformationDialog ( wxArrayString& selected, MainFrame* parent=NULL );
+    explicit InformationDialog ( wxArrayString& selected, MainFrame* parent=nullptr );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	void Prepare ( wxArrayString selected );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     void OnSelect ( wxCommandEvent& unused );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-    ~InformationDialog ( void ) { }
+    ~InformationDialog ( );
 
 private:
     DECLARE_DYNAMIC_CLASS( InformationDialog )

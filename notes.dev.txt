@@ -1,0 +1,149 @@
+-----
+creating forms/controls:
+  Use wxFormBuilder to layout forms (controls).
+  It can generate C++ code that can be "adapted" to CAVASS.
+  This is much easier and less error prone that doing it "by hand."
+  binaries (including linux flatpak) available from:
+    https://github.com/wxFormBuilder/wxFormBuilder/releases
+    linux: flatpak install wxFormBuilder-4.2.1-x86_64.flatpak
+      note: (linux) run from lm Programming menu
+            (or via command: /usr/bin/flatpak run --branch=master --arch=x86_64 --command=wxformbuilder --file-forwarding org.wxformbuilder.wxFormBuilder @@ %f @@)
+-----
+instructions for using clion and valgrind:
+  https://www.jetbrains.com/help/clion/memory-profiling-with-valgrind.html
+-----
+persistence (and preference):
+
+Persisted values _and_ preferences are all stored .cavass.ini (in ~ on linux
+or c:\Users\george\AppData\Roaming on win).
+
+ex. of _preference_ (simply a name/value pair) in .cavass.ini:
+lastFrame=Segment2dFrame
+
+ex. of _persisted_ value in .cavass.ini for ExampleFrame:
+[Persistent_Options]
+[Persistent_Options/ExampleFrame]
+[Persistent_Options/ExampleFrame/frame]
+graymap=0
+isIconized=0
+isMaximized=1
+pos_x=0
+pos_y=74
+sashPos=1186
+size_h=1648
+size_w=3072
+slice=79
+invert=1
+level=2048
+width=4096
+graymap=0
+t_x=195
+t_y=373
+
+steps:
+
+1. Using PersistentExampleFrame.h and PersistentExampleFrame.cpp as a 
+   template, create files PersistentFooFrame.h and
+   PersistentFooFrame.cpp. Foo is the name of your frames.
+
+2. Create a group name string like the following:
+   const string PersistentFooFrame::group = "Persistent_Options/FooFrame/frame";
+
+3. Create strings for each of the values that will be stored. For example,
+   const string PersistentFooFrame::size_h = "size_h";
+   const string PersistentFooFrame::size_w = "size_w";
+
+   Note that the window's size has two values (viz., height and width).
+   The simplest approach to handle this is to store two separate name/value
+   pairs.
+
+4. If PersistentFooFrame needs to access private or protected members of FooFrame
+   or FooCanvas, make PersistentFooFrame a friend.
+
+5. Override the following: string FooFrame::whatAmI ( ) override { return "FooFrame"; }
+   This is used by a preference (lastFrame) to keep track of the last frame that
+   was created (and will be recreated the next time cavass runs).
+
+6. Add FooFrame::recallFrameSettings() to FooFrame.
+
+7. Add FooFrame::recallControlSettings() to FooFrame.
+   Call it at the end of FooFrame::loadFile(...).
+
+
+
+   Note: Save() and Restore() do most of the work.
+
+2. Create a name string that will be assigned to the persisted widget when
+   it is created. For example,
+       const string GrayMapControls::levelNameDefault = "graymap.level";
+   or
+       const string ExampleFrame::levelNameDefault = "example.graymap.level";
+   for different settings for each type of frame (more granularity).
+
+3. When the persisted widget is created, assign it this name. For example,
+       mLevel = new wxSlider( mContrastBox, levelSliderID, currentLevel, min,
+                              max, wxDefaultPosition, wxDefaultSize,
+                              wxSL_HORIZONTAL|wxSL_MIN_MAX_LABELS|
+                              wxSL_VALUE_LABEL );
+       //very important for persistence:
+       mLevel->SetName( GrayMapControls::levelNameDefault );
+   or
+       mLevel->SetName( ExampleFrame::levelName );
+   for different settings for each type of frame.
+
+   Then register this widget for persistence, and restore it to the
+   persisted value. For example,
+       if (Preferences::getDejaVuMode())
+           wxPersistenceManager::Get().Register( mLevel );
+
+4. When it is destroyed, .cavass.ini will be updated automatically.
+
+5. Often we need to get the persisted value without or before the widget
+   is actually created. In that case, we need to get it's value(s) from
+   .cavass.ini directly.
+
+   a. First, define a string that corresponds to its entry in .cavass.ini.
+      For example,
+        const string GrayMapControls::levelGroupDefault =
+            "Persistent_Options/wxSlider/graymap.level";
+
+   Note that the end of this string (viz., "graymap.level") matches the string
+   (associated with the widget) above.
+
+   b. Define recallPersistedSettings() in the frame .cpp file. For example,
+      void ExampleFrame::recallPersistedSettings ( ) {
+          cout << "ExampleFrame::recallPersistedSettings()" << endl;
+          if (!Preferences::getDejaVuMode())    return;
+          auto canvas = dynamic_cast<ExampleCanvas*>( mCanvas );
+          assert( canvas != nullptr );
+          if (canvas == nullptr)    return;
+
+          //get level
+          int level;
+          bool levelOK = Preferences::getPersistence(
+                  GrayMapControls::levelGroupDefault, "value", level,
+                  canvas->getCenter(0));
+          if (levelOK) {
+              cout << "level=" << level << endl;
+              canvas->setCenter(0, level);
+          }
+          //update contrast (if necessary)
+          if (levelOK) {
+              canvas->initLUT(0);
+              canvas->reload();
+          } else {
+              //report any problems
+              cerr << "At least one widget not found in .cavass.ini." << endl
+                   << "Did you ever create the widget, and call wxPersistenceManager::Get().RegisterAndRestore(widget); to create the entry in .cavass.ini?"
+                   << endl;
+          }
+      }
+
+   c. Call recallPersistedSettings() at the end of loadFile() in the frame
+      .cpp file.
+
+
+See https://docs.wxwidgets.org/3.0/overview_persistence.html.
+-----
+
+

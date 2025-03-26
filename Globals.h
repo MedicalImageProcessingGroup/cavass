@@ -243,6 +243,8 @@ bool equals ( wxFileName f1, wxFileName f2 );
 
 void setBackgroundColor ( wxWindow* w );
 void setColor           ( wxWindow* w );
+void setBoxColor        ( wxWindow* w );
+void setSliderBoxColor  ( wxWindow* w );
 void setDisabledColor   ( wxWindow* w );
 void setZoomInColor     ( wxWindow* w );
 

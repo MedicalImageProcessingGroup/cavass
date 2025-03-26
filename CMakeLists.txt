@@ -1,9 +1,19 @@
 #------------------------------------------------------------------------------
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 IF (COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
     CMAKE_POLICY(SET CMP0043 NEW)
 ENDIF (COMMAND CMAKE_POLICY)
+
+set( CMAKE_CXX_STANDARD 17 )
+set( CMAKE_PREFIX_PATH /home/jorge/mipg/libtorch/share/cmake/Torch/ )
+
+#indicate location of wxwidgets
+if (MSVC)
+    set( wxWidgets_LIB_DIR         C:/Users/george/Desktop/software/wxWidgets-3.2.6/lib/vc_x64_lib/ )
+    set( wxWidgets_ROOT_DIR        C:/Users/george/Desktop/software/wxWidgets-3.2.6/ )
+    set( wxWidgets_wxrc_EXECUTABLE C:/Users/george/Desktop/software/wxWidgets-3.2.6/utils/wxrc/vc_x64_mswud/wxrc.exe/ )
+endif (MSVC)
 
 project( CAVASS )
 #------------------------------------------------------------------------------
@@ -49,8 +59,14 @@ else()
       -Wno-stringop-overflow
       -Wno-unused-result
       -Wno-unused-variable
+#      -fsanitize=address
+#      -static-libasan
   )
+  # add_link_options( -fsanitize=address )
+  ADD_DEFINITIONS( -DUSING_GTK )
 endif()
+
+# set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g" )
 #------------------------------------------------------------------------------
 # (optional) Parallel build.
 if (NOT BUILD_PARALLEL)
@@ -95,6 +111,11 @@ ENDIF (ITK_FOUND)
 IF (MSVC)
     add_definitions( -D_CRT_SECURE_NO_DEPRECATE )
 ENDIF (MSVC)
+#------------------------------------------------------------------------------
+find_package( Torch )
+IF (Torch_FOUND)
+    ADD_DEFINITIONS( -DBUILD_WITH_TORCH )
+ENDIF (Torch_FOUND)
 #------------------------------------------------------------------------------
 SET (MAXFLOW_VERSION adjacency_list)
 
@@ -454,8 +475,8 @@ if (wxWidgets_FOUND)
 
     #include wxWidgets macros
     include( ${wxWidgets_USE_FILE} )
-    include_directories( . ./3dviewnix/INCLUDE ./frames ./filter ./render
-                         ./port_data ${wxWidgets_INCLUDE_DIRS} )
+    include_directories( . ./3dviewnix/INCLUDE ./frames .frames/segment2d
+        ./filter ./render ./port_data ${wxWidgets_INCLUDE_DIRS} )
 
     # For convenience we define the sources as a variable.
     SET( SRCS
@@ -523,6 +544,11 @@ if (wxWidgets_FOUND)
         frames/AlgebraCanvas.h
         frames/AlgebraFrame.cpp
         frames/AlgebraFrame.h
+        frames/CButton.cpp
+        frames/CButton.h
+        frames/CCheckBox.cpp
+        frames/CCheckBox.h
+        frames/CComboBox.h
         frames/CineControls.h
         frames/ClassifyControls.h
         frames/ColorControls.h
@@ -555,6 +581,7 @@ if (wxWidgets_FOUND)
         frames/FuzzCompCanvas.h
         frames/FuzzCompFrame.cpp
         frames/FuzzCompFrame.h
+        frames/GrayMapControls.cpp
         frames/GrayMapControls.h
         frames/HistoSettingControls.h
         frames/IRFCCanvas.cpp
@@ -597,15 +624,30 @@ if (wxWidgets_FOUND)
         frames/OverlayFrame.h
         frames/OverlayPrint.h
         frames/ParameterControls.h
+        frames/PersistentExampleFrame.cpp
+        frames/PersistentExampleFrame.h
+        frames/PersistentMainFrame.cpp
+        frames/PersistentMainFrame.h
         frames/RegisterFrame.cpp
         frames/RegisterFrame.h
         frames/RegistrationControls.h
         frames/SaveScreenControls.h
-        frames/Segment2dCanvas.cpp
-        frames/Segment2dCanvas.h
-        frames/Segment2dFrame.cpp
-        frames/Segment2dFrame.h
+        frames/segment2d/PersistentSegment2dFrame.cpp
+        frames/segment2d/PersistentSegment2dFrame.h
+        frames/segment2d/Segment2dAuxControls.h
+        frames/segment2d/Segment2dAuxControls.cpp
+        frames/segment2d/Segment2dCanvas.cpp
+        frames/segment2d/Segment2dCanvas.h
+        frames/segment2d/Segment2dFrame.cpp
+        frames/segment2d/Segment2dFrame.h
+        frames/segment2d/Segment2dIntDLControls.h
+        frames/segment2d/Segment2dIntDLControls.cpp
+        frames/segment2d/Segment2dSlider.h
+        frames/segment2d/Segment2dSlider.cpp
+        frames/segment2d/SetSegment2dOutputControls.cpp
+        frames/segment2d/SetSegment2dOutputControls.h
         frames/SetFuzzCompIndexControls.h
+        frames/SetIndexControls.cpp
         frames/SetIndexControls.h
         frames/ShowScreenCanvas.cpp
         frames/ShowScreenCanvas.h
@@ -687,7 +729,8 @@ if (wxWidgets_FOUND)
         add_executable( cavass WIN32 ${SRCS} )
     endif (APPLE)
 
-    target_link_libraries( cavass  ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
+    # target_link_libraries( cavass  ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
+    target_link_libraries( cavass  ${TORCH_LIBRARIES} ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
 
     add_executable( from_dicom  port_data/from_dicom.cpp port_data/read_acrnema.cpp )
     target_link_libraries( from_dicom  ${wxWidgets_LIBRARIES} 3dviewnix )
@@ -930,11 +973,8 @@ IF (ITK_FOUND)
     target_link_libraries( ballScale ${ITK_LIBRARIES} 3dviewnix )
 ENDIF (ITK_FOUND)
 #------------------------------------------------------------------------------
-# copy the 3dviewnix directory (to access configuration files) to the location of
-# the executables
-# This appears to no longer work in cmake!
-# It has been replaced with code above (search for copy_dir).
-#
+# copy the 3dviewnix directory (to access configuration files) to the location
+# of the executables
 if (MSVC)
     EXECUTE_PROCESS(
         COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/3dviewnix/ ${CAVASS_BINARY_DIR}/Release
@@ -960,6 +1000,23 @@ else (MSVC)
     EXECUTE_PROCESS(
         COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/tutorials/ ${CAVASS_BINARY_DIR}/tutorials
     )
+endif (MSVC)
+
+#copy ml code & models
+if (MSVC)
+    EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/
+                                                     ${CAVASS_BINARY_DIR}/Release/ )
+    EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/
+                                                     ${CAVASS_BINARY_DIR}/Debug/ )
+    EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/segment_anything/
+                                                     ${CAVASS_BINARY_DIR}/Release/segment_anything/ )
+    EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/segment_anything/
+                                                     ${CAVASS_BINARY_DIR}/Debug/segment_anything/ )
+else (MSVC)
+    EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/
+                                                     ${CAVASS_BINARY_DIR}/ )
+    EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/segment_anything/
+                                                     ${CAVASS_BINARY_DIR}/segment_anything/ )
 endif (MSVC)
 #------------------------------------------------------------------------------
 if (PARALLEL)

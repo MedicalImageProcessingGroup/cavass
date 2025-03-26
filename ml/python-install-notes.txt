@@ -1,0 +1,23 @@
+download and install python
+
+for computer w/OUT gpu:
+    open a command prompt window and enter the following commands:
+        pip install numpy
+        pip install matplotlib
+        pip install torch
+        pip install torchvision
+        pip install scikit-image
+
+for computer WITH gpu:
+    download cuda driver from nvidia
+    open a command prompt window and enter the following commands:
+        pip install numpy
+        pip install matplotlib
+        pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+        pip install scikit-image
+
+if one makes a mistake and installs w/OUT gpu and then needs to install WITH gpu:
+    pip uninstall torch torchvision torchaudio
+    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+

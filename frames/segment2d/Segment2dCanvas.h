@@ -29,10 +29,15 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  * Copyright: (C) 2003, George Grevera
  *
  * Rise and shine and give God your glory (glory).
+ * <pre>
+ * object_mask.TMP file format:
+ *     4 bytes: ///\0
+ *     96 bytes file name (mother file name)
+ *     data (one byte per pixel (8-bits packed)
+ * </pre>
  */
 //======================================================================
-#ifndef __Segment2dCanvas_h
-#define __Segment2dCanvas_h
+#pragma once
 
 #include  <deque>
 #include  <math.h>
@@ -42,9 +47,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 #include  "MainCanvas.h"
 
-
-
-#define NUM_SEG2D_MODES 10
+#define NUM_SEG2D_MODES 12
 #define MAX_NUM_FEATURES 7 
 #define MAX_NUM_TRANSFORMS 6 
 #define DEFAULT_FEATURE 5
@@ -108,8 +111,8 @@ typedef struct {
 		IMAGE *img;	/* Image in which contour is specified */
 } OPEN_CONTOUR;
 
-struct dlisttype{
-	dlisttype *next,*previous;
+struct dlisttype {
+	dlisttype *next, *previous;
 };
 
 typedef struct {
@@ -145,14 +148,13 @@ struct FeatureList {
 	float rmean;
 	float rstddev;
 	  /* r-prefix ==> ratio & not actual value */
-
 };
 
 typedef struct {
     int sd;              /* scene dimension */
-        int width;                       /* imager width */
-        int height;                      /* image height */
-        int bits;                        /* image depth in bits (1, 8 or 16) */
+    int width;                       /* imager width */
+    int height;                      /* image height */
+    int bits;                        /* image depth in bits (1, 8 or 16) */
     int total_slices;    /* total number of slices in the scene */
     int volumes;         /* number of volumes in the scene */
     int *slices;         /* number of slices in each volume in the scene */
@@ -174,15 +176,10 @@ typedef struct {
     float Fov3;          /* enclosing field of view (along X3) for the scene */
     int *variable_spacing;/* for each volume -  0=constant slice spacing, 1=variable s.s. */
     int Variable_spacing; /* entire scene  - 0=constant slice spacing, 1=variable s.s. */
- 
-                                        } SLICES;
-
-
-
+} SLICES;
 
 extern const unsigned char onbit[9];
 extern const unsigned char offbit[9];
-
 
 /** \brief the canvas on which images and other things are drawn (i.e., 
  *  the drawing area of the window).
@@ -196,18 +193,19 @@ extern const unsigned char offbit[9];
 class Segment2dCanvas : public MainCanvas {
     int  mXSize, mYSize, mZSize;         ///< max count of pixels of displayed images in x,y,z
 public:
-	enum {
-		LWOF = 2   /* Live Wire On The Fly */ ,
+	enum Mode {
+		LWOF = 2,   /* Live Wire On The Fly; why start at 2? */
 		TRAINING,
 		PAINT,
-		MANUAL,
-		ILW        /* Iterative Live Wire */ ,
-		LSNAKE     /* Live Snake */ ,
+		MANUAL,     ///< unused
+		ILW,        /* Iterative Live Wire */
+		LSNAKE,     /* Live Snake */
 		SEL_FEATURES,
 		REVIEW,
 		REPORT,
 		PEEK,
-		ROI
+        INT_DL,      ///< interactive deep learning
+		ROI,         ///< simply used to mark end; unused otherwise AFAIK
 	};
 
     int               mFileOrDataCount;  ///< count of files and/or data (1 needed for this example)
@@ -253,8 +251,8 @@ public:
 	int pRow, pCol;
 	IMAGE orig;
 	int LAST_DP_slice_index; /* slice on which Calc_Edge_Cost last done */
-	int detection_mode;
-	int detection_modes[NUM_SEG2D_MODES];
+	int detection_mode;  ///< subscript into detection_modes to indicate current mode
+	Mode detection_modes[NUM_SEG2D_MODES];
 	int num_detection_modes;
 	X_Point Points[MAX_POINTS];  /* vertices in scene - used in LiveWire */
 	int NumPoints; /* # of pts in Cont Seg, including both end pts */
@@ -290,13 +288,13 @@ public:
 	bool layout_flag, overlay_flag;
 	bool straight_path;
 
+	double            mScale;            ///< scale for both directions
+                                         ///< \todo make scale independent in each direction
 
 protected:
     static const int  sSpacing;          ///< space, in pixels, between each slice (on the screen)
     //when in plain old move mode:
     int               mLastX, mLastY;    ///< last (x,y) of mouse as it's dragged
-    double            mScale;            ///< scale for both directions
-                                         ///< \todo make scale independent in each direction
 	double            reviewScale;
     bool              mLabels;          ///< toggle display overlay
 	bool              switch_images_flag;
@@ -311,7 +309,7 @@ protected:
     ~Segment2dCanvas ( void );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   protected:
-    void init ( void );
+    void init ( );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     void release ( void );
 	int allocControlPoints();
@@ -518,4 +516,3 @@ extern "C" {
 		int* npoints );
 }
 
-#endif

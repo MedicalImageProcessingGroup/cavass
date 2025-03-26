@@ -37,6 +37,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 #include  "CyclePrint.h"
 #include  "CycleCanvas.h"
 #include  "CineControls.h"
+#include  "GrayMapControls.h"
 #include  "SetIndexControls.h"
 #include  "TextControls.h"
 

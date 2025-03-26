@@ -1,5 +1,5 @@
 /*
-  Copyright 1993-2016, 2018, 2021-2022 Medical Image Processing Group
+  Copyright 1993-2016, 2018, 2021-2025 Medical Image Processing Group
               Department of Radiology
             University of Pennsylvania
 
@@ -32,7 +32,8 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 //======================================================================
 #include  "cavass.h"
-
+#include  "Segment2dFrame.h"
+#include  "Segment2dIntDLControls.h"
 
 #define QueueItem X_Point
 #define HandleQueueError {fprintf(stderr,"Out of memory.\n");exit(1);}
@@ -115,17 +116,25 @@ Segment2dCanvas::Segment2dCanvas ( wxWindow* parent, MainFrame* parent_frame,
     init();
 }
 //----------------------------------------------------------------------
-/** \brief initialize members. */
-void Segment2dCanvas::init ( void ) {
-	num_detection_modes = 8;
+/**
+ * \brief initialize members. persisted values should only be initialized
+ * when init() is called from a ctor.
+ * @param everything should be true when called from a ctor; otherwise, it
+ * should be false (when called from release() below).
+ * \todo determine what should be left alone when everything is false.
+ */
+void Segment2dCanvas::init ( ) {
+	num_detection_modes = 9;
 	detection_modes[0] = TRAINING;
 	detection_modes[1] = ILW;
 	detection_modes[2] = LSNAKE;
-	detection_modes[3] = PAINT;
+	detection_modes[3] = Mode::PAINT;
 	detection_modes[4] = SEL_FEATURES;
 	detection_modes[5] = REVIEW;
 	detection_modes[6] = REPORT;
-	detection_modes[7] = PEEK;
+    detection_modes[7] = PEEK;
+    detection_modes[8] = Mode::INT_DL;
+
     mFileOrDataCount = 0;
     mScale           = 1.8;
 	reviewScale      = 0.0;
@@ -201,7 +210,7 @@ void Segment2dCanvas::init ( void ) {
 	curr_feature     = 5;
 	switch_images_flag = false;
 	train_brush_size = 0;
-	paint_brush_size = 2;
+    paint_brush_size = 2;
 	training_phase   = 0;
 	region           = NULL;
 	hist             = NULL;
@@ -729,7 +738,8 @@ void Segment2dCanvas::reload ( void ) {
 				case 3:
 					SetStatusText("ADD", 2);
 					SetStatusText(paint_brush_size<0? "":"CUT", 3);
-					SetStatusText("DONE", 4);
+                    //SetStatusText(paint_brush_size==0 ? "DONE" : "---", 4);
+                    SetStatusText("DONE", 4);
 					break;
 			}
 			break;
@@ -776,17 +786,40 @@ void Segment2dCanvas::reload ( void ) {
 	}
 }
 //----------------------------------------------------------------------
+static void reportKey ( long k ) {
+    if (k == 32) {
+        wxLogMessage( "Segment2dCanvas::OnChar: ' '" );
+    } else if (wxIsprint(k)) {
+        wxString s1( "Segment2dCanvas::OnChar: " );
+        wxString s2( (char)k );
+        wxLogMessage( s1 + s2 );
+    } else if (k == 0) {
+        wxLogMessage( "Segment2dCanvas::OnChar: nul" );
+    } else if (k == 27) {
+        wxLogMessage( "Segment2dCanvas::OnChar: Esc" );
+    } else if (k == 127) {
+        wxLogMessage( "Segment2dCanvas::OnChar: Del" );
+    } else if (wxIscntrl(k) && k<27) {
+        wxString s1( "Segment2dCanvas::OnChar: ctrl-" );
+        cout << k << endl;
+        wxString s2( (char)(k+'a'-1) );
+        wxLogMessage( s1 + s2 );
+    } else {
+        wxLogMessage( "Segment2dCanvas::OnChar: ?" );
+    }
+}
 /** \brief note: spacebar mimics middle mouse button. */
 void Segment2dCanvas::OnChar ( wxKeyEvent& e ) {
     //cout << "Segment2dCanvas::OnChar" << endl;
-    wxLogMessage( "Segment2dCanvas::OnChar" );
+    reportKey( e.m_keyCode );
+
     if (e.m_keyCode==' ') {
         if (isLoaded(1)) {
             mCavassData->mNext->mDisplay = !mCavassData->mNext->mDisplay;
             reload();
         }
     } else if (e.m_keyCode=='h' || e.m_keyCode == 'H' || e.m_keyCode == '/'
-               || e.m_keyCode == 'h') {
+               || e.m_keyCode == '?') {
         wxCommandEvent e;
         Segment2dFrame::OnHelp( e );
     } else {
@@ -1024,64 +1057,78 @@ void Segment2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
 					reload();
 				}
 				break;
+
+            case INT_DL:
+                // cerr << "Segment2dCanvas::OnMouseMove @todo handle INT_DL" << endl;
+                {
+                    auto f = dynamic_cast<Segment2dFrame*>( m_parent_frame );
+                    f->mIntDLControls->doMouseMove( e, pt.x, pt.y );
+                }
+                break;
+
 			case PEEK:
 				/* Show the density and the Object# of the pixel */
-				wxString text="";
-				if( orig.bits > 1)
-				{
-					int value;
-					int vn, vs, ve, vw; /* values for: North, South, East and
+                {
+                    wxString text = "";
+                    if (orig.bits > 1) {
+                        int value;
+                        int vn, vs, ve, vw; /* values for: North, South, East and
 						West */
-					double gradient;
-					const int	x = pt.x,
-							    y = pt.y,
-								xp = x>=orig.width-1? orig.width-1: x+1,
-								yp = y>=orig.height-1? orig.height-1: y+1,
-								xm = x<=0? 0: x-1,
-								ym = y<=0? 0: y-1;
-					if(orig.bits == 8)
-					{
-						const unsigned char *t8 = (unsigned char *)
-							mCavassData->getSlice(mCavassData->m_sliceNo);
-						value = t8[pt.y*orig.width+pt.x];
-						vn = t8[ym*orig.width + pt.x ];
-						vs = t8[yp*orig.width + pt.x ];
-						ve = t8[pt.y*orig.width + xp ];
-						vw = t8[pt.y*orig.width + xm ];
-						gradient = sqrt( (double)(vs-vn)*(vs-vn) +
-							(double)(ve-vw)*(ve-vw) );
-					}
-					else
-					{
-						const unsigned short *t16 = (unsigned short *)
-							mCavassData->getSlice(mCavassData->m_sliceNo);
-						value = t16[pt.y*orig.width+pt.x];
-						vn = t16[ym*orig.width + pt.x ];
-						vs = t16[yp*orig.width + pt.x ];
-						ve = t16[pt.y*orig.width + xp ];
-						vw = t16[pt.y*orig.width + xm ];
-						gradient = sqrt( (double)(vs-vn)*(vs-vn) +
-							(double)(ve-vw)*(ve-vw) );
-					}
+                        double gradient;
+                        const int x = pt.x,
+                                y = pt.y,
+                                xp = x >= orig.width - 1 ? orig.width - 1 : x + 1,
+                                yp = y >= orig.height - 1 ? orig.height - 1 : y + 1,
+                                xm = x <= 0 ? 0 : x - 1,
+                                ym = y <= 0 ? 0 : y - 1;
+                        if (orig.bits == 8) {
+                            const unsigned char *t8 = (unsigned char *)
+                                    mCavassData->getSlice(mCavassData->m_sliceNo);
+                            value = t8[pt.y * orig.width + pt.x];
+                            vn = t8[ym * orig.width + pt.x];
+                            vs = t8[yp * orig.width + pt.x];
+                            ve = t8[pt.y * orig.width + xp];
+                            vw = t8[pt.y * orig.width + xm];
+                            gradient = sqrt((double) (vs - vn) * (vs - vn) +
+                                            (double) (ve - vw) * (ve - vw));
+                        } else {
+                            const unsigned short *t16 = (unsigned short *)
+                                    mCavassData->getSlice(mCavassData->m_sliceNo);
+                            value = t16[pt.y * orig.width + pt.x];
+                            vn = t16[ym * orig.width + pt.x];
+                            vs = t16[yp * orig.width + pt.x];
+                            ve = t16[pt.y * orig.width + xp];
+                            vw = t16[pt.y * orig.width + xm];
+                            gradient = sqrt((double) (vs - vn) * (vs - vn) +
+                                            (double) (ve - vw) * (ve - vw));
+                        }
 
-					text = wxString::Format("(%3d,%3d): %3d : (%3.0f) ",
-						pt.x, pt.y, value, gradient);
-				}
-				if(object_mask[pt.y*orig.width+pt.x] > 0)
-				{
-					text += " [";
-					for(int i=0; i<8; i++)
-					{
-						if( (object_mask[pt.y*orig.width+pt.x] & onbit[i]) >0)
-							text += wxString::Format(" %d ", i+1);
-					}
-					text += "]";
-				}
-				SetStatusText(text, 0);
+                        text = wxString::Format("(%3d,%3d): %3d : (%3.0f) ",
+                                                pt.x, pt.y, value, gradient);
+                    }
+                    if (object_mask[pt.y * orig.width + pt.x] > 0) {
+                        text += " [";
+                        for (int i = 0; i < 8; i++) {
+                            if ((object_mask[pt.y * orig.width + pt.x] & onbit[i]) > 0)
+                                text += wxString::Format(" %d ", i + 1);
+                        }
+                        text += "]";
+                    }
+                    SetStatusText(text, 0);
+                }
 				break;
-		}
-	}
-}
+
+			case REPORT:
+			case SEL_FEATURES:
+				//nothing to do (but i don't want to see the default message)
+				break;
+
+            default:
+                cerr << "Segment2dCanvas::OnMouseMove: unrecognized detection mode, " << detection_mode << endl;
+                break;
+        }  //end switch
+	}  //end if
+}  //end OnMouseMove
 
 int Segment2dCanvas::get_closest_contour_point(int x, int y)
 {
@@ -1427,6 +1474,12 @@ void Segment2dCanvas::OnRightDown ( wxMouseEvent& e ) {
     mLastX = wx;
     mLastY = wy;
 
+    if (detection_mode == INT_DL) {
+        auto f = dynamic_cast<Segment2dFrame*>( m_parent_frame );
+        f->mIntDLControls->doRightDown();
+        return;
+    }
+
 	if (detection_mode == TRAINING)
 	{
 		switch (training_phase)
@@ -1744,11 +1797,20 @@ void Segment2dCanvas::OnMiddleDown ( wxMouseEvent& e ) {
 		SetStatusText("Trace boundary on slice", 0);
 		reload();
 	}
+
+	if (detection_mode == Mode::INT_DL) {
+		auto f = dynamic_cast<Segment2dFrame*>( m_parent_frame );
+		f->mIntDLControls->doMiddleDown();
+	}
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle middle mouse button up events. */
 void Segment2dCanvas::OnMiddleUp ( wxMouseEvent& e ) {
     log( "OnMiddleUp" );
+    if (detection_mode == Mode::INT_DL) {
+    	auto f = dynamic_cast<Segment2dFrame*>( m_parent_frame );
+		f->mIntDLControls->doMiddleUp();
+	}
 }
 //----------------------------------------------------------------------
 /** \brief Callback to handle left mouse button down events. */
@@ -1791,10 +1853,18 @@ void Segment2dCanvas::OnLeftDown ( wxMouseEvent& e ) {
     const long  wy = dc.DeviceToLogicalY( pos.y ) - Ty;
     mLastX = wx;
     mLastY = wy;
-	if (layout_flag)
-		return;
-	if (detection_mode == TRAINING)
-	{
+	if (layout_flag)    return;
+
+    if (detection_mode == Mode::INT_DL) {
+        X_Point pt;
+        pt.y = orig.tbly[wy - orig.locy];
+        pt.x = orig.tblx[wx - orig.locx];
+        auto f = dynamic_cast<Segment2dFrame*>( m_parent_frame );
+        f->mIntDLControls->doLeftDown( pt.x, pt.y );
+        return;
+    }
+
+    if (detection_mode == TRAINING) {
 		if (train_brush_size == 0)
 			switch (training_phase)
 			{
@@ -2056,11 +2126,16 @@ void Segment2dCanvas::OnLeftUp ( wxMouseEvent& e ) {
 		return;
 	}
 
-	if (detection_mode==SEL_FEATURES && switch_images_flag)
-	{
+	if (detection_mode==SEL_FEATURES && switch_images_flag) {
 		switch_images_flag = false;
 		reload();
-	}
+	} else if (detection_mode == INT_DL) {
+//        X_Point pt;
+//        pt.y = orig.tbly[wy - orig.locy];
+//        pt.x = orig.tblx[wx - orig.locx];
+        auto f = dynamic_cast<Segment2dFrame*>( m_parent_frame );
+        f->mIntDLControls->doLeftUp();
+    }
 	SetCursor( *wxSTANDARD_CURSOR );
 }
 
@@ -2177,6 +2252,10 @@ void Segment2dCanvas::OnPaint ( wxPaintEvent& e ) {
 //----------------------------------------------------------------------
 /** \brief called in response to paint, print, or copy to the clipboard. */
 void Segment2dCanvas::paint ( wxDC* dc ) {
+    auto f = dc->GetFont();
+    f = f.Scale( 0.9 );
+    dc->SetFont( f );
+
     dc->SetTextBackground( *wxBLACK );
     dc->SetTextForeground( wxColour(Yellow) );
 	dc->SetPen( wxPen(wxColour(0, 255, 0)) );
@@ -2197,9 +2276,15 @@ void Segment2dCanvas::paint ( wxDC* dc ) {
 			break;
 	}
 
+        /** \todo replace w/ a wxGrid (like a spreadsheet) in its own window */
 	if (detection_mode == REPORT)
 	{
-		FILE *fp;
+        //use a monospaced font so things line up nicely
+        wxFont font = dc->GetFont();
+        font.SetFamily( wxFONTFAMILY_TELETYPE );
+        dc->SetFont( font );
+
+        FILE *fp;
 		char name[101];
 		int n,			/* index of the current mask on the scene */
 			size;		/* size of each mask */
@@ -2447,7 +2532,7 @@ void Segment2dCanvas::paint ( wxDC* dc ) {
 		line += wxString::Format("%s3", units[xunit]);
 		dc->DrawText(line, column_pos, line_pos);
 	}
-    else if (mBitmaps!=NULL) {
+    else if (mBitmaps!=NULL) {  //draw slice(s)
         int  i=0;
         for (int r=0; r<mRows; r++) {
             const int  y = (int)(r*(ceil(mYSize*getScale())+sSpacing));
@@ -2455,6 +2540,7 @@ void Segment2dCanvas::paint ( wxDC* dc ) {
                 if (mBitmaps[i]!=NULL && mBitmaps[i]->Ok()) {
 					const int u = switch_images_flag? c^1: c;
                     const int  x = (int)(u*(ceil(mXSize*getScale())+sSpacing));
+                    //draw an image (2d slice)
                     dc->DrawBitmap( *mBitmaps[i], x+Tx, y+Ty );
                     //show the overlay?  (the overlay consists of numbers that indicate the slice)
                     if (mLabels) {
@@ -2472,7 +2558,7 @@ void Segment2dCanvas::paint ( wxDC* dc ) {
                             dc->DrawText( s, x+Tx, y+Ty );
                         }
                     }
-					if (i==0 && detection_mode!=REVIEW)
+					if (i==0 && detection_mode!=REVIEW)  //first slice is special
 					{
 						bool drawing=false;
 						if (o_contour.last!= -1 && o_contour.slice_index==
@@ -2582,7 +2668,11 @@ void Segment2dCanvas::paint ( wxDC* dc ) {
 								dc->DrawLine(sx, sy-1, sx, sy+2);
 								dc->DrawText(text, sx, sy);
 							}
-						}
+						} else if (detection_mode == INT_DL) {
+                            //draw box (if necessary)
+                            auto tmp = dynamic_cast<Segment2dFrame*>( m_parent_frame );
+                            tmp->mIntDLControls->doPaint( dc, x+Tx, y+Ty );
+                        }  //end elif INT_DL
 					}
                 }
                 i++;
@@ -8798,7 +8888,7 @@ int Segment2dCanvas::check_mask_file(int *slice, int *volume)
 	for(i=0; i<101; i++) mother_file[i] = 0;
 
 	/***************************/
-	/* Parametrs for DP (DP.c) */
+	/* Parameters for DP (DP.c) */
 	int initial_object=object_number;
 	object_number = 8;
 	Reset_training_proc(2);

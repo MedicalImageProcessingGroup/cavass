@@ -1,0 +1,43 @@
+Dear Lipeng and Yubing,
+
+I'm trying to load a pytorch checkpoint file (medsam_vit_b.pth, specifically) into C++ for use in CAVASS. My understanding is that one must save a scripted model rather than an "ordinary" one. I've been successful in doing that (save from python then load with C++) for a simple model that was trained on the  MNIST image data.
+This is python code that saves an "ordinary" one for MNIST:
+    torch.save( model.state_dict(), "mnist_cnn.pt" )
+This is python code saves a scripted one for MNIST:
+    torch.jit.save( torch.jit.script(model), "mnist_cnn.scripted.pt" )
+I simply added the above line to https://github.com/pytorch/examples/blob/main/mnist/main.py. Easy!
+
+However, I'm having difficulty saving a scripted model of medsam_vit_b.pth in python. I added the following similar line:
+    torch.jit.save( torch.jit.script(medsam_model), "scripted.pt")
+to MedSAM_Inference.py but get the error message below. Note that it occurs in MedSAM python code.
+
+Would it be possible for you to save a scripted model/checkpoint file for me for your improved MedSam? Any help is appreciated.
+
+Thanks.
+
+George
+
+
+
+pad_hw is not defined in the false branch:
+  File "/home/jorge/mipg/MedSAM/segment_anything/modeling/image_encoder.py", line 175
+        x = self.norm1(x)
+        # Window partition
+        if self.window_size > 0:
+        ~~~~~~~~~~~~~~~~~~~~~~~~
+            H, W = x.shape[1], x.shape[2]
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            x, pad_hw = window_partition(x, self.window_size)
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ <--- HERE
+    
+        x = self.attn(x)
+and was used here:
+  File "/home/jorge/mipg/MedSAM/segment_anything/modeling/image_encoder.py", line 182
+        # Reverse window partition
+        if self.window_size > 0:
+            x = window_unpartition(x, self.window_size, pad_hw, (H, W))
+                                                        ~~~~~~ <--- HERE
+    
+        x = shortcut + x
+python-BaseException
+

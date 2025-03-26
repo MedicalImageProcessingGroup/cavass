@@ -32,7 +32,9 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 //======================================================================
 #include  "cavass.h"
-
+#include  "GrayMapControls.h"
+#include  "segment2d/Segment2dSlider.h"
+#include  "segment2d/Segment2dFrame.h"
 #include  "SurfOpacityControls.h"
 #include  "SurfPropertiesControls.h"
 #include  "SurfSpeedControls.h"

@@ -33,6 +33,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 //======================================================================
 #include  "cavass.h"
 #include  "CineControls.h"
+#include  "GrayMapControls.h"
 #include  "SetIndexControls.h"
 
 extern Vector  gFrameList;
