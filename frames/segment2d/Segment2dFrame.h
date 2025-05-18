@@ -206,6 +206,9 @@ public:
 	wxCheckBox    *m_overlay;  //used by Set Index
 	wxCheckBox    *m_layout;
 	wxButton*      m_setOutputBut;
+#if wxUSE_DRAG_AND_DROP
+    MainFileDropTarget* m_dropTarget;
+#endif
 	int out_object;
 	int OUTPUT_DATA_TYPE{};
 

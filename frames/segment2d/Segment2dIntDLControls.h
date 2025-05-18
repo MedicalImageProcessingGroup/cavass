@@ -43,12 +43,13 @@ class Segment2dIntDLControls {
     wxString          mInSlice;              ///< name of temp input (to dl seg) slice file
     wxString          mOutSlice;             ///< name of temp output slice file (result of dl seg)
 
+    //for selecting a rectangle:
     int               mdx1 = -1, mdy1 = -1;  ///< location of first click (in data subscript coords)
     int               mdx2 = -1, mdy2 = -1;  ///< location of second point while dragging (in data subscript coords)
 
     int               mWidth  = -1;          ///< width  (cols) of result in pixels; cols in slice
     int               mHeight = -1;          ///< height (rows) of result in pixels; rows in slice
-    unsigned char*    mResult = nullptr;     ///< result of seg; rgb; blue value indicated segmentation
+    unsigned char*    mResult = nullptr;     ///< result of seg; rgb; blue value indicates segmentation
     unsigned char*    mAlpha  = nullptr;     ///< alpha transparency for mResult; binary; semi-opaque (not transparent) where the segmentation is present.
     wxBitmap*         mBitmap = nullptr;     ///< result of seg as a bitmap
     bool              mShow   = true;        ///< paint() should show bitmap
@@ -58,6 +59,7 @@ class Segment2dIntDLControls {
     void loadModel ( wxString& fn );
     void loadResult ( );
     void reset ( );
+    void setButtonState ( );
 public:
     /** based on paint controls */
     Segment2dIntDLControls ( Segment2dFrame* frame, wxPanel* cp, wxSizer* bottomSizer );

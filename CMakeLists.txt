@@ -731,6 +731,18 @@ if (wxWidgets_FOUND)
 
     # target_link_libraries( cavass  ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
     target_link_libraries( cavass  ${TORCH_LIBRARIES} ${wxWidgets_LIBRARIES} 3dviewnix libtiff )
+    if (APPLE)
+        # why do i have to do this? i don't know. but if i don't,
+        # File --> Open will NOT show a dialog box on mac!
+        add_custom_command(
+            TARGET cavass
+            POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+                $<TARGET_FILE:cavass>
+                ${PROJECT_BINARY_DIR}/
+            COMMMENT "copy cavass"
+        }
+    endif (APPLE)
 
     add_executable( from_dicom  port_data/from_dicom.cpp port_data/read_acrnema.cpp )
     target_link_libraries( from_dicom  ${wxWidgets_LIBRARIES} 3dviewnix )

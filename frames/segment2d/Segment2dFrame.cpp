@@ -171,7 +171,8 @@ Segment2dFrame::Segment2dFrame ( bool maximize, int w, int h )
     //wxPersistenceManager::Get().Restore( this );    // <-- _MUST_ be called before Show(); and Raise(); (otherwise SetPosition and other calls will be ignored)
 
 #if wxUSE_DRAG_AND_DROP
-    SetDropTarget( new MainFileDropTarget );
+    m_dropTarget = new MainFileDropTarget;
+    SetDropTarget( m_dropTarget );
 #endif
     wxToolTip::Enable( Preferences::getShowToolTips() );
     //mSplitter->SetSashPosition( -s2dControlsHeight );
@@ -187,11 +188,14 @@ Segment2dFrame::Segment2dFrame ( bool maximize, int w, int h )
     styles[0] = styles[1] = wxSB_NORMAL;
     for (int i=2; i<fields; i++)    styles[i] = wxSB_SUNKEN;
     tmp->SetStatusStyles( tmp->GetFieldsCount(), styles );
+    delete[] styles;    styles = nullptr;
     //wxClientDC dc( tmp );
     //dc.SetBackground( wxBrush(wxColour(LtBlue), wxBRUSHSTYLE_SOLID) );
 
     Show();
     Raise();
+
+    delete topSizer;    topSizer = nullptr;
 }
 //----------------------------------------------------------------------
 /** \brief initialize menu bar and items (in addition to the standard ones).
@@ -499,6 +503,9 @@ Segment2dFrame::~Segment2dFrame ( ) {
     cout << "Segment2dFrame::~Segment2dFrame" << endl;
     wxLogMessage( "Segment2dFrame::~Segment2dFrame" );
 
+#if wxUSE_DRAG_AND_DROP
+    delete m_dropTarget;    m_dropTarget = nullptr;
+#endif
     if (mCanvas != nullptr) {
         delete mCanvas;
         mCanvas = nullptr;
@@ -569,6 +576,7 @@ Segment2dFrame::~Segment2dFrame ( ) {
 		mControlPanel=NULL;
 	}
     if (mSplitter!=NULL)      { delete mSplitter;      mSplitter=NULL;     }
+#if 0  //this should happen in superclass (MainFrame) dtor
     //if we are in the mode that supports having more than one window open
     // at a time, we need to remove this window from the list.
     Vector::iterator  i;
@@ -582,8 +590,10 @@ Segment2dFrame::~Segment2dFrame ( ) {
     // to exit.
     if (::gFrameList.begin() == ::gFrameList.end()) {
         /** \todo check. exit() call may bypass persistent saves. */
+        ~MainFrame();
         exit(0);
     }
+#endif
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

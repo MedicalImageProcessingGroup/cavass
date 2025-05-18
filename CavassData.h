@@ -225,6 +225,7 @@ public:
         if (m_ysub!=NULL) { free(m_ysub);  m_ysub=NULL; }
         if (m_zsub!=NULL) { free(m_zsub);  m_zsub=NULL; }
         if (m_lut !=NULL) { free(m_lut );  m_lut =NULL; }
+        if (m_fname != nullptr) { free(m_fname); m_fname = nullptr; }
     }
     //------------------------------------------------------------------
     /** \brief indicates whether or not actual data has been associated 

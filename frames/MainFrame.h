@@ -59,6 +59,7 @@ class MainFrame : public wxFrame {
     char*        mFileNameFilter; ///< input file name filter string
     wxMenuItem*  mHideControls;   ///< ptr to "hide controls" menu item (so it can be changed dynamically)
     wxMenu*      mFileMenu;       ///< ptr to file menu (so it can be changed dynamically)
+    wxMenu*      mHelpMenu;       ///< so it can be deallocated
     wxMenu*      mWindowMenu;     ///< ptr to window menu (so it can be changed dynamically)
     MainCanvas*  mCanvas;         ///< drawing area of window
     wxString     mWindowTitle;    ///< title of window
@@ -123,6 +124,7 @@ class MainFrame : public wxFrame {
     wxMenu*   mSegmentMenu;   ///< ptr to segment menu (so it can be changed dynamically)
     wxMenu*   mClassifyMenu;  ///< ptr to segment menu (so it can be changed dynamically)
     wxMenu*   mVOIMenu;
+    wxMenu*   mKinematicsMenu; ///< to avoid memory leak
     #define   dControlsHeight  ((buttonHeight+1)*mButtonRows+50)    ///< height of control panel (from bottom)
 	int       mButtonRows;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

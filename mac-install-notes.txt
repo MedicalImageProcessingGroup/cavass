@@ -5,10 +5,10 @@ Note: gcc --version
       shows that gcc on the mac is clang.
 
 Obtain wxWidgets source code. Then:
-  tar xjf ~/Downloads/wxWidgets-3.2.1.tar.bz2 
+  tar xjf ~/Downloads/wxWidgets-3.2.7.tar.bz2 
   mkdir wx-build
   cd wx-build
-  ../wxWidgets-3.2.1/configure
+  ../wxWidgets-3.2.7/configure --with-png=no --enable-svg=no
   make
 
 (optional) Obtain ITK source code.

@@ -316,10 +316,10 @@ void MainFrame::initializeMenu ( void ) {
     structure_menu->Append( ID_ANL_REGISTER,   "&Register" );
     structure_menu->Append( ID_ANL_STATIC,   "&Static" );
 
-    auto KinematicsMenu = new wxMenu();
-    KinematicsMenu->Append( ID_ANL_KINEMATICS_INTER, "&Inter" );
-    KinematicsMenu->Append( ID_ANL_KINEMATICS_INTRA, "&Intra" );
-    structure_menu->Append( ID_ANL_KINEMATICS, "&Kinematics", KinematicsMenu );
+    mKinematicsMenu = new wxMenu();
+    mKinematicsMenu->Append( ID_ANL_KINEMATICS_INTER, "&Inter" );
+    mKinematicsMenu->Append( ID_ANL_KINEMATICS_INTRA, "&Intra" );
+    structure_menu->Append( ID_ANL_KINEMATICS, "&Kinematics", mKinematicsMenu );
 
     analyze_menu->Append( ID_ANL_STRUCTURE, "&Structure", structure_menu );
     menu_bar->Append( analyze_menu, "&Analyze" );
@@ -338,22 +338,22 @@ void MainFrame::initializeMenu ( void ) {
 #endif
     menu_bar->Append( mWindowMenu, "&Window" );
 
-    auto help_menu = new wxMenu();
+    mHelpMenu = new wxMenu();
 #ifdef __MACH__
     mHideControls = new wxMenuItem( mWindowMenu, ID_WINDOW_HIDE_CONTROLS,
                                     "Hide Controls\tAlt-C" );
     help_menu->Append( mHideControls );
     help_menu->AppendSeparator();
 #endif
-    help_menu->Append( ID_ABOUT,         "&About"       );
-    help_menu->Append( ID_HELP,          "&Help"        );
-    help_menu->Append( ID_INFORMATION,   "&Information" );
-    help_menu->Append( ID_DOCUMENTATION, "&Documentation" );
-    help_menu->AppendSeparator();
-    help_menu->Append( ID_EXAMPLE,       "&Example"     );
-    menu_bar->Append( help_menu, "&Help" );
+    mHelpMenu->Append( ID_ABOUT,         "&About"       );
+    mHelpMenu->Append( ID_HELP,          "&Help"        );
+    mHelpMenu->Append( ID_INFORMATION,   "&Information" );
+    mHelpMenu->Append( ID_DOCUMENTATION, "&Documentation" );
+    mHelpMenu->AppendSeparator();
+    mHelpMenu->Append( ID_EXAMPLE,       "&Example"     );
+    menu_bar->Append( mHelpMenu, "&Help" );
 
-    help_menu->Enable( ID_HELP, false );
+    mHelpMenu->Enable( ID_HELP, false );
     
     SetMenuBar( menu_bar );
     
@@ -385,7 +385,14 @@ MainFrame::~MainFrame ( ) {
     }
     //if (mSplitter!=nullptr) { delete mSplitter;  mSplitter=nullptr; }
     //if (mCanvas!=NULL) { delete mCanvas;  mCanvas=NULL; }
+    delete mWindowMenu;      mWindowMenu = nullptr;
+#ifndef __MACH__
+    //delete mHideControls;    mHideControls = nullptr;
+#endif
+    delete mHelpMenu;        mHelpMenu = nullptr;
 #if 1
+    //if we are in the mode that supports having more than one window open
+    // at a time, we need to remove this window from the list.
     Vector::iterator  i;
     for (i=::gFrameList.begin(); i!=::gFrameList.end(); i++) {
         if (*i==this) {
@@ -400,6 +407,8 @@ MainFrame::~MainFrame ( ) {
             break;
         }
     }
+    //if this window is the last remaining/only window, it is time for us
+    // to exit.
     if (::gFrameList.begin() == ::gFrameList.end()) {
         exit( 0 );
     }

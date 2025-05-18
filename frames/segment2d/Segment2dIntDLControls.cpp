@@ -85,6 +85,8 @@ Segment2dIntDLControls::Segment2dIntDLControls ( Segment2dFrame* frame,
     mBottomSizer->Prepend( mAuxSizer, 0, wxGROW|wxALL, 5 );  //was 10
     mBottomSizer->Layout();
     cp->Refresh();
+
+    setButtonState();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief dtor (obviously) */
@@ -388,6 +390,7 @@ void Segment2dIntDLControls::doClear ( ) {
     VERBOSE;
     reset();
     mFr->mCanvas->Refresh();  //cause repaint
+    setButtonState();
 }
 
 void Segment2dIntDLControls::reset ( ) {
@@ -479,6 +482,7 @@ void Segment2dIntDLControls::doRun ( ) {
     wxSetCursor( *wxSTANDARD_CURSOR );
     mShow = true;
     mFr->mCanvas->Refresh();  //cause repaint
+    setButtonState();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /**
@@ -502,6 +506,7 @@ void Segment2dIntDLControls::doLeftDown ( int x, int y ) {
 //    mSecondCornerSpecified = false;
     //mFr->mCanvas->reload();  //cause repaint
     mFr->mCanvas->Refresh();  //cause repaint
+    setButtonState();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /**
@@ -525,8 +530,7 @@ void Segment2dIntDLControls::doMouseMove ( wxMouseEvent& e, int x, int y ) {
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /**
- * \todo should this record the location of the "up" (as doMouseMove does) by
- * calling it with (x,y)?
+ * \todo should this record the location of the "up" (as doMouseMove does) by calling it with (x,y)?
  */
 void Segment2dIntDLControls::doLeftUp ( ) {
     VERBOSE;
@@ -534,11 +538,13 @@ void Segment2dIntDLControls::doLeftUp ( ) {
         mFr->SetStatusText("", 0);
         mFr->SetStatusText("run", 4);
     } else {
-        mFr->SetStatusText("choose a model; run", 0);
+        mFr->SetStatusText("choose a model, then run", 0);
     }
-    mFr->SetStatusText( "run", 4 );
+//    mFr->SetStatusText( "run", 4 );
     if (mFirstCornerSpecified)    mSecondCornerSpecified = true;
     mFr->mCanvas->Refresh();  //cause repaint
+
+    setButtonState();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void Segment2dIntDLControls::doRightDown ( ) {
@@ -693,5 +699,23 @@ void Segment2dIntDLControls::doMiddleDown ( ) {
 void Segment2dIntDLControls::doMiddleUp ( ) {
     mShow = true;
     mFr->mCanvas->Refresh();  //cause repaint
+}
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void Segment2dIntDLControls::setButtonState ( ) {
+    if (!mFirstCornerSpecified || !mSecondCornerSpecified) {
+        //Add, Blink, Clear and Run should all be disabled
+        mAdd->Enable(   false );
+        mBlink->Enable( false );
+        mClear->Enable( false );
+        mRun->Enable(   false );
+        return;
+    }
+    //here when both corners available
+    //Blink and Clear should be enabled
+    mBlink->Enable( true );
+    mClear->Enable( true );
+
+    mAdd->Enable( mResult != nullptr );  //only when result is available
+    mRun->Enable( mModelLoaded );  //only when model (and corners) available
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
