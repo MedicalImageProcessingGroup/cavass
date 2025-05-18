@@ -10,4 +10,5 @@
 cmake-build-debug/
 cmake-build-release/
 doxydocs/
+ml/*.pth
 
