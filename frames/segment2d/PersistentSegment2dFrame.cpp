@@ -487,8 +487,10 @@ bool PersistentSegment2dFrame::Restore ( ) {
         cerr << "the error messages below normally appear the very first time that this frame is instantiated." << endl;
         cerr << "restore w_isIconized failed." << endl;
     } else {
-#ifndef WIN32
-        w->SetIconizeState(w_isIconizedVal == 1);
+#if defined(__APPLE__) || defined(__MACH__)
+        w->Iconize(isIconizedVal == 1);  //ok for linux, but not mac
+#elif !defined(WIN32)
+        w->SetIconizeState(w_isIconizedVal == 1);  //ok for linux, but not mac
 #endif
     }
 

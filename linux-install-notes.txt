@@ -15,9 +15,9 @@ You need to install Gnome development software and cmake.
 
 You also need to install wxWidgets:
   go to wxwidgets.org
-  download wxWidgets-3.2.4.tar.bz2 (or current release)
-  tar xjf wxWidgets-3.2.4.tar.bz2
-  cd wxWidgets-3.2.4
+  download wxWidgets-3.2.8.tar.bz2 (or current release)
+  tar xjf wxWidgets-3.2.8.tar.bz2
+  cd wxWidgets-3.2.8
   mkdir buildgtk
   cd buildgtk
   ../configure --with-gtk
@@ -50,8 +50,8 @@ Then you install CAVASS:
   e [exit help]
   go down to CMAKE_BUILD_TYPE, press "enter", type "Release", press "enter"
   optionally go down to ITK_DIR, press "enter", type "../itk-build", press "enter"
-  go down to wxWidgets_CONFIG_EXECUTABLE, press "enter", type "../wxWidgets-3.2.4/buildgtk/wx-config, press "enter"
-  go down to wxWidgets_wxrc/EXECUTABLE, press "enter", type "../wxWidgets-3.2.4/buildgtk/utils/wxrc/wxrc", press "enter"
+  go down to wxWidgets_CONFIG_EXECUTABLE, press "enter", type "../wxWidgets-3.2.8/buildgtk/wx-config, press "enter"
+  go down to wxWidgets_wxrc/EXECUTABLE, press "enter", type "../wxWidgets-3.2.8/buildgtk/utils/wxrc/wxrc", press "enter"
   c [configure]
   g [generate and exit]
   make

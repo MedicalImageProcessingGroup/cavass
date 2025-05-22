@@ -5,10 +5,10 @@ Note: gcc --version
       shows that gcc on the mac is clang.
 
 Obtain wxWidgets source code. Then:
-  tar xjf ~/Downloads/wxWidgets-3.2.7.tar.bz2 
+  tar xjf ~/Downloads/wxWidgets-3.2.8.tar.bz2
   mkdir wx-build
   cd wx-build
-  ../wxWidgets-3.2.7/configure --with-png=no --enable-svg=no
+  ../wxWidgets-3.2.8/configure
   make
 
 (optional) Obtain ITK source code.
@@ -23,7 +23,7 @@ Obtain cavass source code.
   run cmake gui
     source code:       /Users/ggrevera/monday/cavass
     binaries:          /Users/ggrevera/monday/cavass-build
-    CMAKE_BUILD_TYPE:  Debug or Release
+    CMAKE_BUILD_TYPE:  Debug (or Release)
     ITK_DIR:           (optionally specify location)
     wxWidgets_CONFIG_EXECUTABLE:  /Users/ggrevera/monday/wx-build/wx-config
     wxWidgets_wxrc_EXECUTABLE:  /Users/ggrevera/monday/wx-build/utils/wxrc/wxrc
@@ -31,8 +31,8 @@ Obtain cavass source code.
 Edit (create, if necessary) ~/.zshrc. Add the following lines to the end:
   export VIEWNIX_ENV=~/cavass-build
   #the export below is necessary to run cavass w/ an icon
-  export PATH=$PATH:~/cavass-build/cavass.app/Contents/MacOS
   export PATH=$PATH:~/cavass-build
+  export PATH=$PATH:~/cavass-build/cavass.app/Contents/MacOS
   export WXSUPPRESS_SIZER_FLAGS_CHECK=1
 Open a new terminal window for these changes to take effect.
 -------------------------------------

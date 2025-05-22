@@ -86,7 +86,7 @@ protected:
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     void loadFile ( const char* const fn );
     void initLUT ( const int which );
-    void reload ( void );
+    void reload ( void ) override;
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     void OnChar       ( wxKeyEvent&   e );
     void OnLeftDown   ( wxMouseEvent& e );

@@ -741,7 +741,7 @@ if (wxWidgets_FOUND)
                 $<TARGET_FILE:cavass>
                 ${PROJECT_BINARY_DIR}/
             COMMMENT "copy cavass"
-        }
+        )
     endif (APPLE)
 
     add_executable( from_dicom  port_data/from_dicom.cpp port_data/read_acrnema.cpp )

@@ -167,7 +167,7 @@ class  SetUIDControls;
        </pre> </li>
   <li> Add the following to MainFrame::initializeMenu() in MainFrame.cpp:
        <pre>
-           help_menu->Append( ID_EXAMPLE, "&Export" );
+           mHelpMenu->Append( ID_EXAMPLE, "&Export" );
        </pre> </li>
  </ol>
  <h3> A note about callbacks... </h3>

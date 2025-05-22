@@ -114,7 +114,7 @@ class  Segment2dIntDLControls;
        </pre> </li>
   <li> Add the following to MainFrame::initializeMenu() in MainFrame.cpp:
        <pre>
-           help_menu->Append( ID_PP_SCOPS_SEGMENT_2DINTERACTIVE, "&Segment2d" );
+           mHelpMenu->Append( ID_PP_SCOPS_SEGMENT_2DINTERACTIVE, "&Segment2d" );
        </pre> </li>
  </ol>
  */
@@ -228,7 +228,7 @@ public:
         return match( filename );
     };
 
-	virtual void flush_temp_data ( );
+	void flush_temp_data ( ) override;
     void loadFile ( const char* const fname );
     void loadData ( char* name,
         const int xSize, const int ySize, const int zSize,
@@ -237,13 +237,13 @@ public:
         const ViewnixHeader* const vh=NULL, const bool vh_initialized=false );
     // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     virtual void OnGrayMap         ( wxCommandEvent& unused );
-    virtual void OnInput           ( wxCommandEvent& unused );
+    void OnInput           ( wxCommandEvent& unused ) override;
 	virtual void OnMouseWheel      ( wxMouseEvent& e );
     virtual void OnNext            ( wxCommandEvent& unused );
-    virtual void OnOpen            ( wxCommandEvent& unused );
+    void OnOpen            ( wxCommandEvent& unused ) override;
     virtual void OnPrevious        ( wxCommandEvent& unused );
-    virtual void OnPrint           ( wxCommandEvent& unused );
-    virtual void OnPrintPreview    ( wxCommandEvent& unused );
+    void OnPrint           ( wxCommandEvent& unused ) override;
+    void OnPrintPreview    ( wxCommandEvent& unused ) override;
 
     void OnInvert       ( wxCommandEvent& e );
     void OnOverlay      ( wxCommandEvent& e );  //used by Set Index

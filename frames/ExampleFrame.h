@@ -157,7 +157,7 @@ class  GrayMapControls;
        </pre> </li>
   <li> Add the following to MainFrame::initializeMenu() in MainFrame.cpp:
        <pre>
-           help_menu->Append( ID_EXAMPLE, "&Example" );
+           mHelpMenu->Append( ID_EXAMPLE, "&Example" );
        </pre> </li>
  </ol>
  <h3> A note about callbacks... </h3>

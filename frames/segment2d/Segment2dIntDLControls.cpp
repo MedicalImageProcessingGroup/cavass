@@ -311,7 +311,7 @@ void Segment2dIntDLControls::saveCurrentSlice ( bool ascii ) {
             }
         }
         fwrite( tmp, sizeof(unsigned short), rows*cols, fp );
-        delete tmp;
+        delete[] tmp;
         tmp = nullptr;
     }
     fclose( fp );

@@ -502,6 +502,8 @@ static void calledAtExit ( void ) {
 	//this is very important because it causes the write to the configuration file
     cout << "calledAtExit" << endl;
 
+    // @todo this code needs to be debugged. it causes a seg fault on mac.
+#if defined(__APPLE__) || defined(__MACH__)
     //save location
     wxPoint p;
     p = gLogWindow->GetFrame()->GetPosition();
@@ -514,6 +516,7 @@ static void calledAtExit ( void ) {
     Preferences::setShowLog_h( s.GetHeight() );
 
     delete wxConfigBase::Set( (wxConfigBase*)nullptr );
+#endif
 }
 //======================================================================
 /** \brief CavassMain definition and implementation.

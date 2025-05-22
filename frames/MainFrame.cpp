@@ -342,8 +342,8 @@ void MainFrame::initializeMenu ( void ) {
 #ifdef __MACH__
     mHideControls = new wxMenuItem( mWindowMenu, ID_WINDOW_HIDE_CONTROLS,
                                     "Hide Controls\tAlt-C" );
-    help_menu->Append( mHideControls );
-    help_menu->AppendSeparator();
+    mHelpMenu->Append( mHideControls );
+    mHelpMenu->AppendSeparator();
 #endif
     mHelpMenu->Append( ID_ABOUT,         "&About"       );
     mHelpMenu->Append( ID_HELP,          "&Help"        );
