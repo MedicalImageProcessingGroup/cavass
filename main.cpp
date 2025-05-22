@@ -503,7 +503,7 @@ static void calledAtExit ( void ) {
     cout << "calledAtExit" << endl;
 
     // @todo this code needs to be debugged. it causes a seg fault on mac.
-#if defined(__APPLE__) || defined(__MACH__)
+#if !defined(__APPLE__) && !defined(__MACH__)
     //save location
     wxPoint p;
     p = gLogWindow->GetFrame()->GetPosition();
