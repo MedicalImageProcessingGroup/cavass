@@ -1075,7 +1075,7 @@ if (APPLE)
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
                 $<TARGET_FILE:cavass>
-                ${PROJECT_BINARY_DIR}/
+                ${CMAKE_BINARY_DIR}/
             COMMMENT "Copying cavass executable to destination directory ${CMAKE_SYSTEM_VERSION} on Mac OS Sequioa"
         )
     endif()
