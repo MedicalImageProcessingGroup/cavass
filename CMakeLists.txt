@@ -1065,15 +1065,20 @@ if (PARALLEL)
 endif (PARALLEL)
 #------------------------------------------------------------------------------
 if (APPLE)
-    # why do i have to do this? i don't know. but if i don't,
-    # File --> Open will NOT show a dialog box on mac!
-    add_custom_command(
+    # mac os major version number (24 is sequoia, and is handled differently)
+    string( REGEX MATCH "^([0-9]+)" MACOS_VERSION_MAJOR "${CMAKE_SYSTEM_VERSION}" )
+    if ("${MACOS_VERSION_MAJOR}" STREQUAL "24")
+        # why do i have to do this? i don't know. but if i don't,
+        # File --> Open will NOT show a dialog box on mac!
+        add_custom_command(
             TARGET cavass
             POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
                 $<TARGET_FILE:cavass>
                 ${PROJECT_BINARY_DIR}/
-            COMMMENT "copying cavass executable to destination directory"
-    )
+            COMMMENT "Copying cavass executable to destination directory ${CMAKE_SYSTEM_VERSION} on Mac OS Sequioa"
+        )
+    endif()
 endif (APPLE)
 #------------------------------------------------------------------------------
+

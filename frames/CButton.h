@@ -6,6 +6,9 @@
  * probably need something based on this instead:
  * https://forums.wxwidgets.org/viewtopic.php?t=42202
  */
+#ifdef __MACH__
+    #define CButton wxButton
+#else
 class CButton : public wxButton {
 
 public:
@@ -26,4 +29,5 @@ private:
 
     DECLARE_EVENT_TABLE()
 };
+#endif
 
