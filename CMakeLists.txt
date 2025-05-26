@@ -1076,7 +1076,7 @@ if (APPLE)
             COMMAND ${CMAKE_COMMAND} -E copy
                 $<TARGET_FILE:cavass>
                 ${CMAKE_BINARY_DIR}/
-            COMMMENT "Copying cavass executable to destination directory ${CMAKE_SYSTEM_VERSION} on Mac OS Sequioa"
+            COMMMENT "Copying executable to destination directory ${CMAKE_SYSTEM_VERSION} on Mac OS Sequioa."
         )
     endif()
 endif (APPLE)
