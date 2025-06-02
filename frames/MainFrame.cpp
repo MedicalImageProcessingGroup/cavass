@@ -385,11 +385,11 @@ MainFrame::~MainFrame ( ) {
     }
     //if (mSplitter!=nullptr) { delete mSplitter;  mSplitter=nullptr; }
     //if (mCanvas!=NULL) { delete mCanvas;  mCanvas=NULL; }
-    delete mWindowMenu;      mWindowMenu = nullptr;
+    //delete mWindowMenu;      mWindowMenu = nullptr;
 #ifndef __MACH__
     //delete mHideControls;    mHideControls = nullptr;
 #endif
-    delete mHelpMenu;        mHelpMenu = nullptr;
+    //delete mHelpMenu;        mHelpMenu = nullptr;
 #if 1
     //if we are in the mode that supports having more than one window open
     // at a time, we need to remove this window from the list.
