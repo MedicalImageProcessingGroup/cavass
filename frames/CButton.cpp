@@ -6,6 +6,7 @@
  * has no effect on linux gtk!
  * haven't tested on mac yet.
  */
+#ifndef __MACH__
 CButton::CButton ( wxWindow* parent, wxWindowID id,
               const wxString& label,
               const wxPoint& pos,
@@ -52,4 +53,6 @@ BEGIN_EVENT_TABLE( CButton, wxButton )
     EVT_PAINT( CButton::paintEvent )
 END_EVENT_TABLE()
 #endif
+
+#endif //ndef __MACH__
 

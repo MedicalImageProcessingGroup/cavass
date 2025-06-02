@@ -499,24 +499,23 @@ unsigned char* toRGBInterpolated ( CavassData& cd, double sx, double sy ) {
 //----------------------------------------------------------------------
 //======================================================================
 static void calledAtExit ( void ) {
-	//this is very important because it causes the write to the configuration file
+    //this is very important because it causes the write to the
+    // configuration file
     cout << "calledAtExit" << endl;
 
-    // @todo this code needs to be debugged. it causes a seg fault on mac.
-#if !defined(__APPLE__) && !defined(__MACH__)
     //save location
-    wxPoint p;
-    p = gLogWindow->GetFrame()->GetPosition();
-    Preferences::setShowLog_x( p.x );
-    Preferences::setShowLog_y( p.y );
-    //save size
-    wxSize  s;
-    s = gLogWindow->GetFrame()->GetSize();
-    Preferences::setShowLog_w( s.GetWidth() );
-    Preferences::setShowLog_h( s.GetHeight() );
+    auto frame = gLogWindow->GetFrame();
+    if (frame != nullptr) {
+        auto p = frame->GetPosition();
+        Preferences::setShowLog_x( p.x );
+        Preferences::setShowLog_y( p.y );
+        //save size
+        auto s = frame->GetSize();
+        Preferences::setShowLog_w( s.GetWidth() );
+        Preferences::setShowLog_h( s.GetHeight() );
+    }
 
     delete wxConfigBase::Set( (wxConfigBase*)nullptr );
-#endif
 }
 //======================================================================
 /** \brief CavassMain definition and implementation.
