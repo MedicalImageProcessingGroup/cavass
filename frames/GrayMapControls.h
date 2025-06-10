@@ -35,6 +35,7 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
+#include "CCheckBox.h"
 /**
  * \brief Definition and implementation of GrayMapControls class.
  *
@@ -45,7 +46,6 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
  */
 class GrayMapControls {
     wxSizer*          mBottomSizer;  ///< DO NOT DELETE in dtor!
-    wxCheckBox*       mCb;           ///< invert the gray map checkbox
     wxSlider*         mLevel;        ///< window level slider
 //    wxStaticBox*      mContrastBox;
     wxSizer*          mContrastBoxSizer;
@@ -61,6 +61,7 @@ class GrayMapControls {
 public:
 //    static const string levelGroupDefault, widthGroupDefault, invertGroupDefault;
 //    static const string levelNameDefault,  widthNameDefault,  invertNameDefault;
+    CCheckBox* m_cb_invert; ///< invert the gray map checkbox
 
     GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer, const char* title,
                       int currentLevel, int currentWidth,int max, bool currentInvert,

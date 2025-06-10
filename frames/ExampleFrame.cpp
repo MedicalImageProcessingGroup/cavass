@@ -477,7 +477,8 @@ void ExampleFrame::loadFile ( const char* const fname ) {
     canvas->loadFile( fname );
     cout << "loadFile after: size is now (w,h)=" << GetSize().GetWidth() << "," << GetSize().GetHeight() << endl;
 	if (!canvas->isLoaded(0)) {
-		delete m_buttonBox;
+		//delete m_buttonBox;
+	    m_buttonBox->Destroy();
 		m_buttonBox = nullptr;
 		mFileOrDataCount = 0;
 		return;
@@ -700,7 +701,7 @@ void ExampleFrame::OnPrintPreview ( wxCommandEvent& unused ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for invert checkbox for data set  */
 void ExampleFrame::OnInvert ( wxCommandEvent& e ) {
-    bool  value = e.IsChecked();
+    bool  value  = mGrayMapControls->m_cb_invert->GetValue();
     auto  canvas = dynamic_cast<ExampleCanvas*>(mCanvas);
     canvas->setInvert( 0, value );
     canvas->initLUT( 0 );

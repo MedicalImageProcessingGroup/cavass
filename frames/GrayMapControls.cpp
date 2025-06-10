@@ -33,6 +33,8 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 //======================================================================
 #include "cavass.h"
 #include "GrayMapControls.h"
+#include "CButton.h"
+#include "CCheckBox.h"
 
 /** strings for preferences */
 //const string GrayMapControls::levelGroupDefault  = "Persistent_Options/wxSlider/graymap.level";
@@ -78,8 +80,9 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
     mBottomSizer = bottomSizer;
 
     auto mContrastBox = new wxStaticBox(cp, wxID_ANY, title);
-    ::setSliderBoxColor( mContrastBox );
+    //::setSliderBoxColor( mContrastBox );
     //::setBackgroundColor( mContrastBox );
+    //::setBoxColor( mContrastBox );
     mContrastBoxSizer = new wxStaticBoxSizer(mContrastBox, wxVERTICAL);
     mContrastBoxSizer->SetMinSize(controlsWidth*3, 0);
 
@@ -112,26 +115,26 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
     auto presetsSizer = new wxGridSizer( 0, 2, 0, 0 );
     //add optional preset buttons
     if (lungID != wxID_ANY) {  //ct lung
-        auto mLung = new wxButton(mContrastBox, lungID, _("CT lung"), wxDefaultPosition, wxDefaultSize, 0);
+        auto mLung = new CButton(mContrastBox, lungID, _("CT lung"), wxDefaultPosition, wxDefaultSize, 0);
         presetsSizer->Add(mLung, 1, wxALL|wxEXPAND, 15);
     }
     if (softTissueID != wxID_ANY) {  //ct soft tissue
-        auto mSoftTissue = new wxButton(mContrastBox, softTissueID, _("CT soft tissue"), wxDefaultPosition,
+        auto mSoftTissue = new CButton(mContrastBox, softTissueID, _("CT soft tissue"), wxDefaultPosition,
                                         wxDefaultSize, 0);
         presetsSizer->Add(mSoftTissue, 1, wxALL|wxEXPAND, 15);
     }
     if (boneID != wxID_ANY) {  //ct bone
-        auto mBone = new wxButton(mContrastBox, boneID, _("CT bone"), wxDefaultPosition, wxDefaultSize, 0);
+        auto mBone = new CButton(mContrastBox, boneID, _("CT bone"), wxDefaultPosition, wxDefaultSize, 0);
         presetsSizer->Add(mBone, 1, wxALL|wxEXPAND, 15);
     }
     if (PETID != wxID_ANY) {  //pet
-        auto mPET = new wxButton(mContrastBox, PETID, _("PET"), wxDefaultPosition, wxDefaultSize, 0);
+        auto mPET = new CButton(mContrastBox, PETID, _("PET"), wxDefaultPosition, wxDefaultSize, 0);
         presetsSizer->Add(mPET, 0, wxALL|wxEXPAND, 15);
     }
     if (invertID != wxID_ANY) {
         presetsSizer->Add( 0, 5, 10, wxGROW );  //spacer
-        mCb = new wxCheckBox( mContrastBox, invertID, _("invert on/off"), wxDefaultPosition, wxDefaultSize, 0 );
-        ::setColor( mCb );
+        mCb = new CCheckBox( mContrastBox, invertID, _("invert on/off"), wxDefaultPosition, wxDefaultSize, 0 );
+//::setColor( mCb );
         mCb->SetValue( currentInvert );
         mCb->SetName( invertName );  //very important for persistence
         presetsSizer->Add( mCb, 0, wxALL|wxEXPAND, 15 );
@@ -195,8 +198,8 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         ::setColor(mSt2);
         mContrastSizer->Add(mSt2, 0, wxRIGHT);
 
-        mCb = new wxCheckBox(cp, invertID, "On/Off");
-        ::setColor(mCb);
+        mCb = new CCheckBox(cp, invertID, "On/Off");
+//::setColor(mCb);
         mCb->SetValue(currentInvert);
         mContrastSizer->Add(mCb, 0, wxALIGN_RIGHT, 2 * ButtonOffset);
     } else {
@@ -205,7 +208,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
     }
     // - - - - - - - - - -
     if (lungID != wxID_ANY) {
-        mLung = new wxButton(cp, lungID, "CT Lung", wxDefaultPosition,
+        mLung = new CButton(cp, lungID, "CT Lung", wxDefaultPosition,
                              wxSize(buttonWidth, buttonHeight));
         ::setColor(mLung);
         mContrastSizer->Add(mLung, 0, wxRIGHT);
@@ -213,7 +216,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         mLung = nullptr;
     }
     if (softTissueID != wxID_ANY) {
-        mSoftTissue = new wxButton(cp, softTissueID, "CT Soft Tissue",
+        mSoftTissue = new CButton(cp, softTissueID, "CT Soft Tissue",
                                    wxDefaultPosition, wxSize(buttonWidth, buttonHeight));
         ::setColor(mSoftTissue);
         mContrastSizer->Add(mSoftTissue, 0, wxRIGHT);
@@ -221,7 +224,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         mSoftTissue = nullptr;
     }
     if (boneID != wxID_ANY) {
-        mBone = new wxButton( cp, boneID, "CT Bone", wxDefaultPosition,
+        mBone = new CButton( cp, boneID, "CT Bone", wxDefaultPosition,
             wxSize(buttonWidth,buttonHeight) );
         ::setColor( mBone );
         mContrastSizer->Add( mBone, 0, wxRIGHT );
@@ -229,7 +232,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         mBone = nullptr;
     }
     if (PETID != wxID_ANY) {
-        mPET = new wxButton( cp, PETID, "PET", wxDefaultPosition,
+        mPET = new CButton( cp, PETID, "PET", wxDefaultPosition,
             wxSize(buttonWidth,buttonHeight) );
         ::setColor( mPET );
         mContrastSizer->Add( mPET, 0, wxRIGHT );
@@ -268,8 +271,9 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
     mBottomSizer = bottomSizer;
 
     auto mContrastBox = new wxStaticBox(cp, wxID_ANY, title);
-    ::setSliderBoxColor( mContrastBox );
+    //::setSliderBoxColor( mContrastBox );
     //::setBackgroundColor( mContrastBox );
+    ::setBoxColor( mContrastBox );
     mContrastBoxSizer = new wxStaticBoxSizer(mContrastBox, wxVERTICAL);
     //mContrastBoxSizer->SetMinSize(controlsWidth*3, 0);
     mContrastBoxSizer->SetMinSize((int)(0.30*cp->GetSize().x), 0);
@@ -301,28 +305,28 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
     auto presetsSizer = new wxGridSizer( 0, 2, 0, 0 );
     //add optional preset buttons
     if (lungID != wxID_ANY) {  //ct lung
-        auto mLung = new wxButton(mContrastBox, lungID, _("CT lung"), wxDefaultPosition, wxDefaultSize, 0);
+        auto mLung = new CButton(mContrastBox, lungID, _("CT lung"), wxDefaultPosition, wxDefaultSize, 0);
         presetsSizer->Add(mLung, 1, wxALL|wxEXPAND, 15);
     }
     if (softTissueID != wxID_ANY) {  //ct soft tissue
-        auto mSoftTissue = new wxButton(mContrastBox, softTissueID, _("CT soft tissue"), wxDefaultPosition,
+        auto mSoftTissue = new CButton(mContrastBox, softTissueID, _("CT soft tissue"), wxDefaultPosition,
                                         wxDefaultSize, 0);
         presetsSizer->Add(mSoftTissue, 1, wxALL|wxEXPAND, 15);
     }
     if (boneID != wxID_ANY) {  //ct bone
-        auto mBone = new wxButton(mContrastBox, boneID, _("CT bone"), wxDefaultPosition, wxDefaultSize, 0);
+        auto mBone = new CButton(mContrastBox, boneID, _("CT bone"), wxDefaultPosition, wxDefaultSize, 0);
         presetsSizer->Add(mBone, 1, wxALL|wxEXPAND, 15);
     }
     if (PETID != wxID_ANY) {  //pet
-        auto mPET = new wxButton(mContrastBox, PETID, _("PET"), wxDefaultPosition, wxDefaultSize, 0);
+        auto mPET = new CButton(mContrastBox, PETID, _("PET"), wxDefaultPosition, wxDefaultSize, 0);
         presetsSizer->Add(mPET, 0, wxALL|wxEXPAND, 15);
     }
     if (invertID != wxID_ANY) {
         presetsSizer->Add( 0, 5, 10, wxGROW );  //spacer
-        mCb = new wxCheckBox( mContrastBox, invertID, _("invert on/off"), wxDefaultPosition, wxDefaultSize, 0 );
-        ::setSliderBoxColor( mCb );
-        mCb->SetValue( currentInvert );
-        presetsSizer->Add( mCb, 0, wxALL|wxEXPAND, 15 );
+        m_cb_invert = new CCheckBox( mContrastBox, invertID, _("invert on/off"), wxDefaultPosition, wxDefaultSize, 0 );
+//::setSliderBoxColor( mCb );
+        m_cb_invert->SetValue( currentInvert );
+        presetsSizer->Add( m_cb_invert, 0, wxALL|wxEXPAND, 15 );
     }
     gmFGSizer->Add( presetsSizer, 0, wxALIGN_CENTER|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0 );
     mContrastBoxSizer->Add( gmFGSizer, 1, wxEXPAND, 5 );
@@ -377,8 +381,8 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         ::setColor(mSt2);
         mContrastSizer->Add(mSt2, 0, wxRIGHT);
 
-        mCb = new wxCheckBox(cp, invertID, "On/Off");
-        ::setColor(mCb);
+        mCb = new CCheckBox(cp, invertID, "On/Off");
+//::setColor(mCb);
         mCb->SetValue(currentInvert);
         mContrastSizer->Add(mCb, 0, wxALIGN_RIGHT, 2 * ButtonOffset);
     } else {
@@ -387,7 +391,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
     }
     // - - - - - - - - - -
     if (lungID != wxID_ANY) {
-        mLung = new wxButton(cp, lungID, "CT Lung", wxDefaultPosition,
+        mLung = new CButton(cp, lungID, "CT Lung", wxDefaultPosition,
                              wxSize(buttonWidth, buttonHeight));
         ::setColor(mLung);
         mContrastSizer->Add(mLung, 0, wxRIGHT);
@@ -395,7 +399,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         mLung = nullptr;
     }
     if (softTissueID != wxID_ANY) {
-        mSoftTissue = new wxButton(cp, softTissueID, "CT Soft Tissue",
+        mSoftTissue = new CButton(cp, softTissueID, "CT Soft Tissue",
                                    wxDefaultPosition, wxSize(buttonWidth, buttonHeight));
         ::setColor(mSoftTissue);
         mContrastSizer->Add(mSoftTissue, 0, wxRIGHT);
@@ -403,7 +407,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         mSoftTissue = nullptr;
     }
     if (boneID != wxID_ANY) {
-        mBone = new wxButton( cp, boneID, "CT Bone", wxDefaultPosition,
+        mBone = new CButton( cp, boneID, "CT Bone", wxDefaultPosition,
             wxSize(buttonWidth,buttonHeight) );
         ::setColor( mBone );
         mContrastSizer->Add( mBone, 0, wxRIGHT );
@@ -411,7 +415,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
         mBone = nullptr;
     }
     if (PETID != wxID_ANY) {
-        mPET = new wxButton( cp, PETID, "PET", wxDefaultPosition,
+        mPET = new CButton( cp, PETID, "PET", wxDefaultPosition,
             wxSize(buttonWidth,buttonHeight) );
         ::setColor( mPET );
         mContrastSizer->Add( mPET, 0, wxRIGHT );
@@ -439,7 +443,7 @@ GrayMapControls::GrayMapControls ( wxPanel* cp, wxSizer* bottomSizer,
 void GrayMapControls::update_sliders ( int newLevel, int newWidth, bool invert ) {
     mLevel->SetValue(newLevel);
     mWidth->SetValue(newWidth);
-    if (mCb)    mCb->SetValue( invert );
+    if (m_cb_invert)    m_cb_invert->SetValue( invert );
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief GrayMapControls dtor. */

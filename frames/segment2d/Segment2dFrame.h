@@ -57,7 +57,6 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
     #include  <unistd.h>
 #endif
 #include <cstdlib>  // #include  <stdlib.h>
-#include "CComboBox.h"
 
 class  GrayMapControls;
 class  SetIndexControls;
@@ -195,7 +194,7 @@ public:
 	wxButton*      m_setIndex;
 	wxButton*      m_grayMap;
 	wxStaticText  *mModeLabel{};
-	CComboBox    *mMode;
+	wxComboBox    *mMode;
 	//CComboBox*     mMode;
 	wxButton*      m_reset;
 	wxStaticText  *m_objectLabel{};
@@ -203,7 +202,7 @@ public:
 	wxButton      *m_deleteObject;
 	wxButton      *m_loadObject;
 	wxCheckBox    *m_defaultFill;
-	wxCheckBox    *m_overlay;  //used by Set Index
+	wxCheckBox    *m_overlay;  //used by Set Index?
 	wxCheckBox    *m_layout;
 	wxButton*      m_setOutputBut;
 #if wxUSE_DRAG_AND_DROP

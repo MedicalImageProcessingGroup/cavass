@@ -246,6 +246,7 @@ void Segment2dIntDLControls::loadModel ( wxString& fn ) {
     }
 #endif
     mModelLoaded = true;
+    setButtonState();
 }
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /**
@@ -399,7 +400,6 @@ void Segment2dIntDLControls::reset ( ) {
     if (mAlpha  != nullptr) {  delete mAlpha;     mAlpha  = nullptr;  }
     if (mBitmap != nullptr) {  delete mBitmap;    mBitmap = nullptr;  }
     mFirstCornerSpecified = mSecondCornerSpecified = false;
-    mdx1 = mdy1 = mdx2 = mdy2 = -1;
     mdx1 = mdy1 = mdx2 = mdy2 = -1;
     //m_sliceNo = c->mCavassData->m_sliceNo;
     mShow = true;

@@ -37,23 +37,16 @@ along with CAVASS.  If not, see <http://www.gnu.org/licenses/>.
 Preferences*   Preferences::_instance    = nullptr;
 wxConfigBase*  Preferences::_preferences = nullptr;
 
-int            Preferences::_bgBlue  = 90;
-int            Preferences::_bgGreen = 80;
-int            Preferences::_bgRed   = 80;
 long           Preferences::_customAppearance = 1;
-#ifdef USING_GTK
-    //change the foreground because gtk doesn't allow us to change the
-    // background for buttons
-    //gray
-    int        Preferences::_fgBlue  = 50;
-    int        Preferences::_fgGreen = 50;
-    int        Preferences::_fgRed   = 50;
-#else
-    //yellow
-    int        Preferences::_fgBlue  = 167;
-    int        Preferences::_fgGreen = 255;
-    int        Preferences::_fgRed   = 255;
-#endif
+//background color (dark blue):
+int            Preferences::_bgBlue  = 89;
+int            Preferences::_bgGreen = 69;
+int            Preferences::_bgRed   = 69;
+//foreground color (yellow):
+int            Preferences::_fgBlue  = 167;
+int            Preferences::_fgGreen = 255;
+int            Preferences::_fgRed   = 255;
+
 wxString       Preferences::_file[ Preferences::FileCount ];
 wxString       Preferences::_hostNames( "" );
 wxString       Preferences::_hostProcessCounts( "" );

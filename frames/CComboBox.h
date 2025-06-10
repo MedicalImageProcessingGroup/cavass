@@ -17,8 +17,8 @@ public:
                 const wxString& name = wxComboBoxNameStr  )
         : wxOwnerDrawnComboBox( parent, id, value, pos, size, choices, style, validator, name )
     {
-        SetBackgroundColour( wxColour(255, 0, 0) );    //ignored on gtk
-        SetForegroundColour( wxColour(255, 0, 255) );  //ignored on gtk
+//        SetBackgroundColour( wxColour(255, 0, 0) );    //ignored on gtk
+//        SetForegroundColour( wxColour(255, 0, 255) );  //ignored on gtk
     }
 #if 0
     void OnDrawBackground ( wxDC& dc, const wxRect& rect, int item, int flags )
@@ -40,7 +40,6 @@ public:
         dc.SetPen( wxPen(bgCol) );
         dc.DrawRectangle( rect );
     }
-#endif
     void OnDrawItem ( wxDC& dc, const wxRect& rect, int item, int flags )
     const override
     {
@@ -72,6 +71,7 @@ public:
     wxCoord OnMeasureItem ( int item ) const {
          return GetTextExtent( GetString(item) ).GetHeight() + 6;
     }
+#endif
 
     wxString GetStringSelection ( ) const override {
         return wxItemContainerImmutable::GetStringSelection();
@@ -79,8 +79,38 @@ public:
     }
 
 };
-
+//----------------------------------------------------------------------
 #else
-#define CComboBox wxComboBox
+//#define CComboBox wxComboBox
+class CComboBox : public wxComboBox {
+public:
+    CComboBox ( wxWindow* parent,
+                wxWindowID id,
+                const wxString& value,
+                const wxPoint& pos,
+                const wxSize& size,
+                const wxArrayString& choices,
+                const long style = 0,
+                const wxValidator& validator = wxDefaultValidator,
+                const wxString& name = wxComboBoxNameStr )
+        : wxComboBox( parent, id, value, pos, size, choices, style,
+                      validator, name )
+    {
+        if (Preferences::getCustomAppearance()) {
+            int  r, g, b;
+
+            r = Preferences::getBgRed();
+            g = Preferences::getBgGreen();
+            b = Preferences::getBgBlue();
+            SetBackgroundColour( wxColour(r,g,b) );
+
+            r = Preferences::getFgRed();
+            g = Preferences::getFgGreen();
+            b = Preferences::getFgBlue();
+            SetForegroundColour( wxColour(r,g,b) );
+        }
+    }
+};
 #endif
+//----------------------------------------------------------------------
 

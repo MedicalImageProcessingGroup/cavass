@@ -436,7 +436,7 @@ void Segment2dFrame::addButtonBox ( ) {
     }
     mMode = new CComboBox( m_buttonBox, ID_MODE, modeName[canvas->detection_mode], wxDefaultPosition, wxDefaultSize, sa, wxCB_READONLY );
     //mMode = new CComboBox( m_buttonBox, ID_MODE, modeName[canvas->detection_mode], wxDefaultPosition, wxDefaultSize, sa, wxCB_READONLY );
-    ::setColor( mMode );
+//    ::setColor( mMode );
     gs->Add( mMode, 1, wxEXPAND, border );
 #if defined(wxUSE_TOOLTIPS) && !defined(__WXX11__)
     mMode->SetToolTip(  "disabled when Layout is checked" );
@@ -503,6 +503,7 @@ Segment2dFrame::~Segment2dFrame ( ) {
     cout << "Segment2dFrame::~Segment2dFrame" << endl;
     wxLogMessage( "Segment2dFrame::~Segment2dFrame" );
 
+return; //gjg: free nada!
 #if wxUSE_DRAG_AND_DROP
     delete m_dropTarget;    m_dropTarget = nullptr;
 #endif
@@ -1206,7 +1207,7 @@ void Segment2dFrame::doLayout ( bool isChecked ) {
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 /** \brief callback for invert checkbox for data set  */
 void Segment2dFrame::OnInvert ( wxCommandEvent& e ) {
-    bool  value = e.IsChecked();
+    bool  value  = mGrayMapControls->m_cb_invert->GetValue();
     Segment2dCanvas*  canvas = dynamic_cast<Segment2dCanvas*>(mCanvas);
     canvas->setInvert( 0, value );
     canvas->initLUT( 0 );

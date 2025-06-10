@@ -435,7 +435,8 @@ Segment2dAuxControls::Segment2dAuxControls ( Segment2dFrame* frame,
     mCp = cp;
     mBottomSizer = bottomSizer;
     mAuxBox = new wxStaticBox( cp, -1, title );
-    ::setSliderBoxColor( mAuxBox );
+    //::setSliderBoxColor( mAuxBox );
+    ::setBoxColor( mAuxBox );
     mAuxSizer = new wxStaticBoxSizer( mAuxBox, wxHORIZONTAL );
     mFgs = new wxFlexGridSizer( 3, 0, 5 );  //cols,vgap,hgap
     mFgs->SetMinSize( controlsWidth, 0 );

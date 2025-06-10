@@ -21,7 +21,8 @@ SetIndexControls::SetIndexControls( wxPanel* cp, wxSizer* bottomSizer,
     mBottomSizer = bottomSizer;
     mSetIndexBox = new wxStaticBox(cp, -1, title);
     //mSetIndexBox->SetSize( cp->GetSize().x/3, 0 );
-    ::setSliderBoxColor(mSetIndexBox);
+    //::setSliderBoxColor(mSetIndexBox);
+    ::setBoxColor( mSetIndexBox );
     mSetIndexSizer = new wxStaticBoxSizer(mSetIndexBox, wxHORIZONTAL);
     //mSetIndexSizer->SetMinSize(cp->GetSize().x/3, 0);
     mFgs = new wxFlexGridSizer(2, 0, 5);  //2 cols,vgap,hgap
