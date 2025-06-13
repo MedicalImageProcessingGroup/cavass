@@ -1062,7 +1062,8 @@ void Segment2dCanvas::OnMouseMove ( wxMouseEvent& e ) {
                 // cerr << "Segment2dCanvas::OnMouseMove @todo handle INT_DL" << endl;
                 {
                     auto f = dynamic_cast<Segment2dFrame*>( m_parent_frame );
-                    f->mIntDLControls->doMouseMove( e, pt.x, pt.y );
+                    if (f != nullptr && f->mIntDLControls != nullptr)
+                        f->mIntDLControls->doMouseMove( e, pt.x, pt.y );
                 }
                 break;
 

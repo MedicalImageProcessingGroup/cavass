@@ -1,3 +1,9 @@
+
+contents:
+    a. build/install cavass
+    b. cavass & git (source code repository)
+    c. cavass & clion ide
+
 --------------------
 build/install cavass
 --------------------
@@ -21,12 +27,12 @@ Obtain cavass source code.
   git clone https://github.com/MedicalImageProcessingGroup/cavass.git
   mkdir cavass-build
   run cmake gui
-    source code:       /Users/ggrevera/monday/cavass
-    binaries:          /Users/ggrevera/monday/cavass-build
+    source code:       /Users/ggrevera/software/cavass
+    binaries:          /Users/ggrevera/software/cavass-build
     CMAKE_BUILD_TYPE:  Debug (or Release)
     ITK_DIR:           (optionally specify location)
-    wxWidgets_CONFIG_EXECUTABLE:  /Users/ggrevera/monday/wx-build/wx-config
-    wxWidgets_wxrc_EXECUTABLE:  /Users/ggrevera/monday/wx-build/utils/wxrc/wxrc
+    wxWidgets_CONFIG_EXECUTABLE:  /Users/ggrevera/software/wx-build/wx-config
+    wxWidgets_wxrc_EXECUTABLE:  /Users/ggrevera/software/wx-build/utils/wxrc/wxrc
 
 Edit (create, if necessary) ~/.zshrc. Add the following lines to the end:
   export VIEWNIX_ENV=~/cavass-build
@@ -35,10 +41,12 @@ Edit (create, if necessary) ~/.zshrc. Add the following lines to the end:
   export PATH=$PATH:~/cavass-build/cavass.app/Contents/MacOS
   export WXSUPPRESS_SIZER_FLAGS_CHECK=1
 Open a new terminal window for these changes to take effect.
+cd ~/cavass-build
+make -j 5
 -------------------------------------
 cavass & git (source code repository)
 -------------------------------------
-Note: All git commands (except clone) must be in CAVASS source dir.
+Note: All git commands (except clone) _must_ be in CAVASS source dir.
 Useful git commands:
   1. obtain a complete copy of CAVASS (from a remote repository)
        git clone https://github.com/MedicalImageProcessingGroup/cavass.git
@@ -78,16 +86,16 @@ My personal/suggested workflow:
           git push -u origin master
   Note: One may repeat this throughout the day as often as one wishes.
 --------------------
-cavass and clion ide
+cavass & clion ide
 --------------------
 1. Build cavass as per above.
-2. Open cavass-build as a makefile (not cmake) project.
+2. Open cavass-build as a makefile (_NOT_ cmake) project.
 3. Clean and rebuild all of cavass.
-4. To debug cavass using the clion, you must tell clion where it is.
-   Select cavass from the menu between the hammer and run and debug icons.
+4. To debug cavass using the clion, you must first tell clion where it is.
+   Select cavass from the menu near the hammer, run, and debug icons.
    Select cavass --> > --> Edit... and specify executable (e.g.,
-   ~/monday/cavass-build/cavass.app/Contents/MacOS/cavass).
-5. Source code appears in Project --> External Sources.
+   /Users/ggrevera/software/cavass-build/cavass.app/Contents/MacOS/cavass).
+5. Source code appears in Project --> cavass-build --> cavass.
    main.cpp is where cavass starts (in CavassMain::OnInit()).
 
 Note: cavass --> > --> Run 'cavass' with Valgring Memcheck is available

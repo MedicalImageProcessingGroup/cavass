@@ -1004,6 +1004,7 @@ endif (MSVC)
 
 #copy ml code & models
 if (MSVC)
+    message( "Copying ML code (windows)." )
     EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/
                                                      ${CAVASS_BINARY_DIR}/Release/ )
     EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/
@@ -1012,7 +1013,11 @@ if (MSVC)
                                                      ${CAVASS_BINARY_DIR}/Release/segment_anything/ )
     EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/segment_anything/
                                                      ${CAVASS_BINARY_DIR}/Debug/segment_anything/ )
+elseif (APPLE)
+    message( "Copying ML code (mac)." )
+    file( COPY ${CAVASS_SOURCE_DIR}/ml/ DESTINATION ${CAVASS_BINARY_DIR}/ )
 else (MSVC)
+    message( "Copying ML code (linux)." )
     EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/
                                                      ${CAVASS_BINARY_DIR}/ )
     EXECUTE_PROCESS( COMMAND cmake -E copy_directory ${CAVASS_SOURCE_DIR}/ml/segment_anything/
@@ -1067,7 +1072,7 @@ endif (PARALLEL)
 if (APPLE)
     # mac os major version number (24 is sequoia, and is handled differently)
     string( REGEX MATCH "^([0-9]+)" MACOS_VERSION_MAJOR "${CMAKE_SYSTEM_VERSION}" )
-    if ("${MACOS_VERSION_MAJOR}" STREQUAL "24")
+    #if ("${MACOS_VERSION_MAJOR}" STREQUAL "24")
         # why do i have to do this? i don't know. but if i don't,
         # File --> Open will NOT show a dialog box on mac!
         add_custom_command(
@@ -1078,7 +1083,7 @@ if (APPLE)
                 ${CMAKE_BINARY_DIR}/
             COMMENT "Copying executable to destination directory ${CMAKE_SYSTEM_VERSION} on Mac OS Sequioa."
         )
-    endif()
+    #endif()
 endif (APPLE)
 #------------------------------------------------------------------------------
 

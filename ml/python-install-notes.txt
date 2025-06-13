@@ -1,7 +1,8 @@
 download and install python
 
 for computer w/OUT gpu:
-    open a command prompt window and enter the following commands:
+    open a command prompt window and enter the following commands
+    (use pip3 on mac):
         pip install numpy
         pip install matplotlib
         pip install torch
@@ -15,9 +16,35 @@ for computer WITH gpu:
         pip install matplotlib
         pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
         pip install scikit-image
-
+-----
+ignore: WARNING: The scripts ... are installed in ~/Library/Python/3.9/bin which is not on PATH.
+-----
+test python installation:
+python3
+import torch
+x = torch.rand(5, 3)
+print( x )
+exit()
+-----
 if one makes a mistake and installs w/OUT gpu and then needs to install WITH gpu:
     pip uninstall torch torchvision torchaudio
-    pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+-----
+(untested) install sam2 + models:
+
+git clone https://github.com/facebookresearch/sam2.git
+cd sam2
+cd checkpoints
+./download_ckpts.sh
+ls
+
+download_ckpts.sh		sam2.1_hiera_small.pt
+sam2.1_hiera_base_plus.pt	sam2.1_hiera_tiny.pt
+sam2.1_hiera_large.pt
+-----
+(tested) instructions for medsam models: https://github.com/bowang-lab/MedSAM?tab=readme-ov-file
+(untested) instructions for litemedsam: https://github.com/bowang-lab/MedSAM?tab=readme-ov-file
+(untested) instructions for medsam2 models: https://github.com/bowang-lab/MedSAM2/tree/main/checkpoints
+-----
 
 

@@ -456,15 +456,10 @@ void Segment2dIntDLControls::doRun ( ) {
 
     wxString sep = wxFileName::GetPathSeparator();
     wxString device = (mUseGPU->IsChecked()) ? "gpu" : "cpu";
-#if defined(__APPLE__) || defined(__MACH__)
-    wxString path = "python3 " + Preferences::getHome() + sep
-                    + "dist" + sep + "inference" + sep;
-#else
     wxString path = "python3 " + Preferences::getHome() + sep;
-#endif
     wxString tmp = wxString::Format(
                 // "python inference.py --box [%d,%d,%d,%d] --data_path %s --device %s --seg_path %s --checkpoint %s",
-                "%sinference.py --box [%d,%d,%d,%d] --data_path %s --device %s --seg_path %s --checkpoint %s",
+                "%sinference.py --box '[%d,%d,%d,%d]' --data_path %s --device %s --seg_path %s --checkpoint %s",
                 path.c_str(),
                 left, top, right, bottom,
                 mInSlice.c_str(),

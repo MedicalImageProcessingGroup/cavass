@@ -152,10 +152,10 @@ void PersistentSegment2dFrame::saveGeneralSettings ( ) const {
         SaveValue(w_sashPos, sashPosVal);
     }
 
+#if 0
     //save canvas specific items
     auto canvas = dynamic_cast<Segment2dCanvas*>( w->mCanvas );
     assert(canvas != nullptr);
-#if 0
     /** \todo disabled for now; needs work. to demonstrate problem:
      * 1. set scale to a large value.
      * 2. move image around.
@@ -179,13 +179,14 @@ void PersistentSegment2dFrame::saveInteractive2dSettings ( ) const {
     if (canvas == nullptr)    return;
 
     //save main controls (Interactive2D) settings: mode, default fill, layout, and overlay
-    //SaveValue( m_lastMode, w->mMode->GetStringSelection() );
+    SaveValue( m_lastMode, w->mMode->GetStringSelection() );
+#if 0  //causes seg fault on mac
     SaveValue( m_lastMode, w->modeName[canvas->detection_mode] );
     if ( w->mMode->GetStringSelection() != w->modeName[canvas->detection_mode] ) {
         cerr << "mMode = " << w->mMode->GetStringSelection() << ", modeName = " << w->modeName[canvas->detection_mode] << endl;
         assert( w->mMode->GetStringSelection() == w->modeName[canvas->detection_mode] );
     }
-
+#endif
     SaveValue( c_defaultFillOn, w->m_defaultFill->IsChecked() );
     SaveValue( c_layout, w->m_layout->IsChecked() );
     SaveValue( c_object, w->m_object->GetStringSelection() );
