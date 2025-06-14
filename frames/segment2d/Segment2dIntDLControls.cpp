@@ -457,8 +457,8 @@ void Segment2dIntDLControls::doRun ( ) {
     wxString sep = wxFileName::GetPathSeparator();
 
     wxString device = "cpu";  //default
-    if (mUseGPU->IsChecked())    device = "mps";
 #if defined(__APPLE__) || defined(__MACH__)
+    if (mUseGPU->IsChecked())    device = "mps";
 #else
     if (mUseGPU->IsChecked())    device = "cuda";
 #endif
