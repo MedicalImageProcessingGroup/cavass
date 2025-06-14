@@ -455,11 +455,22 @@ void Segment2dIntDLControls::doRun ( ) {
     // python inference.py --box [84,309,114,343] --data_path C:\Users\george\AppData\Local\Temp\cav3FB9.tmp.pgm --device cpu --seg_path C:\Users\george\AppData\Local\Temp --checkpoint C:\Users\george\Desktop\medsam_vit_b.pth
 
     wxString sep = wxFileName::GetPathSeparator();
-    wxString device = (mUseGPU->IsChecked()) ? "gpu" : "cpu";
+
+    wxString device = "cpu";  //default
+    if (mUseGPU->IsChecked())    device = "mps";
+#if defined(__APPLE__) || defined(__MACH__)
+#else
+    if (mUseGPU->IsChecked())    device = "cuda";
+#endif
+
+#ifdef WIN32
+    wxString path = "python " + Preferences::getHome() + sep;
+#else
     wxString path = "python3 " + Preferences::getHome() + sep;
+#endif
+
     wxString tmp = wxString::Format(
-                // "python inference.py --box [%d,%d,%d,%d] --data_path %s --device %s --seg_path %s --checkpoint %s",
-                "%sinference.py --box '[%d,%d,%d,%d]' --data_path %s --device %s --seg_path %s --checkpoint %s",
+                "%sinference.py --box \"[%d,%d,%d,%d]\" --data_path %s --device %s --seg_path %s --checkpoint %s",
                 path.c_str(),
                 left, top, right, bottom,
                 mInSlice.c_str(),
